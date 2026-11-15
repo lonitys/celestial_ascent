@@ -169,6 +169,28 @@ class Bone:
         return out
 
 
+    def curve_spike(self, base, dirs, lengths, widths, mat, spin=45.0, inflate=0.0, overlap=0.7, **params):
+        """Curved horn/flame: one box per segment, each along its own direction, chained tip to base."""
+        p0 = np.asarray(base, dtype=float)
+        total = float(sum(lengths))
+        acc = 0.0
+        out = []
+        n = len(lengths)
+        for k, (d, L, w) in enumerate(zip(dirs, lengths, widths)):
+            d = unit(d)
+            R = orient(d, spin)
+            e = euler(R)
+            wi = max(1, int(round(w)))
+            origin = p0 + np.array([-wi / 2, 0, -wi / 2])
+            p = dict(params)
+            p.update(seg=k, nseg=n, spike_len=L, spike_y0=0.0, spike_base=p0.tolist(),
+                     curve_prog0=acc / total, curve_prog1=(acc + L) / total)
+            out.append(self.cube(origin, (wi, int(L), wi), mat, inflate, p0, e, **p))
+            p0 = p0 + d * (L - overlap)
+            acc += L
+        return out
+
+
 class Model:
     def __init__(self, name):
         self.name = name

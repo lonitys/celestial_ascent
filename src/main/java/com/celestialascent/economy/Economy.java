@@ -47,6 +47,15 @@ public final class Economy {
                     Shapes.or(Shapes.box(0.125, 0, 0.125, 0.875, 0.1875, 0.875), Shapes.box(0.25, 0.1875, 0.25, 0.75, 0.75, 0.75),
                             Shapes.box(0.125, 0.75, 0.125, 0.875, 0.875, 0.875))));
 
+    public static final DeferredBlock<QuestBoardBlock> QUEST_BOARD = Content.block("quest_board",
+            () -> new QuestBoardBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).strength(2f).sound(SoundType.WOOD).noOcclusion()));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<QuestBoardBlock.BoardEntity>> QUEST_BOARD_BE =
+            CAReg.BLOCK_ENTITIES.register("quest_board", () -> BlockEntityType.Builder.of(QuestBoardBlock.BoardEntity::new, QUEST_BOARD.get()).build(null));
+
+    public static final DeferredHolder<MenuType<?>, MenuType<QuestMenu>> QUEST_MENU =
+            CAReg.MENUS.register("quest_board", () -> IMenuTypeExtension.create(QuestMenu::client));
+
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ShopStallBlockEntity>> SHOP_STALL_BE =
             CAReg.BLOCK_ENTITIES.register("shop_stall", () -> BlockEntityType.Builder.of(ShopStallBlockEntity::new, SHOP_STALL.get()).build(null));
 
@@ -66,6 +75,7 @@ public final class Economy {
         for (CoinTier t : CoinTier.values()) com.celestialascent.compat.Emc.set(COINS.get(t), emc[t.ordinal()]);
         com.celestialascent.compat.Emc.set(BANK_COUNTER, 2_048);
         com.celestialascent.compat.Emc.set(SHOP_STALL, 1_024);
+        com.celestialascent.compat.Emc.set(QUEST_BOARD, 512);
         com.celestialascent.compat.Emc.set(TITAN_ANVIL, 12_000);
     }
 }

@@ -61,6 +61,25 @@ public class LangGen extends LanguageProvider {
         add("message.celestialascent.shop_out_of_stock", "This shop is out of stock");
         add("message.celestialascent.shop_cannot_afford", "You can't afford this (coins or bank balance)");
 
+        add(com.celestialascent.economy.Economy.QUEST_BOARD.get(), "Quest Board");
+        add("container.celestialascent.quest_board", "Quest Board");
+        add("gui.celestialascent.deliver", "Deliver");
+        add("gui.celestialascent.quest_done", "Done");
+        add("gui.celestialascent.quest_line", "Bring %s × %s");
+        add("message.celestialascent.quest_missing", "You need %s × %s");
+        add("message.celestialascent.prosperity", "Village prosperity: %s (next building at %s)");
+        add("message.celestialascent.village_grew", "The village has grown: a new %s was built!");
+        add("message.celestialascent.stall_rented", "You rented this stall. Right-click to stock it.");
+        add("message.celestialascent.stall_unclaimed", "Unclaimed stall. Sneak + right-click to rent it for %s");
+        add("building.celestialascent.market_stall", "Market Stall");
+        add("building.celestialascent.lamp_post", "Lamp Post");
+        add("building.celestialascent.cottage", "Cottage");
+        add("building.celestialascent.bank_kiosk", "Bank Kiosk");
+        add("building.celestialascent.garden", "Garden");
+        add("building.celestialascent.fountain", "Fountain");
+        add("building.celestialascent.watchtower", "Watchtower");
+        add("building.celestialascent.smithy", "Smithy");
+
         // ---- titans ----
         add(Titans.TITAN_SHARD.get(), "Titan Shard");
         for (Element e : Element.values()) {

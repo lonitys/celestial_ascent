@@ -97,6 +97,11 @@ public class RecipeGen extends RecipeProvider {
                 .define('I', com.celestialascent.empire.Empire.IMPERIAL_SEAL)
                 .unlockedBy("has_heart", has(com.celestialascent.abyss.Abyss.VOID_HEART)).save(out);
 
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, Economy.QUEST_BOARD.get())
+                .pattern("PPP").pattern("PBP").pattern("PPP")
+                .define('P', ItemTags.PLANKS).define('B', Items.BOOK)
+                .unlockedBy("has_book", has(Items.BOOK)).save(out);
+
         sigil(out, Element.FROST, Items.BLUE_ICE, Items.DIAMOND);
         sigil(out, Element.TIDE, Items.PRISMARINE_SHARD, Items.NAUTILUS_SHELL);
         sigil(out, Element.STORM, Items.LIGHTNING_ROD, Items.AMETHYST_SHARD);

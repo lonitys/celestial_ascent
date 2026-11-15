@@ -76,6 +76,8 @@ def resolve_tex(ref, textures, depth=0):
     while ref.startswith('#') and depth < 10:
         ref = textures.get(ref[1:], ref)
         depth += 1
+    if os.path.isabs(ref) and os.path.exists(ref):
+        return ref
     if ':' in ref:
         ns, path = ref.split(':', 1)
     else:

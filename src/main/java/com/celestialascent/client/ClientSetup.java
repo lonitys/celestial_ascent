@@ -39,6 +39,7 @@ public final class ClientSetup {
         e.register(Economy.BANK_MENU.get(), BankScreen::new);
         e.register(Economy.SHOP_MENU.get(), ShopScreen::new);
         e.register(com.celestialascent.core.station.Stations.MENU.get(), StationScreen::new);
+        e.register(Economy.QUEST_MENU.get(), QuestScreen::new);
     }
 
     @SubscribeEvent

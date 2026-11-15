@@ -63,12 +63,16 @@ def write(path, root):
         f.write(bytes(out))
 
 
-def structure(size, palette, blocks, data_version=3955):
-    """palette: list of {'Name': ..., 'Properties': {...}}; blocks: list of (x, y, z, palette_index[, nbt])."""
+def structure(size, palette, blocks, data_version=3955, entities=None):
+    """palette: list of {'Name': ..., 'Properties': {...}}; blocks: list of (x, y, z, palette_index[, nbt]);
+    entities: list of (x, y, z, nbt_dict) placed at block centres."""
     bl = []
     for b in blocks:
         e = {'pos': [b[0], b[1], b[2]], 'state': b[3]}
         if len(b) > 4 and b[4]:
             e['nbt'] = b[4]
         bl.append(e)
-    return {'DataVersion': data_version, 'size': list(size), 'palette': palette, 'blocks': bl, 'entities': []}
+    ents = []
+    for (x, y, z, tag) in entities or []:
+        ents.append({'pos': [x + 0.5, float(y), z + 0.5], 'blockPos': [x, y, z], 'nbt': tag})
+    return {'DataVersion': data_version, 'size': list(size), 'palette': palette, 'blocks': bl, 'entities': ents}

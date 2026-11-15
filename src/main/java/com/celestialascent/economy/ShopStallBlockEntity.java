@@ -40,8 +40,15 @@ public class ShopStallBlockEntity extends BlockEntity {
         super(Economy.SHOP_STALL_BE.get(), pos, state);
     }
 
+    /** Rent for an unclaimed stall (trade city stalls start without an owner). */
+    public static final long RENT = 100;
+
     public boolean isOwner(Player p) {
-        return owner == null || owner.equals(p.getUUID());
+        return owner != null && owner.equals(p.getUUID());
+    }
+
+    public boolean hasOwner() {
+        return owner != null;
     }
 
     public void setOwner(Player p) {

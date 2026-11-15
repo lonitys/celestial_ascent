@@ -54,6 +54,15 @@ public class ShopStallBlock extends FacingBlock implements EntityBlock {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide && player instanceof ServerPlayer sp && level.getBlockEntity(pos) instanceof ShopStallBlockEntity be) {
+            if (!be.hasOwner()) {
+                if (sp.isShiftKeyDown() && Coins.pay(sp, ShopStallBlockEntity.RENT)) {
+                    be.setOwner(sp);
+                    sp.displayClientMessage(Component.translatable("message.celestialascent.stall_rented"), true);
+                } else {
+                    sp.displayClientMessage(Component.translatable("message.celestialascent.stall_unclaimed", Coins.format(ShopStallBlockEntity.RENT)), true);
+                }
+                return InteractionResult.CONSUME;
+            }
             boolean owner = be.isOwner(sp) && !sp.isShiftKeyDown();
             Component title = owner ? Component.translatable("container.celestialascent.shop_manage")
                     : Component.translatable("container.celestialascent.shop", be.ownerName());

@@ -15,10 +15,10 @@ from anim_helpers import TAU
 NAME = "storm_titan"
 HITBOX = (2.2, 4.5)
 RINGS = [  # (bone, pivot y, radius, puffs, puff size, tilt)
-    ("vortex_ring1", 24.0, 10.0, 8, (8, 5, 6), 6),
-    ("vortex_ring2", 17.0, 7.5, 7, (6, 4, 5), -5),
-    ("vortex_ring3", 10.5, 5.0, 6, (5, 3, 4), 7),
-    ("vortex_ring4", 5.0, 3.0, 4, (3, 3, 3), -6),
+    ("vortex_ring1", 24.0, 10.5, 8, (10, 5, 5), 6),
+    ("vortex_ring2", 17.0, 7.8, 7, (8, 4, 4), -5),
+    ("vortex_ring3", 10.5, 5.2, 6, (6, 3, 4), 7),
+    ("vortex_ring4", 5.0, 3.2, 4, (5, 3, 3), -6),
 ]
 
 # =============================================================================== geometry
@@ -46,9 +46,9 @@ def build_model():
 
     chest = m.bone("chest", "body", (0, 33, 0), rotation=[8, 0, 0])
     chest.boxb(0, 32, 0, 16, 8, 11, "stone")                                    # abdomen
-    chest.boxb(0, 39, 0, 28, 14, 15, "stone")                                   # broad chest
-    chest.box((-6.6, 47.0, -7.9), (11, 8, 2), "plate", rot=[-10, 12, 0])        # pectoral plates
-    chest.box((6.6, 47.0, -7.9), (11, 8, 2), "plate", rot=[-10, -12, 0])
+    chest.boxb(0, 39, 0, 26, 14, 15, "stone")                                   # broad chest
+    chest.box((-6.2, 47.0, -7.9), (10, 8, 2), "plate", rot=[-10, 12, 0])        # pectoral plates
+    chest.box((6.2, 47.0, -7.9), (10, 8, 2), "plate", rot=[-10, -12, 0])
     chest.box((0, 44.5, -8.0), (5, 7, 2), "core")                               # storm core
     chest.box((0, 36.0, -6.1), (12, 3, 2), "plate", rot=[4, 0, 0])              # ab plates
     chest.box((0, 33.0, -6.0), (10, 2, 2), "plate", rot=[2, 0, 0])
@@ -56,14 +56,14 @@ def build_model():
         chest.spike((x, y, 7.0), d, L, 3, "plate", segs=[0.6, 0.4])             # jagged back ridges
     # cloud mane over the shoulders and back of the neck
     chest.box((0, 53.5, 5.5), (16, 8, 8), "cloud", mane=True)
-    chest.box((-9.5, 52.5, 3.0), (8, 7, 9), "cloud", mane=True, rot=[0, 10, 12])
-    chest.box((9.5, 52.5, 3.0), (8, 7, 9), "cloud", mane=True, rot=[0, -10, -12])
+    chest.box((-8.5, 52.5, 3.0), (8, 7, 9), "cloud", mane=True, rot=[0, 10, 12])
+    chest.box((8.5, 52.5, 3.0), (8, 7, 9), "cloud", mane=True, rot=[0, -10, -12])
     chest.box((0, 47.0, 9.0), (12, 9, 5), "cloud", mane=True, rot=[-14, 0, 0])
 
-    shard_r = m.bone("shard_right", "chest", (-17, 60, 8))
-    shard_r.spike((-17, 57, 8), (-0.2, 1.0, 0.1), 8, 3, "plate", segs=[0.6, 0.4], vein=True)
-    shard_l = m.bone("shard_left", "chest", (17, 62, 7))
-    shard_l.spike((17, 59, 7), (0.25, 1.0, -0.1), 7, 3, "plate", segs=[0.6, 0.4], vein=True)
+    shard_r = m.bone("shard_right", "chest", (-16, 60, 8))
+    shard_r.spike((-16, 57, 8), (-0.2, 1.0, 0.1), 8, 3, "plate", segs=[0.6, 0.4], vein=True)
+    shard_l = m.bone("shard_left", "chest", (16, 62, 7))
+    shard_l.spike((16, 59, 7), (0.25, 1.0, -0.1), 7, 3, "plate", segs=[0.6, 0.4], vein=True)
 
     neck = m.bone("neck", "chest", (0, 52, -2), rotation=[-8, 0, 0])
     head = m.bone("head", "neck", (0, 53, -3))
@@ -79,32 +79,35 @@ def build_model():
         head.box((7.6 * s, 65.0, -2.4), (2, 4, 2), "horn", rot=[-10, 0, 25 * s])
         head.box((9.0 * s, 68.0, -1.6), (1, 4, 1), "horn", rot=[-35, 0, -20 * s], tip=True)
     # wild mane: big puffs crowning and trailing behind the head
-    head.box((0, 63.6, -1.0), (11, 4, 11), "cloud", mane=True)
-    head.box((0, 61.0, 3.5), (13, 9, 6), "cloud", mane=True, rot=[-12, 0, 0])
-    head.box((-6.5, 58.5, 0.5), (4, 9, 9), "cloud", mane=True, rot=[0, 0, 10])
-    head.box((6.5, 58.5, 0.5), (4, 9, 9), "cloud", mane=True, rot=[0, 0, -10])
-    head.box((0, 57.0, 6.5), (10, 8, 5), "cloud", mane=True, rot=[-25, 0, 0])
+    head.box((0, 61.5, 3.5), (12, 8, 6), "cloud", mane=True, rot=[-20, 0, 0])
+    head.box((-4.0, 66.0, 2.5), (5, 7, 5), "cloud", mane=True, rot=[-25, 8, 22])
+    head.box((4.0, 66.0, 2.5), (5, 7, 5), "cloud", mane=True, rot=[-25, -8, -22])
+    head.box((0, 67.5, 4.5), (6, 8, 5), "cloud", mane=True, rot=[-38, 0, 0])
+    head.box((-6.8, 58.5, -1.0), (4, 8, 8), "cloud", mane=True, rot=[0, 0, 14])
+    head.box((6.8, 58.5, -1.0), (4, 8, 8), "cloud", mane=True, rot=[0, 0, -14])
+    head.box((0, 56.5, 6.5), (11, 7, 5), "cloud", mane=True, rot=[-30, 0, 0])
+    head.box((0, 63.4, -2.5), (9, 2, 7), "cloud", mane=True, rot=[8, 0, 0])
     jaw = m.bone("jaw", "head", (0, 54, -3))
     jaw.boxb(0, 50.5, -4.5, 9, 3, 9, "stone")
     jaw.box((0, 49.5, -6.5), (7, 3, 4), "cloud", mane=True)                     # cloud beard
 
     for side, nm in ((-1, "right"), (1, "left")):
         s = side
-        arm = m.bone(f"{nm}_arm", "chest", (15 * s, 50, 0), rotation=[-8, 0, -4 * s])
-        arm.boxb(18 * s, 38, 0, 8, 14, 8, "stone")                              # upper arm
-        arm.box((18.5 * s, 51.5, 0), (12, 6, 13), "plate", rot=[0, 0, -16 * s])  # angular pauldron
-        arm.box((20.5 * s, 49.0, 0), (3, 4, 14), "plate", rot=[0, 0, -16 * s])
-        arm.spike((22 * s, 52, 0), (0.9 * s, 0.8, 0), 7, 3, "plate", segs=[0.6, 0.4])
-        arm.box((18.0 * s, 56.5, 2.0), (10, 5, 10), "cloud", mane=True)         # thunderhead on shoulder
-        fore = m.bone(f"{nm}_forearm", f"{nm}_arm", (18 * s, 38.5, 0), rotation=[-10, 0, 0])
-        fore.boxb(18 * s, 25, 0, 7, 14, 7, "stone")                             # forearm
-        fore.boxb(18 * s, 26, 0, 9, 9, 9, "copper")                             # copper bracer
-        fore.boxb(18 * s, 35.5, 0, 9, 1, 9, "copper", inflate=0.2, ring=True)   # upper ring
-        fore.spike((18 * s, 37, 3.5), (0, 0.2, 1.0), 5, 3, "plate", segs=[1.0])  # elbow spike
-        fore.boxb(18 * s, 18, -0.5, 8, 7, 9, "stone")                           # hand
-        for x, z in ((15.6, -4.0), (18.0, -4.3), (20.4, -4.0)):
+        arm = m.bone(f"{nm}_arm", "chest", (14 * s, 50, 0), rotation=[-8, 0, -4 * s])
+        arm.boxb(17 * s, 38, 0, 8, 14, 8, "stone")                              # upper arm
+        arm.box((17.5 * s, 51.5, 0), (11, 6, 13), "plate", rot=[0, 0, -16 * s])  # angular pauldron
+        arm.box((19.5 * s, 49.0, 0), (3, 4, 14), "plate", rot=[0, 0, -16 * s])
+        arm.spike((21 * s, 52, 0), (0.9 * s, 0.8, 0), 7, 3, "plate", segs=[0.6, 0.4])
+        arm.box((17.0 * s, 56.5, 2.0), (10, 5, 10), "cloud", mane=True)         # thunderhead on shoulder
+        fore = m.bone(f"{nm}_forearm", f"{nm}_arm", (17 * s, 38.5, 0), rotation=[-10, 0, 0])
+        fore.boxb(17 * s, 25, 0, 7, 14, 7, "stone")                             # forearm
+        fore.boxb(17 * s, 26, 0, 9, 9, 9, "copper")                             # copper bracer
+        fore.boxb(17 * s, 35.5, 0, 9, 1, 9, "copper", inflate=0.2, ring=True)   # upper ring
+        fore.spike((17 * s, 37, 3.5), (0, 0.2, 1.0), 5, 3, "plate", segs=[1.0])  # elbow spike
+        fore.boxb(17 * s, 18, -0.5, 8, 7, 9, "stone")                           # hand
+        for x, z in ((14.6, -4.0), (17.0, -4.3), (19.4, -4.0)):
             fore.box((x * s, 16.6, z), (2, 5, 2), "claw", rot=[-18, 0, 0])
-        fore.box((14.0 * s, 20.0, -2.5), (2, 4, 2), "claw", rot=[0, 0, 20 * s])  # thumb
+        fore.box((13.0 * s, 20.0, -2.5), (2, 4, 2), "claw", rot=[0, 0, 20 * s])  # thumb
     return m
 
 # =============================================================================== shaders
@@ -113,8 +116,8 @@ def build_model():
 STONE = palette("#15181f", "#1d2129", "#262b35", "#30363f", "#3c434e", "#49515d", "#58616e", "#6a7482", "#808a98")
 PLATE = palette("#1f2430", "#2a303d", "#363e4d", "#444d5e", "#535d70", "#657084", "#7a869b", "#929db0")
 VEIN = palette("#f0b020", "#ffd848", "#fff08a", "#fffbd8", "#ffffff")
-CLOUD = palette("#666e80", "#828a9b", "#9ea5b4", "#b9bfcb", "#d0d5de", "#e3e7ed", "#f2f4f8", "#ffffff")
-CLOUD_D = palette("#3e4554", "#4d5464", "#5e6575", "#727a8a", "#8a92a1", "#a3aab7", "#bdc3ce")
+CLOUD = palette("#7d879b", "#97a0b2", "#b0b8c7", "#c7cdd9", "#dadfe7", "#e9ecf2", "#f5f7fa", "#ffffff")
+CLOUD_D = palette("#454c5c", "#565e6f", "#697183", "#7f8798", "#979fae", "#b1b8c4", "#cbd0d9", "#e2e5eb")
 COPPER = palette("#4a200c", "#6e3216", "#934520", "#b85b2a", "#d77538", "#ee944c", "#fbb56c", "#ffd59a")
 VERD = palette("#2b6e62", "#3e8d7d", "#58ab98", "#7fcab4")
 EYE = palette("#ffe14a", "#fff59a", "#ffffe8")
@@ -159,25 +162,28 @@ def shade_stone(ctx, plate=False):
 
 def shade_cloud(ctx, dark=False):
     p = ctx.p
-    f1, f2, _ = worley(p, 0.42, 9)
-    bulge = 1.0 - np.clip(f1, 0, 1)
-    v = 0.45 + bulge * 0.35 + (fbm(p, 0.2, 3, 4) - 0.5) * 0.3
-    v -= ((f2 - f1) < 0.08) * 0.18
+    f1, f2, _ = worley(p, 0.36, 9)
+    bulge = 1.0 - np.clip(f1 * 1.1, 0, 1)
+    v = 0.5 + bulge * 0.3 + (fbm(p, 0.18, 3, 4) - 0.5) * 0.24
     side = ctx.face not in ("up", "down")
-    v += (0.18 if ctx.face == "up" else 0) - (0.25 if ctx.face == "down" else 0)
+    v += (0.2 if ctx.face == "up" else 0) - (0.3 if ctx.face == "down" else 0)
     if side:
-        v += (0.5 - ctx.t) * 0.3
-    v += edge_term(ctx, 0.12, 0.05, 0.0) - ctx.ao * 0.45
+        v += (0.5 - ctx.t) * 0.36
+    v -= ((f2 - f1) < 0.05) * (fbm(p, 0.3, 2, 6) > 0.5) * 0.1        # soft folds between billows
+    if ctx.params.get("ring") or dark:
+        streak = np.mod(ctx.i + ctx.j * 2.2 + hash3(ctx.index, 1, 1, 2)[0] * 30, 11) < 1.5
+        v += streak * 0.14
+    v += edge_term(ctx, 0.14, 0.04, 0.0) - ctx.ao * 0.4
     rgb = ramp(CLOUD_D if dark else CLOUD, v)
-    # ragged wispy borders (cutout)
+    # ragged, fluffy borders (cutout)
     de = np.minimum(np.minimum(ctx.i, ctx.tw - 1 - ctx.i), np.minimum(ctx.j, ctx.th - 1 - ctx.j))
-    ragged = (de < 2) & (fbm(p, 0.6, 2, 15) > (0.52 if de.min() >= 0 else 1)) & side
-    ragged &= ~((ctx.face == "up") | (ctx.j < 1))
-    alpha = np.where(ragged & (de == 0), 0, 255)
+    nz = fbm(p, 0.7, 2, 15)
+    ragged = ((de == 0) & (nz > 0.46)) | ((de == 1) & (nz > 0.66))
+    ragged &= side & (ctx.j > 0)
+    alpha = np.where(ragged, 0, 255)
     glow = np.zeros(ctx.N, dtype=bool)
     if dark or ctx.params.get("ring"):
-        # stray sparks of lightning inside the vortex
-        g = (_th(ctx, 41) > 0.985)
+        g = (_th(ctx, 41) > 0.988) & ~ragged
         rgb[g] = VEIN[2]
         glow = g
     return rgb, alpha, glow
