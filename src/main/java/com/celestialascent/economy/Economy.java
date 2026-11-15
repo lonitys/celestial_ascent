@@ -62,5 +62,10 @@ public final class Economy {
 
     public static void init() {
         Professions.init();
+        long[] emc = {32, 320, 3_200, 32_000, 320_000, 3_200_000, 32_000_000};
+        for (CoinTier t : CoinTier.values()) com.celestialascent.compat.Emc.set(COINS.get(t), emc[t.ordinal()]);
+        com.celestialascent.compat.Emc.set(BANK_COUNTER, 2_048);
+        com.celestialascent.compat.Emc.set(SHOP_STALL, 1_024);
+        com.celestialascent.compat.Emc.set(TITAN_ANVIL, 12_000);
     }
 }

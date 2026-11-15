@@ -28,9 +28,6 @@ public final class ClientSetup {
     public static final KeyMapping TOGGLE = new KeyMapping("key.celestialascent.toggle", InputConstants.Type.KEYSYM,
             GLFW.GLFW_KEY_G, "key.categories.celestialascent");
 
-    /** Content modules add their entity/block-entity renderer registrations here. */
-    public static final List<Consumer<EntityRenderersEvent.RegisterRenderers>> RENDERERS = new ArrayList<>();
-
     @SubscribeEvent
     public static void keys(RegisterKeyMappingsEvent e) {
         e.register(ABILITY);
@@ -41,12 +38,12 @@ public final class ClientSetup {
     public static void screens(RegisterMenuScreensEvent e) {
         e.register(Economy.BANK_MENU.get(), BankScreen::new);
         e.register(Economy.SHOP_MENU.get(), ShopScreen::new);
+        e.register(com.celestialascent.core.station.Stations.MENU.get(), StationScreen::new);
     }
 
     @SubscribeEvent
     public static void renderers(EntityRenderersEvent.RegisterRenderers e) {
         e.registerBlockEntityRenderer(Economy.SHOP_STALL_BE.get(), ShopStallRenderer::new);
-        RENDERERS.forEach(r -> r.accept(e));
     }
 
     @EventBusSubscriber(modid = CelestialAscent.MODID, value = Dist.CLIENT)

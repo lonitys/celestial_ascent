@@ -110,6 +110,28 @@ public abstract class CelestialBoss extends Monster implements GeoEntity {
 
     protected void onPhaseChange(int newPhase) {}
 
+    /** Called every server tick outside phase transitions (auras, ambient hazards). Target may be null. */
+    protected void passiveTick(LivingEntity target) {}
+
+    /** Players within radius (alive, not spectating). */
+    public List<Player> playersNear(double radius) {
+        return level().getEntitiesOfClass(Player.class, getBoundingBox().inflate(radius),
+                p -> p.isAlive() && !p.isSpectator() && !p.isCreative());
+    }
+
+    /** Ground position (top of the first solid block at or below y+3). */
+    public Vec3 ground(double x, double z, double fromY) {
+        BlockPos.MutableBlockPos m = BlockPos.containing(x, fromY + 3, z).mutable();
+        for (int i = 0; i < 16 && !level().getBlockState(m.below()).isSolid(); i++) m.move(0, -1, 0);
+        return new Vec3(x, m.getY(), z);
+    }
+
+    /** Position of an attack origin in front of the boss at a height fraction of its body. */
+    public Vec3 front(double forward, double heightFraction) {
+        Vec3 look = Vec3.directionFromRotation(0, getYRot());
+        return position().add(look.scale(forward)).add(0, getBbHeight() * heightFraction, 0);
+    }
+
     /** Ambient particles shown around the boss on the client. */
     protected ParticleOptions ambientParticle() { return null; }
 
@@ -188,6 +210,7 @@ public abstract class CelestialBoss extends Monster implements GeoEntity {
         cooldowns.replaceAll((k, v) -> Math.max(0, v - 1));
         LivingEntity target = getTarget();
         if (target != null && !target.isAlive()) target = null;
+        passiveTick(target);
 
         if (current != null) {
             if (target == null) {

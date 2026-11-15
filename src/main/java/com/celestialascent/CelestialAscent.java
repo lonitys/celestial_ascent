@@ -18,6 +18,8 @@ public final class CelestialAscent {
         Progress.TYPE.getClass();
         ArmorTiers.init();
         com.celestialascent.economy.Economy.init();
+        com.celestialascent.titans.Titans.init();
+        com.celestialascent.empire.Empire.init();
         CAReg.register(modBus);
     }
 }
