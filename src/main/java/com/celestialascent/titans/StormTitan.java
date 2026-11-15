@@ -34,7 +34,7 @@ public class StormTitan extends TitanBoss {
     @Override public Element element() { return Element.STORM; }
     @Override public double baseMaxHealth() { return 500; }
     @Override protected ParticleOptions ambientParticle() { return ParticleTypes.ELECTRIC_SPARK; }
-    @Override protected String moveAnimation() { return "walk"; }
+    @Override protected int animTransition() { return 0; } // vortex rings spin in whole turns
 
     private ServerLevel sl() { return (ServerLevel) level(); }
 

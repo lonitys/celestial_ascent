@@ -58,6 +58,12 @@ neoForge {
     runs {
         client {
             client()
+            // ./gradlew runClient -Pshowcase : scripted screenshot tour of the mod in run/saves/devworld
+            if (project.hasProperty('showcase')) {
+                systemProperty 'celestialascent.showcase', 'true'
+                systemProperty 'celestialascent.showcase.only', project.findProperty('showcaseOnly') ?: ''
+                programArguments.addAll '--quickPlaySingleplayer', 'devworld'
+            }
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }

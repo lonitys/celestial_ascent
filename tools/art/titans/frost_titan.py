@@ -387,7 +387,7 @@ def anim_blizzard():
     c = Clip("attack.blizzard", 3.0)
     # arms thrown up into a V, then the torso whirls side to side while the arms circle overhead
     for side, nm in ((-1, "right"), (1, "left")):
-        c.rot(f"{nm}_arm", [(0, (0, 0, 0)), (0.55, (-20, 0, -150 * side), "io"), (2.55, (-20, 0, -150 * side)),
+        c.rot(f"{nm}_arm", [(0, (0, 0, 0)), (0.55, (6, 0, -148 * side), "io"), (2.55, (6, 0, -148 * side)),
                             (3.0, (0, 0, 0), "io")])
         c.f(f"{nm}_arm", "rotation", lambda t, side=side: (
             22 * math.sin(TAU * 2 * (t - 0.55) / 2.0) * env(t, 0.55, 0.8, 2.3, 2.55),

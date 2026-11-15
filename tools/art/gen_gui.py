@@ -264,11 +264,6 @@ def bank():
         if x % 3 != 2:
             cv.put(x, 19, '#3a3220')
             cv.put(x, 43, '#3a3220')
-    # tiny aster marks at the display's ends
-    for cx in (10, 166):
-        cv.put(cx, 31, GOLD_MID)
-        for dx, dy in N4:
-            cv.put(cx + dx, 31 + dy, GOLD_SH)
     g.keep_clear(6, 48, 170, 91)                 # button areas
     g.player_inventory(104, 162, 92)
     g.specks(1)

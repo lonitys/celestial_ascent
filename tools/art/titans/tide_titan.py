@@ -51,8 +51,11 @@ def build_model():
     chest.box((-2, 37, 7.2), (5, 4, 3), "coral_lump")
     chest.box((5, 41, 7.0), (4, 3, 2), "coral_lump_o")
     chest.boxb(-6.5, 38, 6.9, 2, 2, 2, "barnacle")
-    chest.boxb(7.5, 45, 6.6, 2, 2, 2, "barnacle")
-    chest.boxb(2, 33, 6.4, 2, 1, 2, "barnacle")
+    # antler-like side branches on the big reef growths
+    chest.spike((-6.2, 49.5, 9.0), (-0.9, 0.9, 0.2), 6, 2, "coral_pink", segs=[1.0])
+    chest.spike((-5.0, 52.5, 10.0), (0.2, 1.0, 0.9), 5, 2, "coral_pink", segs=[1.0])
+    chest.spike((5.2, 48.0, 9.5), (0.2, 1.0, 1.0), 5, 2, "coral_orange", segs=[1.0])
+    chest.spike((2.5, 46.5, 8.0), (-0.6, 1.0, 0.6), 4, 2, "coral_orange", segs=[1.0])
 
     neck = m.bone("neck", "chest", (0, 50, -2), rotation=[-6, 0, 0])
     neck.boxb(0, 48, -1.5, 9, 7, 8, "scales", gills=True)
@@ -87,7 +90,7 @@ def build_model():
         else:
             arm.spike((16.5 * s, 54.5, 3), (0.45, 1.0, 0.5), 10, 3, "coral_pink", segs=[0.6, 0.4])
             arm.spike((19 * s, 53.5, -3.5), (0.6, 1.0, -0.3), 6, 2, "coral_orange", segs=[0.6, 0.4])
-        arm.boxb(20.5 * s, 50.5, 4.5, 2, 2, 2, "barnacle")
+        arm.spike((17.5 * s, 57.5, 4.0), (0.9 * s, 0.8, 0.2), 4, 2, "coral_pink" if s < 0 else "coral_orange", segs=[1.0])
         fore = m.bone(f"{nm}_forearm", f"{nm}_arm", (16 * s, 37.5, 0), rotation=[-6, 0, 0])
         fore.boxb(16 * s, 26, -0.5, 7, 12, 8, "scales")                         # forearm
         fore.boxb(16 * s, 30, -0.5, 8, 5, 9, "gold", bracer=True)               # gold bracer

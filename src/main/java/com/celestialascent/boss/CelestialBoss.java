@@ -137,6 +137,9 @@ public abstract class CelestialBoss extends Monster implements GeoEntity {
 
     protected String moveAnimation() { return "walk"; }
 
+    /** Blend ticks between base animations (0 for models with free-spinning parts). */
+    protected int animTransition() { return 5; }
+
     /** Flying bosses skip the "pillar up" anti-cheese teleport. */
     protected boolean canFlyToTarget() { return false; }
 
@@ -504,7 +507,7 @@ public abstract class CelestialBoss extends Monster implements GeoEntity {
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         RawAnimation move = RawAnimation.begin().thenLoop(moveAnimation());
-        controllers.add(new AnimationController<>(this, "main", 5, state -> {
+        controllers.add(new AnimationController<>(this, "main", animTransition(), state -> {
             if (isDeadOrDying()) return state.setAndContinue(DEATH);
             if (isAttacking() || inTransition()) return PlayState.STOP;
             return state.setAndContinue(state.isMoving() ? move : IDLE);

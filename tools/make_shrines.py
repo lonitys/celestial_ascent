@@ -263,7 +263,7 @@ def main():
                                                    'processors': 'minecraft:empty', 'projection': 'rigid'}}]})
         dump(os.path.join(ROOT, NS, 'worldgen', 'structure_set', key + '_shrine.json'), {
             'structures': [{'structure': '%s:%s_shrine' % (NS, key), 'weight': 1}],
-            'placement': {'type': 'minecraft:random_spread', 'spacing': 34, 'separation': 14, 'salt': salt}})
+            'placement': {'type': 'minecraft:random_spread', 'spacing': 24, 'separation': 9, 'salt': salt}})
         dump(os.path.join(ROOT, NS, 'tags', 'worldgen', 'biome', 'has_structure', key + '_shrine.json'), {'values': biomes})
         dump(os.path.join(ROOT, NS, 'tags', 'worldgen', 'structure', key + '_shrine.json'), {'values': ['%s:%s_shrine' % (NS, key)]})
         print('shrine', key, len(b.blocks), 'blocks')

@@ -87,6 +87,9 @@ def build_model():
     head.box((6.8, 58.5, -1.0), (4, 8, 8), "cloud", mane=True, rot=[0, 0, -14])
     head.box((0, 56.5, 6.5), (11, 7, 5), "cloud", mane=True, rot=[-30, 0, 0])
     head.box((0, 63.4, -2.5), (9, 2, 7), "cloud", mane=True, rot=[8, 0, 0])
+    head.box((0, 64.5, 9.5), (5, 4, 9), "cloud", mane=True, rot=[-28, 0, 0])            # wisps streaming back
+    head.box((-5.0, 62.0, 8.5), (4, 4, 8), "cloud", mane=True, rot=[-18, -16, 10])
+    head.box((5.0, 62.0, 8.5), (4, 4, 8), "cloud", mane=True, rot=[-18, 16, -10])
     jaw = m.bone("jaw", "head", (0, 54, -3))
     jaw.boxb(0, 50.5, -4.5, 9, 3, 9, "stone")
     jaw.box((0, 49.5, -6.5), (7, 3, 4), "cloud", mane=True)                     # cloud beard
@@ -99,6 +102,7 @@ def build_model():
         arm.box((19.5 * s, 49.0, 0), (3, 4, 14), "plate", rot=[0, 0, -16 * s])
         arm.spike((21 * s, 52, 0), (0.9 * s, 0.8, 0), 7, 3, "plate", segs=[0.6, 0.4])
         arm.box((17.0 * s, 56.5, 2.0), (10, 5, 10), "cloud", mane=True)         # thunderhead on shoulder
+        arm.box((19.5 * s, 58.5, 6.5), (4, 4, 7), "cloud", mane=True, rot=[-25, 12 * s, -18 * s])
         fore = m.bone(f"{nm}_forearm", f"{nm}_arm", (17 * s, 38.5, 0), rotation=[-10, 0, 0])
         fore.boxb(17 * s, 25, 0, 7, 14, 7, "stone")                             # forearm
         fore.boxb(17 * s, 26, 0, 9, 9, 9, "copper")                             # copper bracer
@@ -116,7 +120,7 @@ def build_model():
 STONE = palette("#15181f", "#1d2129", "#262b35", "#30363f", "#3c434e", "#49515d", "#58616e", "#6a7482", "#808a98")
 PLATE = palette("#1f2430", "#2a303d", "#363e4d", "#444d5e", "#535d70", "#657084", "#7a869b", "#929db0")
 VEIN = palette("#f0b020", "#ffd848", "#fff08a", "#fffbd8", "#ffffff")
-CLOUD = palette("#7d879b", "#97a0b2", "#b0b8c7", "#c7cdd9", "#dadfe7", "#e9ecf2", "#f5f7fa", "#ffffff")
+CLOUD = palette("#6c768c", "#8690a5", "#a1aabc", "#bbc2d0", "#d1d7e1", "#e3e7ee", "#f1f4f8", "#ffffff")
 CLOUD_D = palette("#454c5c", "#565e6f", "#697183", "#7f8798", "#979fae", "#b1b8c4", "#cbd0d9", "#e2e5eb")
 COPPER = palette("#4a200c", "#6e3216", "#934520", "#b85b2a", "#d77538", "#ee944c", "#fbb56c", "#ffd59a")
 VERD = palette("#2b6e62", "#3e8d7d", "#58ab98", "#7fcab4")
@@ -162,23 +166,26 @@ def shade_stone(ctx, plate=False):
 
 def shade_cloud(ctx, dark=False):
     p = ctx.p
-    f1, f2, _ = worley(p, 0.36, 9)
-    bulge = 1.0 - np.clip(f1 * 1.1, 0, 1)
-    v = 0.5 + bulge * 0.3 + (fbm(p, 0.18, 3, 4) - 0.5) * 0.24
+    # cauliflower billows: each Worley cell is a puff lit from above, shaded below, with soft outlines
+    f1, f2, near = tl.worley_pts(p, 0.15, 9)
+    rel = (p - near) * 0.15                                  # in cell units
+    up = rel[:, 1] / (np.sqrt((rel ** 2).sum(1)) + 1e-6)     # -1 bottom .. 1 top of the puff
+    v = 0.64 + up * 0.17 + (1 - np.clip(f1 * 1.4, 0, 1)) * 0.06
+    v -= ((f2 - f1) < 0.06) * (up < 0.2) * 0.08              # soft shadow under each billow
+    v += (fbm(p, 0.2, 2, 4) - 0.5) * 0.1
     side = ctx.face not in ("up", "down")
-    v += (0.2 if ctx.face == "up" else 0) - (0.3 if ctx.face == "down" else 0)
+    v += (0.18 if ctx.face == "up" else 0) - (0.3 if ctx.face == "down" else 0)
     if side:
-        v += (0.5 - ctx.t) * 0.36
-    v -= ((f2 - f1) < 0.05) * (fbm(p, 0.3, 2, 6) > 0.5) * 0.1        # soft folds between billows
+        v += (0.5 - ctx.t) * 0.3
     if ctx.params.get("ring") or dark:
         streak = np.mod(ctx.i + ctx.j * 2.2 + hash3(ctx.index, 1, 1, 2)[0] * 30, 11) < 1.5
-        v += streak * 0.14
-    v += edge_term(ctx, 0.14, 0.04, 0.0) - ctx.ao * 0.4
+        v += streak * 0.12
+    v += edge_term(ctx, 0.14, 0.04, 0.0) - ctx.ao * 0.45
     rgb = ramp(CLOUD_D if dark else CLOUD, v)
     # ragged, fluffy borders (cutout)
     de = np.minimum(np.minimum(ctx.i, ctx.tw - 1 - ctx.i), np.minimum(ctx.j, ctx.th - 1 - ctx.j))
     nz = fbm(p, 0.7, 2, 15)
-    ragged = ((de == 0) & (nz > 0.46)) | ((de == 1) & (nz > 0.66))
+    ragged = ((de == 0) & (nz > 0.44)) | ((de == 1) & (nz > 0.64))
     ragged &= side & (ctx.j > 0)
     alpha = np.where(ragged, 0, 255)
     glow = np.zeros(ctx.N, dtype=bool)
@@ -343,11 +350,11 @@ def anim_walk():
 
 def anim_lightning_call():
     c = Clip("attack.lightning_call", 2.0)
-    spin_rings(c, 2.0, 2)
+    spin_rings(c, 2.0, 1)
     for side, nm in ((-1, "right"), (1, "left")):
-        c.rot(f"{nm}_arm", [(0, (0, 0, 0)), (0.9, (-20, 0, -158 * side), "io"), (1.18, (-22, 0, -150 * side)),
-                            (1.25, (-30, 0, -172 * side), "snap"), (1.6, (-28, 0, -168 * side)), (2.0, (0, 0, 0), "io")])
-        c.rot(f"{nm}_forearm", [(0, (0, 0, 0)), (0.9, (-20, 0, 0)), (1.25, (-4, 0, 0), "snap"), (1.6, (-6, 0, 0)), (2.0, (0, 0, 0))])
+        c.rot(f"{nm}_arm", [(0, (0, 0, 0)), (0.9, (14, 0, -150 * side), "io"), (1.18, (12, 0, -142 * side)),
+                            (1.25, (24, 0, -170 * side), "snap"), (1.6, (22, 0, -166 * side)), (2.0, (0, 0, 0), "io")])
+        c.rot(f"{nm}_forearm", [(0, (0, 0, 0)), (0.9, (-14, 0, 0)), (1.25, (8, 0, 0), "snap"), (1.6, (6, 0, 0)), (2.0, (0, 0, 0))])
     trem = lambda t: env(t, 0.75, 0.95, 1.2, 1.25)
     for b in ("right_arm", "left_arm"):
         c.f(b, "rotation", lambda t, b=b: (shake(t, 24, 3.0, len(b)) * trem(t), 0, shake(t, 21, 3.0, 2 + len(b)) * trem(t)))
@@ -363,7 +370,7 @@ def anim_lightning_call():
 
 def anim_wind_gust():
     c = Clip("attack.wind_gust", 1.5)
-    spin_rings(c, 1.5, 2)
+    spin_rings(c, 1.5, 1)
     for side, nm in ((-1, "right"), (1, "left")):
         c.rot(f"{nm}_arm", [(0, (0, 0, 0)), (0.5, (40, 18 * side, -20 * side), "io"), (0.7, (-86, -10 * side, 6 * side), "snap"),
                             (0.95, (-82, -8 * side, 6 * side)), (1.5, (0, 0, 0), "io")])
@@ -378,7 +385,7 @@ def anim_wind_gust():
 
 def anim_thunder_clap():
     c = Clip("attack.thunder_clap", 1.5)
-    spin_rings(c, 1.5, 2)
+    spin_rings(c, 1.5, 1)
     c.rot("right_arm", [(0, (0, 0, 0)), (0.55, (-72, 55, 0), "io"), (0.8, (-78, -30, 0), "snap"), (1.0, (-76, -28, 0)),
                         (1.5, (0, 0, 0), "io")])
     c.rot("left_arm", [(0, (0, 0, 0)), (0.55, (-72, -55, 0), "io"), (0.8, (-78, 30, 0), "snap"), (1.0, (-76, 28, 0)),
@@ -396,7 +403,7 @@ def anim_thunder_clap():
 
 def anim_storm_dash():
     c = Clip("attack.storm_dash", 1.2)
-    spin_rings(c, 1.2, 2)
+    spin_rings(c, 1.2, 1)
     c.pos("body", [(0, (0, 0, 0)), (0.35, (0, 1.5, 4), "io"), (0.55, (0, -1, -8), "snap"), (0.8, (0, -1, -7)), (1.2, (0, 0, 0), "io")])
     c.rot("body", [(0, (0, 0, 0)), (0.35, (-10, 0, 0)), (0.55, (26, 0, 0), "snap"), (0.8, (24, 0, 0)), (1.2, (0, 0, 0))])
     c.rot("vortex", [(0, (0, 0, 0)), (0.35, (14, 0, 0)), (0.55, (-38, 0, 0), "snap"), (0.8, (-34, 0, 0)), (1.2, (0, 0, 0))])
@@ -411,7 +418,7 @@ def anim_storm_dash():
 
 def anim_phase():
     c = Clip("phase", 2.0)
-    spin_rings(c, 2.0, 3)
+    spin_rings(c, 2.0, 1)
     c.rot("chest", [(0, (0, 0, 0)), (0.45, (20, 0, 0), "io"), (0.75, (-24, 0, 0), "snap"), (1.5, (-22, 0, 0)), (2.0, (0, 0, 0))])
     c.rot("neck", [(0, (0, 0, 0)), (0.45, (14, 0, 0)), (0.75, (-30, 0, 0), "snap"), (1.5, (-28, 0, 0)), (2.0, (0, 0, 0))])
     c.rot("jaw", [(0, (0, 0, 0)), (0.45, (4, 0, 0)), (0.7, (40, 0, 0), "snap"), (1.55, (38, 0, 0)), (2.0, (0, 0, 0))])

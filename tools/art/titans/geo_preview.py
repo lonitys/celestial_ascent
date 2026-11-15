@@ -438,9 +438,12 @@ def render_sheet(geo, tex, glow=None, pose=None, scale=5.0, views=VIEWS, title=N
         d = ImageDraw.Draw(im)
         d.text((6, 4), name, fill=(220, 220, 230))
         tiles.append(im)
-    sheet = Image.new("RGB", (W * len(tiles), H + (16 if title else 0)), (20, 20, 24))
+    cols = 2 if len(tiles) == 4 else len(tiles)
+    rows = (len(tiles) + cols - 1) // cols
+    top = 16 if title else 0
+    sheet = Image.new("RGB", (W * cols, H * rows + top), (20, 20, 24))
     for i, im in enumerate(tiles):
-        sheet.paste(im, (i * W, 16 if title else 0))
+        sheet.paste(im, ((i % cols) * W, top + (i // cols) * H))
     if title:
         ImageDraw.Draw(sheet).text((6, 2), title, fill=(255, 255, 255))
     return sheet

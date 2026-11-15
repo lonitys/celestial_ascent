@@ -269,6 +269,19 @@ class Model:
             ])]),
         ])
 
+    def shift_bones(self, names, dv):
+        """Translate bones (pivots, cubes, cube pivots) by dv in model space."""
+        dv = np.asarray(dv, dtype=float)
+        for n in names:
+            b = self.bones[n]
+            b.pivot = list(np.asarray(b.pivot) + dv)
+            for c in b.cubes:
+                c.origin = list(np.asarray(c.origin) + dv)
+                if c.pivot is not None:
+                    c.pivot = list(np.asarray(c.pivot) + dv)
+                if "spike_base" in c.params:
+                    c.params["spike_base"] = list(np.asarray(c.params["spike_base"]) + dv)
+
     def cube_count(self):
         return sum(len(b.cubes) for b in self.bones.values())
 
@@ -341,6 +354,28 @@ def worley(p, freq=1.0, seed=0, jitter=0.9):
                 cid = np.where(closer, hash3(cx, cy, cz, seed + 31), cid)
                 f1 = np.where(closer, d, f1)
     return f1, f2, cid
+
+
+def worley_pts(p, freq=1.0, seed=0, jitter=0.9):
+    """Like worley() but also returns the nearest feature point (in model units)."""
+    q = np.asarray(p, dtype=float) * freq
+    i = np.floor(q).astype(np.int64)
+    f1 = np.full(len(q), 9.0)
+    f2 = np.full(len(q), 9.0)
+    near = np.zeros_like(q)
+    for dx in (-1, 0, 1):
+        for dy in (-1, 0, 1):
+            for dz in (-1, 0, 1):
+                cx, cy, cz = i[:, 0] + dx, i[:, 1] + dy, i[:, 2] + dz
+                fx = cx + 0.5 + (hash3(cx, cy, cz, seed) - 0.5) * jitter
+                fy = cy + 0.5 + (hash3(cx, cy, cz, seed + 7) - 0.5) * jitter
+                fz = cz + 0.5 + (hash3(cx, cy, cz, seed + 13) - 0.5) * jitter
+                d = np.sqrt((q[:, 0] - fx) ** 2 + (q[:, 1] - fy) ** 2 + (q[:, 2] - fz) ** 2)
+                closer = d < f1
+                f2 = np.where(closer, f1, np.minimum(f2, d))
+                near = np.where(closer[:, None], np.stack([fx, fy, fz], axis=1), near)
+                f1 = np.where(closer, d, f1)
+    return f1, f2, near / freq
 
 
 def hexcol(h):
@@ -648,7 +683,13 @@ class Clip:
     def bake(self, dt=0.05, tol=None):
         tol = tol or {"rotation": 0.35, "position": 0.04, "scale": 0.006}
         n = int(round(self.length / dt))
-        times = [round(i * self.length / n, 4) for i in range(n + 1)]
+        grid = {round(i * self.length / n, 4) for i in range(n + 1)}
+        # also sample every authored key time so snaps / events (e.g. a release frame) stay exact
+        for fns in self.parts.values():
+            for fn in fns:
+                if isinstance(fn, Track):
+                    grid |= {round(k[0], 4) for k in fn.keys if 0 <= k[0] <= self.length}
+        times = sorted(grid)
         bones = OrderedDict()
         for (bone, chan) in sorted(self.parts.keys()):
             vals = np.array([self.eval(bone, chan, t) for t in times])
@@ -747,6 +788,27 @@ def build(name, model, shaders, clips, painter_kw=None, visible=(5, 6, 2.5)):
     return geo, rgba, glow, anims
 
 
+def contact_sheet(name, geo, rgba, glow, anims, poses, frame=(100, 112), scale=2.2, yaw=35, pitch=-12, path=None):
+    """One row per animation, one column per sampled time (3/4 view)."""
+    from PIL import ImageDraw
+    g = gp.load_geo(geo)
+    ncol = max(len(t) for _, t in poses)
+    W, H = int(frame[0] * scale), int(frame[1] * scale)
+    sheet = Image.new("RGB", (W * ncol + 120, H * len(poses)), (18, 18, 22))
+    d = ImageDraw.Draw(sheet)
+    for r, (an, times) in enumerate(poses):
+        d.text((6, r * H + H // 2 - 6), an, fill=(235, 235, 240))
+        for c, t in enumerate(times):
+            pose = gp.sample_anim(anims["animations"][an], t)
+            im = gp.render(g, rgba, glow, pose, yaw=yaw, pitch=pitch, scale=scale, size=(W, H),
+                           center=(0, frame[1] / 2 - 8))
+            ImageDraw.Draw(im).text((4, 3), f"t={t:.2f}", fill=(210, 210, 220))
+            sheet.paste(im, (120 + c * W, r * H))
+    path = path or os.path.join(PREVIEW, f"{name}_animations.png")
+    sheet.save(path)
+    return path
+
+
 def previews(name, geo, rgba, glow, anims, hitbox, poses, frame=(150, 92), scale=4.0, tag=""):
     """poses: list of (anim_name, [times]) strips to render."""
     os.makedirs(PREVIEW, exist_ok=True)
@@ -758,7 +820,7 @@ def previews(name, geo, rgba, glow, anims, hitbox, poses, frame=(150, 92), scale
     out.append(p)
     for an, times in poses:
         strip = gp.render_anim_strip(g, rgba, glow, anims["animations"][an], times, scale=scale * 0.8,
-                                     title=f"{name} {an}", hitbox=hitbox, frame=(frame[0] * 0.75, frame[1]))
+                                     title=f"{name} {an}", hitbox=hitbox, frame=(frame[0] * 0.8, frame[1] * 1.18))
         p = os.path.join(PREVIEW, f"{name}_{an.replace('.', '_')}{tag}.png")
         strip.save(p)
         out.append(p)

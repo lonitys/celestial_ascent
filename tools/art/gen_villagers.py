@@ -8,7 +8,6 @@ The type layer's robe hides the body box, so torso clothing goes on the robe.
 Rim: up-facing brim is 31,48 16x16 (bottom rows = in front of the face), underside 48,48.
 """
 import os
-import tempfile
 
 from common import *
 
@@ -67,7 +66,7 @@ class Overlay:
 BANKER = {
     '0': '#0b130e', '1': '#121e17', '2': '#1a2b21', '3': '#243b2d', '4': '#30503c',
     'g': '#8a6418', 'G': '#d4a83c', 'H': '#f6dc84',
-    's': '#c4bca6', 'S': '#e6e0cc', 'k': '#4e1418', 'K': '#74242a',
+    's': '#a39b86', 'S': '#cdc6b1', 'T': '#e2dcc8', 'k': '#4e1418', 'K': '#74242a',
     'v': '#1e4a2e', 'V': '#2e6a42', 'w': '#123020',
 }
 
@@ -122,10 +121,13 @@ def banker():
         "34....43",
     ], P)
     # --- shirt sleeves with dark garters
-    sleeve = ["SSSS", "SSSs", "SsSs", "3G33", "3333", "SSSs", "SsSs", "sSss"]
-    for f in ('right', 'front', 'left', 'back'):
-        o.paint('arm', f, sleeve, P)
-    o.paint('arm', 'top', ["SSSS", "SSSS", "SsSs", "SSSs"], P)
+    sleeves = {'right': ["TSSs", "SSSs", "SsSs", "2G22", "3333", "SSSs", "SsSs", "sSss"],
+               'front': ["TTSS", "TSSs", "SSsS", "3G33", "3333", "TSSs", "SSsS", "sSss"],
+               'left': ["SSss", "SSss", "sSss", "2g22", "2222", "SSss", "Ssss", "ssss"],
+               'back': ["SSss", "Ssss", "sSss", "2222", "2222", "Ssss", "ssss", "ssss"]}
+    for f, rows in sleeves.items():
+        o.paint('arm', f, rows, P)
+    o.paint('arm', 'top', ["TTTS", "TTSS", "TSSs", "SSss"], P)
     o.paint('armmid', 'top', ["sS....Ss", "SS....SS", "Ss....sS", "SS....SS"], P)
     o.paint('armmid', 'front', ["Ss....sS", "SS....SS", "Ss....sS", "ss....ss"], P)
     o.paint('armmid', 'right', ["SSss", "SsSs", "SSss", "ssss"], P)
@@ -143,7 +145,7 @@ def banker():
         "12222211",
     ], P)
     for f, shade in (('front', '3'), ('right', '3'), ('left', '2'), ('back', '2')):
-        o.paint('hat', f, [shade * 8, shade * 8, "GGGGGGGG", "gggggggg"], P)
+        o.paint('hat', f, [shade * 8, shade * 8, "GGGGGGGG", "11111111"], P)
     o.cv.put(40 + 3, 8 + 2, P['H'])           # band glint on the front
     # visor: up-facing brim in front of the face (rim rows 60-62, cols 34-43)
     o.cv.grid(["VVVVVVVVVV", ".vVVVVVVv.", "..wvvvvw.."], P, 34, 60)
@@ -437,11 +439,13 @@ def mannequin():
     return cv
 
 
-def render_preview(over, base, tag):
+def render_preview(over, base, tag, tmp_dir=None):
     from model_preview import render_model, _tex_cache
     comb = base.copy()
     comb.paste(over.cv, 0, 0)
-    path = os.path.join(tempfile.gettempdir(), f'ca_villager_{tag}.png')
+    tmp_dir = tmp_dir or os.path.join(PREVIEW, '_tmp')
+    os.makedirs(tmp_dir, exist_ok=True)
+    path = os.path.join(tmp_dir, f'villager_{tag}.png')
     comb.pil().save(path)
     _tex_cache.pop(path, None)
     m = {'textures': {}, 'elements': villager_elements(path)}
@@ -467,7 +471,7 @@ def sheet(rows, out_path):
     return out_path
 
 
-def main(vanilla_dir=None):
+def main(vanilla_dir=None, out_dir=None):
     rows = []
     base = mannequin()
     for name, fn in OVERLAYS.items():
@@ -483,11 +487,12 @@ def main(vanilla_dir=None):
         vrows = []
         for name, fn in OVERLAYS.items():
             o = fn()
-            vrows.append((name, [o.cv.pil()] + render_preview(o, b, name + '_v')))
-        out = os.path.join(tempfile.gettempdir(), 'ca_villagers_vanilla.png')
+            vrows.append((name, [o.cv.pil()] + render_preview(o, b, name + '_v', out_dir)))
+        out = os.path.join(out_dir, 'villagers_vanilla.png')
         print(sheet(vrows, out))
 
 
 if __name__ == '__main__':
     import sys
-    main(sys.argv[1] if len(sys.argv) > 1 else None)
+    # usage: gen_villagers.py [vanilla_villager_texture_dir out_dir]
+    main(*(sys.argv[1:3] if len(sys.argv) > 2 else (None, None)))

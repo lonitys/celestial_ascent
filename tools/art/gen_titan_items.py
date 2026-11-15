@@ -216,9 +216,10 @@ def storm_core():
     cv.grid(bolt, {'y': '#ffe14a', 'W': '#ffffff'}, 4, 3)
     outline(cv, '#1a1538', '#100c26')
     # crackling arcs outside the orb
-    for x, y, c in ((14, 5, '#ffe14a'), (15, 4, '#fff7b0'), (1, 10, '#ffe14a'), (0, 11, '#fff7b0'),
-                    (12, 14, '#ffe14a')):
-        cv.put(x, y, c)
+    for x, y, c in ((14, 4, '#ffe14a'), (15, 3, '#fff7b0'), (14, 2, '#ffe14a'),
+                    (1, 11, '#ffe14a'), (0, 12, '#fff7b0'), (1, 13, '#ffe14a')):
+        if not cv.opaque(x, y):
+            cv.put(x, y, c)
     return cv
 
 
@@ -460,14 +461,14 @@ BOOTS = [
     "................",
     "................",
     "................",
-    "...453...433....",
-    "...4z3...4z3....",
-    "...4y3...4y2....",
-    "...453...432....",
-    "..4543..44322...",
-    "..aabbc.abbcd...",
-    ".aabbcd.abccdd..",
-    ".2333221.33221..",
+    "..abbc...abcc...",
+    "..4553...4543...",
+    "...4z3....4z2...",
+    "...4y3....4y2...",
+    "..45432..44322..",
+    "..aabbc..abbcd..",
+    ".aabbccd.abbcdd.",
+    ".23333221.33221.",
     "................",
     "................",
     "................",
@@ -563,7 +564,7 @@ def dragon_heart():
     outline(cv, '#1c0628', '#0f0316')
     # ender sparkle (outside the outline)
     for x, y, c in ((14, 1, '#ffffff'), (13, 1, '#d070ff'), (15, 1, '#d070ff'), (14, 0, '#d070ff'),
-                    (14, 2, '#d070ff'), (1, 12, '#c060f0')):
+                    (14, 2, '#d070ff')):
         if not cv.opaque(x, y):
             cv.put(x, y, c)
     return cv

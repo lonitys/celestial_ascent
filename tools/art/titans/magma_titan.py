@@ -15,7 +15,7 @@ from anim_helpers import TAU, legs_for_drop
 
 NAME = "magma_titan"
 HITBOX = (2.4, 4.6)
-THIGH, SHIN = 10.0, 12.0
+THIGH, SHIN = 11.0, 14.0
 
 # =============================================================================== geometry
 
@@ -51,10 +51,10 @@ def build_model():
     neck = m.bone("neck", "chest", (0, 52, -6), rotation=[-18, 0, 0])
     head = m.bone("head", "neck", (0, 52, -9))
     head.boxb(0, 49, -13, 14, 10, 12, "basalt")                                  # wide flat skull
-    head.box((0, 56.6, -19.4), (16, 3, 4), "obsidian", rot=[16, 0, 0])          # heavy brow
-    head.box((-3.7, 54.6, -19.2), (3, 1, 1), "eye", inflate=0.12)
-    head.box((3.7, 54.6, -19.2), (3, 1, 1), "eye", inflate=0.12)
-    head.box((0, 52.5, -19.4), (4, 3, 2), "plate")                              # snout plate
+    head.box((0, 57.9, -19.3), (16, 2, 4), "obsidian", rot=[10, 0, 0])          # heavy brow
+    head.box((-3.8, 55.4, -19.35), (4, 1, 1), "eye", inflate=0.15)
+    head.box((3.8, 55.4, -19.35), (4, 1, 1), "eye", inflate=0.15)
+    head.box((0, 52.6, -19.4), (4, 3, 2), "plate")                              # snout plate
     # crown of flame-shaped obsidian spikes curling back
     crown = [((0, 58.6, -15.5), [(0, 1, -0.15), (0, 1, 0.25), (0, 1, 0.8)], [6, 5, 4], [4, 3, 2]),
              ((-4.6, 58.4, -14.0), [(-0.2, 1, -0.1), (-0.35, 1, 0.35), (-0.4, 0.9, 0.9)], [5, 4, 3], [3, 3, 2]),
@@ -71,35 +71,38 @@ def build_model():
 
     for side, nm in ((-1, "right"), (1, "left")):
         s = side
-        arm = m.bone(f"{nm}_arm", "chest", (16 * s, 50, 1), rotation=[-18, 0, -6 * s])
-        arm.boxb(20 * s, 34, 1, 11, 15, 12, "basalt")                           # upper arm
-        arm.box((20.5 * s, 50.5, 1), (14, 11, 15), "ember", rot=[0, 0, -10 * s])  # smoldering shoulder boulder
-        arm.boxb(21.5 * s, 56, 1, 8, 4, 8, "vent")                              # shoulder vent
-        arm.boxb(21.8 * s, 59.5, 1, 5, 3, 5, "vent", crater=True)
-        arm.box((26.8 * s, 47.5, 1), (3, 7, 13), "plate", rot=[0, 0, -18 * s])  # outer plate
-        fore = m.bone(f"{nm}_forearm", f"{nm}_arm", (20 * s, 35, 1), rotation=[-10, 0, 0])
-        fore.boxb(20.5 * s, 20, 0.5, 12, 15, 13, "basalt")                      # forearm
-        fore.box((26.8 * s, 27.5, 0.5), (2, 10, 11), "plate", rot=[0, 0, -4 * s])
-        fore.spike((26.5 * s, 31, 0.5), (1.0 * s, 0.5, 0), 5, 3, "obsidian", segs=[1.0])
-        fore.spike((26.5 * s, 25, 2.5), (1.0 * s, 0.3, 0.3), 4, 2, "obsidian", segs=[1.0])
-        fore.boxb(21 * s, 4, 0, 15, 14, 15, "fist")                             # huge fist
-        fore.box((21 * s, 9.5, -7.9), (14, 6, 2), "obsidian")                   # knuckle guard
-        for x in (16.5, 21.0, 25.5):
-            fore.spike((x * s, 9.5, -8.6), (0, 0.15, -1.0), 4, 3, "obsidian", segs=[1.0])
-        fore.box((13.0 * s, 12.5, -4.0), (3, 6, 5), "fist")                     # thumb
+        arm = m.bone(f"{nm}_arm", "chest", (15.5 * s, 50, 1), rotation=[-18, 0, -6 * s])
+        arm.boxb(19 * s, 34, 1, 11, 15, 12, "basalt")                           # upper arm
+        arm.box((19.5 * s, 50.5, 1), (14, 11, 15), "ember", rot=[0, 0, -10 * s])  # smoldering shoulder boulder
+        arm.boxb(20.5 * s, 56, 1, 8, 4, 8, "vent")                              # shoulder vent
+        arm.boxb(20.8 * s, 59.5, 1, 5, 3, 5, "vent", crater=True)
+        arm.box((25.6 * s, 47.5, 1), (3, 7, 13), "plate", rot=[0, 0, -18 * s])  # outer plate
+        fore = m.bone(f"{nm}_forearm", f"{nm}_arm", (19 * s, 35, 1), rotation=[-10, 0, 0])
+        fore.boxb(19.5 * s, 18, 0.5, 12, 17, 13, "basalt")                      # forearm
+        fore.box((25.6 * s, 26.5, 0.5), (2, 11, 11), "plate", rot=[0, 0, -4 * s])
+        fore.spike((25.3 * s, 30, 0.5), (1.0 * s, 0.5, 0), 5, 3, "obsidian", segs=[1.0])
+        fore.spike((25.3 * s, 24, 2.5), (1.0 * s, 0.3, 0.3), 4, 2, "obsidian", segs=[1.0])
+        fore.boxb(20 * s, 2, 0, 15, 14, 15, "fist")                             # huge fist
+        fore.box((20 * s, 7.5, -7.9), (14, 6, 2), "obsidian")                   # knuckle guard
+        for x in (15.5, 20.0, 24.5):
+            fore.spike((x * s, 7.5, -8.6), (0, 0.15, -1.0), 4, 3, "obsidian", segs=[1.0])
+        fore.box((12.0 * s, 10.5, -4.0), (3, 6, 5), "fist")                     # thumb
 
-        leg = m.bone(f"{nm}_leg", "root", (8 * s, 22, 1))
-        leg.boxb(8 * s, 12, 1, 12, 11, 12, "basalt")                            # thigh
-        leg.box((8.2 * s, 18.5, -5.5), (10, 6, 2), "plate", rot=[-8, 0, 0])
-        shin = m.bone(f"{nm}_shin", f"{nm}_leg", (8 * s, 12, 1))
-        shin.boxb(8 * s, 3, 1.5, 11, 10, 11, "lava_limb")
-        shin.box((8 * s, 11.5, -5.2), (10, 6, 3), "plate", rot=[-12, 0, 0])     # knee plate
-        shin.box((8 * s, 6.5, -4.8), (9, 6, 2), "plate")                        # greave
-        shin.box((13.6 * s, 7.0, 1.5), (2, 8, 9), "plate")                      # outer greave
+        leg = m.bone(f"{nm}_leg", "root", (8 * s, 25, 1))
+        leg.boxb(8 * s, 13, 1, 12, 13, 12, "basalt")                            # thigh
+        leg.box((8.2 * s, 20.5, -5.5), (10, 7, 2), "plate", rot=[-8, 0, 0])
+        shin = m.bone(f"{nm}_shin", f"{nm}_leg", (8 * s, 14, 1))
+        shin.boxb(8 * s, 3, 1.5, 11, 12, 11, "lava_limb")
+        shin.box((8 * s, 13.5, -5.2), (10, 6, 3), "plate", rot=[-12, 0, 0])     # knee plate
+        shin.box((8 * s, 7.5, -4.8), (9, 7, 2), "plate")                        # greave
+        shin.box((13.6 * s, 8.0, 1.5), (2, 10, 9), "plate")                     # outer greave
         foot = m.bone(f"{nm}_foot", f"{nm}_shin", (8 * s, 3.5, 1.5))
         foot.boxb(8 * s, 0, -1, 14, 4, 15, "basalt")
         for x in (4.0, 8.0, 12.0):
             foot.box((x * s, 1.5, -9.2), (3, 3, 3), "obsidian")                 # toe claws
+    # raise everything above the hips: the titan towers to its 4.6-block hitbox
+    m.shift_bones(["body", "chest", "neck", "head", "jaw", "right_arm", "left_arm", "right_forearm",
+                   "left_forearm"], (0, 3, 0))
     return m
 
 # =============================================================================== shaders
@@ -138,7 +141,7 @@ def shade_basalt(ctx, seams=0.07, plate=False, fist=False):
     v += 0.1 * max(0, ctx.nw[1]) - 0.08 * max(0, -ctx.nw[1])
     rgb = ramp(BASALT, v)
     # glowing lava seams between the plates (wider low on the body / fists)
-    gate = fbm(p, 0.09, 2, 29) > (0.42 if not plate else 0.62)
+    gate = fbm(p, 0.09, 2, 29) > (0.5 if not plate else 0.66)
     seam = (d < seams) & gate
     hot = (d < seams * 0.45) & gate
     halo = (d < seams * 2.2) & gate & ~seam
@@ -149,7 +152,7 @@ def shade_basalt(ctx, seams=0.07, plate=False, fist=False):
     rgb[hot] = lh[hot]
     # hairline cracks
     g1, g2, _ = worley(p, 0.35, 61)
-    crack = ((g2 - g1) < 0.035) & (fbm(p, 0.3, 2, 62) > 0.6) & ~seam
+    crack = ((g2 - g1) < 0.03) & (fbm(p, 0.22, 2, 62) > 0.68) & ~seam
     rgb[crack] = LAVA[3]
     return rgb, 255, seam | crack
 
@@ -158,11 +161,13 @@ def shade_lava(ctx, limb=False):
     p = ctx.p
     rgb, v = lava_rgb(ctx, 0.05)
     # cooling crust islands floating on the molten flesh
-    f1, f2, cid = worley(p, 0.22 if not limb else 0.16, 81)
-    crust = (f1 < (0.32 if not limb else 0.45)) & (cid > 0.3)
+    exposed = limb or ctx.face != "north"            # only the belly front stays mostly molten
+    f1, f2, cid = worley(p, 0.22 if not exposed else 0.17, 81)
+    r = 0.32 if not exposed else 0.62
+    crust = (f1 < r) & (cid > (0.3 if not exposed else 0.08))
     cv = 0.35 + (cid - 0.5) * 0.3 + edge_term(ctx, 0.1, 0.1) - ctx.ao * 0.4 + (fbm(p, 0.4, 2, 5) - 0.5) * 0.3
     rgb[crust] = ramp(BASALT, cv[crust])
-    rim = (f1 >= (0.32 if not limb else 0.45)) & (f1 < (0.38 if not limb else 0.52)) & (cid > 0.3)
+    rim = (f1 >= r) & (f1 < r + 0.07) & (cid > (0.3 if not exposed else 0.08))
     rgb[rim] = LAVA[2]
     glow = ~crust
     return rgb, 255, glow
@@ -180,19 +185,20 @@ def shade_obsidian(ctx, flame=False):
     glow = np.zeros(ctx.N, dtype=bool)
     if flame:
         prm = ctx.params
-        # heat rises through the flame: hot glowing core near the tip, embers along the edge
+        last = prm["seg"] == prm["nseg"] - 1
         prog = prm["curve_prog0"] + (prm["curve_prog1"] - prm["curve_prog0"]) * (1 - ctx.t)
-        if ctx.face in ("up",):
-            prog = np.full(ctx.N, prm["curve_prog1"])
-        if ctx.face in ("down",):
-            prog = np.full(ctx.N, prm["curve_prog0"])
-        hot = prog > 0.62
-        lv = 0.35 + (prog - 0.62) * 2.0 + (fbm(p, 0.5, 2, 4) - 0.5) * 0.3
+        if ctx.face == "up":
+            prog = np.full(ctx.N, prm["curve_prog1"] if last else prm["curve_prog0"])
+        if ctx.face == "down":
+            prog = np.full(ctx.N, 0.0)
+        # flame tongues: glowing licks rising up the faces, hottest near the tip
+        tongue = np.abs(ctx.s - 0.5 - 0.18 * np.sin(prog * 9 + prm["seg"])) < (0.08 + prog * 0.25)
+        hot = (prog > 0.72) | (tongue & (prog > 0.3))
+        lv = 0.25 + prog * 0.75 + (fbm(p, 0.5, 2, 4) - 0.5) * 0.2
         rgb[hot] = ramp(LAVA, lv[hot])
-        edge = (ctx.i == 0) | (ctx.i == ctx.tw - 1)
-        lick = edge & (prog > 0.35) & ~hot
-        rgb[lick] = LAVA[4]
-        glow = hot | lick
+        edge = ((ctx.i == 0) | (ctx.i == ctx.tw - 1)) & (prog > 0.25) & ~hot
+        rgb[edge] = LAVA[3]
+        glow = hot | edge
     return rgb, 255, glow
 
 
@@ -249,9 +255,9 @@ def shade_eye(ctx):
 
 
 SHADERS = {
-    "basalt": shade_basalt,
-    "plate": lambda c: shade_basalt(c, seams=0.04, plate=True),
-    "fist": lambda c: shade_basalt(c, seams=0.09, fist=True),
+    "basalt": lambda c: shade_basalt(c, seams=0.055),
+    "plate": lambda c: shade_basalt(c, seams=0.035, plate=True),
+    "fist": lambda c: shade_basalt(c, seams=0.075, fist=True),
     "lava": shade_lava,
     "lava_limb": lambda c: shade_lava(c, limb=True),
     "obsidian": shade_obsidian,

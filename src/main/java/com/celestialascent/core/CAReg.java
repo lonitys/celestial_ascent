@@ -46,7 +46,8 @@ public final class CAReg {
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB = TABS.register("main", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.celestialascent"))
-            .icon(() -> TAB_ORDER.isEmpty() ? ItemStack.EMPTY : new ItemStack(TAB_ORDER.get(TAB_ORDER.size() - 1).get()))
+            .icon(() -> new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(
+                    net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(M, "ascendant_chestplate"))))
             .displayItems((params, out) -> TAB_ORDER.forEach(s -> out.accept(s.get())))
             .build());
 

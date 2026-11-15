@@ -505,10 +505,6 @@ def anvil_top():
     engrave(cv, 12, 4, 'tide', 'tide')
     engrave(cv, 1, 9, 'storm', 'storm')
     engrave(cv, 12, 9, 'magma', 'magma')
-    # groove line linking them
-    for x in range(5, 11):
-        cv.put(x, 4, S[2])
-        cv.put(x, 11, S[2])
     for x, y in ((6, 7), (7, 6), (9, 8)):
         cv.put(x, y, S[7])
     return cv
