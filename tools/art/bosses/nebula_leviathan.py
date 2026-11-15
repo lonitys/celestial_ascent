@@ -27,16 +27,16 @@ YC = 15.0       # body centre line height
 ZOFF = 8.0      # whole model shifted back so the head/neck/body sit over the hitbox
 
 # (bone, z_front, length, width, height, sail height, scale size)
-BODY = ("body", -6, 16, 14, 13, 6, 4.0)
+BODY = ("body", -6, 16, 14, 13, 4, 4.0)
 SEGS = [
     ("seg1", 10, 11, 13, 12, 6, 3.8),
-    ("seg2", 21, 10, 13, 12, 6, 3.8),
-    ("seg3", 31, 10, 12, 11, 5, 3.6),
-    ("seg4", 41, 9, 11, 10, 5, 3.4),
-    ("seg5", 50, 9, 10, 9, 4, 3.2),
-    ("seg6", 59, 8, 9, 8, 4, 3.0),
-    ("seg7", 67, 8, 7, 7, 3, 2.7),
-    ("seg8", 75, 7, 6, 6, 3, 2.4),
+    ("seg2", 21, 10, 12, 11, 6, 3.7),
+    ("seg3", 31, 10, 11, 10, 5, 3.5),
+    ("seg4", 41, 9, 10, 9, 5, 3.3),
+    ("seg5", 50, 9, 9, 8, 4, 3.1),
+    ("seg6", 59, 8, 8, 7, 4, 2.9),
+    ("seg7", 67, 8, 7, 6, 3, 2.6),
+    ("seg8", 75, 7, 6, 5, 3, 2.4),
     ("tail", 82, 7, 4, 4, 2, 2.1),
 ]
 CHAIN = ["body"] + [s[0] for s in SEGS]
@@ -93,17 +93,21 @@ def neck_pt(p):
     return NECK_PIVOT + R @ (np.asarray(p, dtype=float) - NECK_PIVOT)
 
 
-def segment(b, z0, L, W, H, sail0, sail1, P, ov=2.5, ridge=True):
+def segment(b, z0, L, W, H, sail0, sail1, P, ov=3.5, ridge=True):
+    """One body segment along +Z from its pivot at z0. The core reaches ov units back inside the
+    (strictly larger) previous segment to hide the joint when it bends; belly, ridge and sail pieces
+    butt against their neighbours instead of overlapping, so nothing is ever coplanar (no z-fighting
+    when a joint passes through zero)."""
     zc = z0 + (L + 0.5 - ov) / 2
     b.box((0, YC, zc), (W, H, L + 0.5 + ov), "scales", P=P)
     if ridge:
-        b.box((0, YC + H / 2 + 0.2, z0 + L / 2), (max(2, int(round(W * 0.5))), 1, L + 1), "ridge", P=P * 0.8)
+        b.box((0, YC + H / 2 + 0.2, z0 + L / 2), (max(2, int(round(W * 0.5))), 1, L), "ridge", P=P * 0.8)
     bw = max(2, int(round(W * 0.66)))
-    b.box((0, YC - H / 2 - 0.4, z0 + L / 2 - 0.25), (bw, 2, L + 1), "belly", Pb=max(1.2, P * 0.68))
+    b.box((0, YC - H / 2 - 0.4, z0 + L / 2 + 0.25), (bw, 2, L), "belly", Pb=max(1.2, P * 0.68))
     sh = max(sail0, sail1)
     if sh > 0:
-        b.plane_from((0, YC + H / 2 + 0.5, z0 - 1), L + 2, sh, "fin", rot=[0, -90, 0], anchor_st=(0, 1),
-                     kind="dorsal", h0=sail0, h1=sail1, sp=max(2.2, P * 1.1), xoff=z0 - 1)
+        b.plane_from((0, YC + H / 2 + 0.5, z0), L, sh, "fin", rot=[0, -90, 0], anchor_st=(0, 1),
+                     kind="dorsal", h0=sail0, h1=sail1, sp=max(2.2, P * 1.1), xoff=z0)
 
 
 def build_model():
@@ -125,8 +129,9 @@ def build_model():
     neck.box((0, 17.0, -10.5), (12, 11, 13), "scales", rot=tilt, pivot=piv, P=3.4)
     neck.box((0, 22.7, -10.5), (6, 1, 13), "ridge", rot=tilt, pivot=piv, P=2.8)
     neck.box((0, 11.2, -10.5), (8, 2, 12), "throat", rot=tilt, pivot=piv, Pb=1.5)
-    neck.plane_from(neck_pt((0, 23.0, -17.5)), 15, 6, "fin", rot=gp.rot_b(tilt) @ gp.rot_b([0, -90, 0]),
-                    anchor_st=(0, 1), kind="dorsal", h0=2.5, h1=6, sp=2.8, xoff=-17.5)
+    # neck sail ends where the body sail begins (both lie in x = 0, so they must not overlap)
+    neck.plane_from(neck_pt((0, 23.0, -16.6)), 7, 4, "fin", rot=gp.rot_b(tilt) @ gp.rot_b([0, -90, 0]),
+                    anchor_st=(0, 1), kind="dorsal", h0=2.5, h1=4, sp=2.8, xoff=-17.5)
 
     # ---------------------------------------------------------------- head (zero rest rotation!)
     head = m.bone("head", "neck", (0, 20, -16))
@@ -185,7 +190,8 @@ def build_model():
             sc = 1.0
             for s in (-1, 1):
                 b.plane_from((W / 2 * s, YC - H / 2 + 2.5, z0 + 1.5), int(16 * sc), int(9 * sc), "fin",
-                             rot=frame((1.0 * s, -0.55, 0.35), (0, -0.1, 1)), anchor_st=(0, 0), kind="pectoral")
+                             rot=frame((1.0 * s, -0.55, 0.35), (0, -0.1, 1)), anchor_st=(0, 0), kind="pectoral",
+                             figure=False)
         parent = name
     tail = m["tail"]
     tail.box((0, YC, 90.5), (3, 3, 4), "scales_plain", P=2.0)                         # tail tip
@@ -219,6 +225,11 @@ def add_wave(c, ya, pa, period, amp=None, t0=0.0, static=1.0):
             + static_joint(k) * (static(t) if callable(static) else static))
     # the neck counter-turns against the body so the head stays aimed
     c.f("neck", "rotation", lambda t: (0, -0.85 * heading(0, TAU * (t + t0) / period, ya[0], ya[1], PHI_Y) * amp(t), 0))
+
+
+def joints_from_headings(H):
+    """Absolute headings per chain element -> joint angles (each relative to its parent)."""
+    return [H[0]] + [H[k] - H[k - 1] for k in range(1, len(H))]
 
 
 def chain_keys(c, keys_per_bone):
@@ -288,8 +299,8 @@ def anim_void_bite():
     damp = lambda t: 1 - 0.65 * env(t, 0.05, 0.3, 0.5, 1.1)
     add_wave(c, IDLE_YA, IDLE_PA, 2.0, amp=damp)
     ambient(c, 2.0, k=0.6)
-    # wind-up: the body bunches into a tight S (a coiled spring), then snaps straight on the strike
-    zz = [0, 10, -16, 16, -12, 8, -6, 4, 0, 0]
+    # wind-up: the front body folds into a snake-strike S (a coiled spring), then whips straight
+    zz = joints_from_headings([0, 42, 58, 12, -44, -56, -20, 26, 42, 22])
     for k, b in enumerate(CHAIN[1:], 1):
         c.rot(b, [(0, (0, 0, 0)), (0.32, (0, zz[k], 0), "io"), (0.42, (0, -0.3 * zz[k], 0), "snap"),
                   (0.75, (0, -0.1 * zz[k], 0)), (1.3, (0, 0, 0), "io")])
@@ -297,12 +308,12 @@ def anim_void_bite():
                    (1.3, (0, 0, 0), "io")])
     c.pos("body", [(0, (0, 0, 0)), (0.32, (0, 1.0, 5), "io"), (0.42, (0, -1.0, -9), "snap"), (0.7, (0, -1.0, -7.5)),
                    (1.3, (0, 0, 0), "io")])
-    c.rot("neck", [(0, (0, 0, 0)), (0.32, (-24, 0, 0), "io"), (0.42, (12, 0, 0), "snap"), (0.62, (9, 0, 0)),
+    c.rot("neck", [(0, (0, 0, 0)), (0.32, (-20, 0, 0), "io"), (0.42, (12, 0, 0), "snap"), (0.62, (9, 0, 0)),
                    (1.3, (0, 0, 0), "io")])
     c.pos("neck", [(0, (0, 0, 0)), (0.32, (0, 1.0, 1.5), "io"), (0.42, (0, -0.5, -2), "snap"), (0.65, (0, -0.5, -1.5)),
                    (1.3, (0, 0, 0), "io")])
     c.f("neck", "rotation", lambda t: (tremor(t, 0.42, 0.45, 0.55, 0.75, 1.5, 24), tremor(t, 0.42, 0.45, 0.55, 0.75, 1.0, 19, 2), 0))
-    c.rot("jaw", [(0, (0, 0, 0)), (0.1, (0, 0, 0)), (0.3, (40, 0, 0), "out"), (0.4, (44, 0, 0)),
+    c.rot("jaw", [(0, (0, 0, 0)), (0.1, (0, 0, 0)), (0.3, (36, 0, 0), "out"), (0.4, (40, 0, 0)),
                   (0.45, (-3, 0, 0), "snap"), (0.7, (2, 0, 0)), (1.3, (0, 0, 0), "io")])
     c.f("head", "position", lambda t: (0, tremor(t, 0.44, 0.46, 0.55, 0.7, 0.5, 30), 0))
     side_keys(c, "frill", [(0, (0, 0, 0)), (0.32, (0, -28, 6), "io"), (0.42, (0, -30, 6)), (0.6, (0, 12, 0), "out"),
@@ -321,7 +332,7 @@ def anim_nebula_breath():
     damp = lambda t: 1 - 0.5 * env(t, 0.3, 0.6, 2.0, 2.45)
     add_wave(c, IDLE_YA, IDLE_PA, 2.4, amp=damp)
     ambient(c, 2.5, k=0.5, jaw=(0, 0))
-    c.rot("neck", [(0, (0, 0, 0)), (0.45, (-18, 0, 0), "io"), (0.58, (3, 0, 0), "snap"), (2.15, (1, 0, 0)),
+    c.rot("neck", [(0, (0, 0, 0)), (0.45, (-18, 0, 0), "io"), (0.58, (-6, 0, 0), "snap"), (2.15, (-8, 0, 0)),
                    (2.5, (0, 0, 0), "io")])
     c.f("neck", "rotation", lambda t: (0, 9 * math.sin(TAU * (t - 0.6) / 1.6) * env(t, 0.6, 0.85, 1.95, 2.2), 0))
     c.pos("neck", [(0, (0, 0, 0)), (0.45, (0, 1, 3), "io"), (0.58, (0, -0.5, -3), "snap"), (2.15, (0, -0.5, -2.5)),
@@ -406,7 +417,7 @@ def anim_phase():
     burst = lambda t: env(t, 0.55, 0.68, 1.45, 2.0, "snap", "io")
     add_wave(c, IDLE_YA, IDLE_PA, 2.0, amp=lambda t: 1 - 0.7 * con(t) - 0.4 * burst(t))
     ambient(c, 2.0, k=0.4, jaw=(0, 0))
-    zz = [0, 12, -16, 16, -14, 12, -10, 8, -6, 4]
+    zz = joints_from_headings([0, -36, -50, -12, 38, 50, 18, -24, -38, -18])
     for k, b in enumerate(CHAIN[1:], 1):
         c.f(b, "rotation", lambda t, k=k: (-4 * con(t) + (5 - 0.8 * k) * burst(t), zz[k] * con(t)
                                            + 10 * (k / 9) * math.sin(TAU * 2.4 * t - k) * burst(t), 0))
@@ -433,14 +444,15 @@ def anim_death():
     limp = lambda t: ease("io", (t - 1.0) / 1.3)
     add_wave(c, IDLE_YA, IDLE_PA, 2.0, amp=live, static=lambda t: 1 - limp(t))
     ambient(c, 2.0, k=0.4, jaw=(0, 0), hover=0.0)
+    lazy = joints_from_headings([0, 8, 14, 10, -2, -12, -14, -6, 6, 12])
+    jolts = joints_from_headings([0, -14, -20, -4, 16, 20, 6, -12, -16, -8])
     for k, b in enumerate(CHAIN[1:], 1):
-        jolt = [0, -10, 14, -14, 10, -8, 6, -4, 3, 2][k]
-        c.f(b, "rotation", lambda t, k=k, jolt=jolt: (
-            (3 - 0.5 * k) * limp(t) + 2.5 * shake(t, 9 + k, 1.0, k) * env(t, 0.25, 0.35, 1.0, 1.3),
-            jolt * env(t, 0.0, 0.25, 0.4, 1.0) + 10 * limp(t), 0))
+        c.f(b, "rotation", lambda t, k=k: (
+            (2.5 - 0.4 * k) * limp(t) + 2.5 * shake(t, 9 + k, 1.0, k) * env(t, 0.25, 0.35, 1.0, 1.3),
+            jolts[k] * env(t, 0.0, 0.25, 0.4, 1.0) + lazy[k] * limp(t), 0))
     c.f("body", "rotation", lambda t: (-14 * env(t, 0.0, 0.25, 0.45, 1.2) + tremor(t, 0.25, 0.35, 1.0, 1.3, 2.5, 18),
-                                       0, 58 * limp(t)))
-    c.f("neck", "rotation", lambda t: (-30 * env(t, 0.0, 0.25, 0.5, 1.2) + 22 * limp(t)
+                                       0, 34 * limp(t)))
+    c.f("neck", "rotation", lambda t: (-30 * env(t, 0.0, 0.25, 0.5, 1.2) + 16 * limp(t)
                                        + tremor(t, 0.25, 0.35, 1.0, 1.3, 3.0, 21, 1), tremor(t, 0.25, 0.35, 1.0, 1.3, 2.0, 16, 3), 0))
     bounce = Track([(0, 0.0), (1.15, 0.0), (2.25, -9.0, "in"), (2.4, -8.0, "out"), (2.55, -9.0, "in"), (2.8, -9.0)])
     c.f("root", "position", lambda t: (0, float(bounce(t)), 0))
@@ -469,7 +481,7 @@ POSES = [
     ("phase", [0.4, 0.62, 1.0, 1.8]),
     ("death", [0.2, 0.9, 1.8, 2.8]),
 ]
-HERO = ("attack.void_bite", 0.34)
+HERO = ("attack.void_bite", 0.3)
 
 
 # =============================================================================== checks + main
@@ -514,7 +526,12 @@ def main():
                          frame=50, px=440))
         print(nv.closeup(NAME, geo, rgba, glow, np.array([0, 18, 20]), [("body side", 90, -4), ("body top", 90, -70)],
                          frame=34, px=520, tag="_body"))
+        print(nv.closeup(NAME, geo, rgba, glow, np.array([0, 14, 2]), [("pectoral fins (top)", 90, -80)],
+                         frame=70, px=520, tag="_fins"))
+        print(nv.closeup(NAME, geo, rgba, glow, np.array([0, 14, 100]), [("tail fluke (top)", 90, -80)],
+                         frame=50, px=520, tag="_fluke"))
         if "--all" in sys.argv:
+            print(nv.pose_sheet(NAME, geo, rgba, glow, anims, "attack.coil", 1.6))
             for an, times in POSES:
                 print(nv.strip(NAME, geo, rgba, glow, anims, an, times))
 

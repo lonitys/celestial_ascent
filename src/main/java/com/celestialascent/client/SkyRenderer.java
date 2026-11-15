@@ -60,6 +60,23 @@ public final class SkyRenderer {
         b.addVertex(m, c.x - r.x + u.x, c.y - r.y + u.y, c.z - r.z + u.z).setColor(R, G, B, alpha);
     }
 
+    /** Soft radial glow: four quads fading from the centre colour to transparent edges (no hard rim). */
+    static void glow(BufferBuilder b, Matrix4f m, Vector3f d, float size, int rgb, float alpha) {
+        Vector3f c = new Vector3f(d).mul((float) RADIUS);
+        Vector3f up = Math.abs(d.y) > 0.9f ? new Vector3f(1, 0, 0) : new Vector3f(0, 1, 0);
+        Vector3f r = new Vector3f(d).cross(up).normalize().mul(size);
+        Vector3f u = new Vector3f(r).cross(d).normalize().mul(size);
+        float R = ((rgb >> 16) & 255) / 255f, G = ((rgb >> 8) & 255) / 255f, B = (rgb & 255) / 255f;
+        float[][] ring = {{1, 0}, {0.7f, 0.7f}, {0, 1}, {-0.7f, 0.7f}, {-1, 0}, {-0.7f, -0.7f}, {0, -1}, {0.7f, -0.7f}};
+        for (int i = 0; i < 8; i += 2) {
+            float[] a = ring[i], mid = ring[(i + 1) % 8], e = ring[(i + 2) % 8];
+            b.addVertex(m, c.x, c.y, c.z).setColor(R, G, B, alpha);
+            b.addVertex(m, c.x + r.x * a[0] + u.x * a[1], c.y + r.y * a[0] + u.y * a[1], c.z + r.z * a[0] + u.z * a[1]).setColor(R, G, B, 0f);
+            b.addVertex(m, c.x + r.x * mid[0] + u.x * mid[1], c.y + r.y * mid[0] + u.y * mid[1], c.z + r.z * mid[0] + u.z * mid[1]).setColor(R, G, B, 0f);
+            b.addVertex(m, c.x + r.x * e[0] + u.x * e[1], c.y + r.y * e[0] + u.y * e[1], c.z + r.z * e[0] + u.z * e[1]).setColor(R, G, B, 0f);
+        }
+    }
+
     /** Thin quad between two sky directions (a constellation line). */
     static void line(BufferBuilder b, Matrix4f m, Vector3f a, Vector3f c, float width, int rgb, float alpha) {
         Vector3f pa = new Vector3f(a).mul((float) RADIUS), pc = new Vector3f(c).mul((float) RADIUS);
@@ -169,7 +186,7 @@ public final class SkyRenderer {
             // Nebulae: large faint overlapping glows.
             int[][] neb = {{40, 20, 0x5A2CA0}, {70, 35, 0x2C5AA0}, {200, -10, 0xA02C7A}, {260, 50, 0x2CA08E}, {330, 5, 0x6B2CA0}, {150, -40, 0x2C3FA0}};
             for (int[] n : neb) {
-                for (int k = 0; k < 6; k++) star(b, m, dir(n[0] + k * 4f, n[1] + (k % 3) * 3f), 18f + k * 4f, n[2], 0.05f);
+                for (int k = 0; k < 5; k++) glow(b, m, dir(n[0] + k * 5f, n[1] + (k % 3) * 4f - 4f), 26f + k * 6f, n[2], 0.16f);
             }
             float time = ticks + partialTick;
             for (int i = 0; i < STARS; i++) {

@@ -71,7 +71,7 @@ neoForge {
         server {
             server()
             programArgument '--nogui'
-            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+            // No gametest namespaces here: with gametests enabled NeoForge creates superflat worlds.
         }
 
         // This run config launches GameTestServer and runs all registered gametests, then exits.

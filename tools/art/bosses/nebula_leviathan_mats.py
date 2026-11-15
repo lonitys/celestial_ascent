@@ -54,8 +54,8 @@ def nebula_colour(v, hb, mg):
 
 def dust(q, seed=719):
     """Ridged dark dust lanes (0..1)."""
-    r = 1 - np.abs(2 * fbm(warp(q, 10.0) * np.array([1.0, 1.0, 0.55]), 0.08, 3, seed) - 1)
-    return smoothstep(0.8, 0.97, r)
+    t = np.abs(fbm(warp(q, 10.0) * np.array([1.0, 1.0, 0.55]), 0.08, 3, seed) - 0.5)
+    return 1 - smoothstep(0.008, 0.03, t)
 
 
 def stars2d(x, y, scale=0.8, density=0.03, seed=0):
@@ -171,8 +171,8 @@ def scales(ctx, P=None, dark=0.0, star_density=0.004, seed=0):
     rel = (sc["id"] - 0.5) * 0.08 + 0.1 * np.clip(du, -0.3, 1.0) - 0.24 * outline + 0.1 * lit - 0.13 * (sh_u < 0.5)
     q = ctx.pw
     hb, cloud, mg = nebula_fields(ctx)
-    lum = 0.7 * (smoothstep(0.32, 0.72, cloud) - 0.32) - dust(q) * 0.07
-    val = 0.41 + rel + lum - dark + roundness(ctx) + tone(ctx) + bevel(ctx, 1.4, 0.04, 0.07)
+    lum = 0.11 * np.clip((cloud - 0.5) / 0.12, -1, 1) + 0.17 * smoothstep(0.56, 0.72, cloud) - dust(q) * 0.1
+    val = 0.42 + rel + lum - dark + roundness(ctx) + tone(ctx) + bevel(ctx, 1.4, 0.04, 0.07)
     rgb = nebula_colour(val, hb, mg)
     sheen = lit & (sc["id"] > 0.3)
     rgb[sheen] = mix(rgb[sheen], sramp(P_EDGE, np.clip(val[sheen] + 0.12, 0, 1)), 0.28)
@@ -193,7 +193,7 @@ def head_plates(ctx):
     e = f2 - f1
     seam = e < 0.075
     hb, cloud, mg = nebula_fields(ctx)
-    v = 0.4 + (cid - 0.5) * 0.08 + 0.7 * (smoothstep(0.32, 0.72, cloud) - 0.4) + 0.14 * np.clip(e, 0, 0.6) - seam * 0.24
+    v = 0.43 + (cid - 0.5) * 0.08 + 0.1 * np.clip((cloud - 0.5) / 0.12, -1, 1) + 0.12 * smoothstep(0.56, 0.72, cloud) + 0.14 * np.clip(e, 0, 0.6) - seam * 0.24
     v = v + tone(ctx) + bevel(ctx, 1.4, 0.06, 0.1) + roundness(ctx) + dither(ctx, 0.015)
     rgb = nebula_colour(v, hb, mg * 0.6)
     rim = (e > 0.075) & (e < 0.14)
@@ -370,7 +370,20 @@ def _membrane_colour(ctx, x, y, inside, ray, edge, radial, seed=0, star_d=0.045)
     return rgb, glow
 
 
-def _polar_fin(ctx, x, y, phis, rmax_fn, scallop=0.1, spine=0.0, edge_w=0.5, seed=0, ray_w=0.3):
+def constellation(ctx, x, y, inside, pts, line_w=0.26, star_r=0.62):
+    """Faint constellation figure: star points (plane units) joined in order by thin lines.
+    Returns (line mask, star mask) limited to the inside of the shape."""
+    from bosslib import seg_dist
+    line = np.zeros(ctx.N, dtype=bool)
+    star = np.zeros(ctx.N, dtype=bool)
+    for (ax, ay), (bx, by) in zip(pts, pts[1:]):
+        line |= seg_dist(x, y, ax, ay, bx, by) < line_w
+    for (px, py) in pts:
+        star |= (x - px) ** 2 + (y - py) ** 2 < star_r ** 2
+    return line & inside & ~star, star & inside
+
+
+def _polar_fin(ctx, x, y, phis, rmax_fn, scallop=0.1, spine=0.0, edge_w=0.55, seed=0, ray_w=0.3, figure=None):
     """Generic fan-shaped fin around the origin (x, y in units). phis = ray angles (radians);
     rmax_fn(phi) = boundary radius before scalloping. Rays run from the root to each phi and may
     poke out past the membrane by `spine` (fraction)."""
@@ -396,6 +409,17 @@ def _polar_fin(ctx, x, y, phis, rmax_fn, scallop=0.1, spine=0.0, edge_w=0.5, see
     ray = ray & ~edge
     radial = np.clip(r / np.maximum(rmax_fn(np.clip(a, lo, hi)), 1e-3), 0, 1)
     rgb, glow = _membrane_colour(ctx, x, y, inside, ray & inside, edge, radial, seed)
+    if figure:
+        # figure = [(phi_deg, radial_frac), ...] placed in the fin's own polar frame
+        pts = []
+        for fd, fr in figure:
+            fa = np.radians(fd)
+            rr = float(rmax_fn(np.array([fa]))[0]) * fr
+            pts.append((rr * np.cos(fa), rr * np.sin(fa)))
+        ln, st = constellation(ctx, x, y, inside & ~edge, pts)
+        rgb[ln] = mix(rgb[ln], sramp(P_EDGE, np.full(int(ln.sum()), 0.5)), 0.55)
+        rgb[st] = np.array([240.0, 236.0, 255.0])
+        glow |= st | ln
     return rgb, np.where(inside, 255, 0), glow & inside
 
 
@@ -435,7 +459,8 @@ def fin(ctx):
         def rmax(a):
             f = np.clip((a - phis[0]) / (phis[-1] - phis[0]), 0, 1)
             return R * (1.0 - 0.55 * f ** 0.85)
-        return _polar_fin(ctx, x, y, phis, rmax, scallop=0.09, spine=0.03, seed=11)
+        fig = [(14, 0.78), (24, 0.52), (40, 0.62), (58, 0.42), (70, 0.66)] if ctx.params.get("figure", True) else None
+        return _polar_fin(ctx, x, y, phis, rmax, scallop=0.09, spine=0.03, seed=11, figure=fig)
     if kind == "frill":
         x = s * w
         y = (0.5 - t) * h
@@ -466,7 +491,8 @@ def fin(ctx):
         def rmax(a):
             f = np.abs(a) / np.radians(50)
             return R * (0.34 + 0.66 * f ** 1.8)
-        return _polar_fin(ctx, x, y, phis, rmax, scallop=0.08, spine=0.03, seed=41)
+        return _polar_fin(ctx, x, y, phis, rmax, scallop=0.08, spine=0.03, seed=41,
+                          figure=[(-40, 0.72), (-22, 0.5), (0, 0.28), (20, 0.48), (38, 0.7), (44, 0.88)])
     if kind == "whisker":
         x = s * w
         y = (0.5 - t) * h

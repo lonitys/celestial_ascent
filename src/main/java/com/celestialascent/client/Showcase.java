@@ -150,17 +150,21 @@ public final class Showcase {
         step(200, "fallen_stars", 0, 15, "gamemode spectator", "time set 6000",
                 "execute in celestialascent:fallen_stars run tp @s 0 235 0 0 15");
         step(40, "fallen_stars_sky", 0, -35, "execute in celestialascent:fallen_stars run tp @s 0 235 0 135 -35");
-        step(200, "sanctum", 0, 70, "execute in celestialascent:fallen_stars run tp @s -145 185 175 0 70");
+        step(200, "sanctum", 0, 30, "execute in celestialascent:fallen_stars run tp @s -303 140 5 0 30");
         STEPS.add(new Step(200, p -> {
             var abyss = p.server.getLevel(com.celestialascent.core.Travel.ABYSS);
             BlockPos at = com.celestialascent.abyss.Abyss.cavePos(abyss, 0, 0);
             cmd(p, "effect give @s night_vision 999 0 true");
             cmd(p, "execute in celestialascent:abyss run tp @s " + at.getX() + " " + (at.getY() + 1) + " " + at.getZ() + " 0 10");
         }, "abyss", 0, 10, CameraType.FIRST_PERSON));
-        step(260, "trade_city", 0, 85, "effect clear @s", "execute in minecraft:overworld run tp @s -300 150 -330 0 85");
-        step(260, "tide_shrine", 0, 85, "execute in minecraft:overworld run tp @s -880 110 -352 0 85");
-        step(260, "ruined_capital", 0, 85, "execute in minecraft:the_end run tp @s -1316 140 108 0 85");
-        step(260, "star_gate", 0, 80, "execute in minecraft:the_end run tp @s -1028 110 -692 0 80");
+        // Structure locations on the devworld seed (from /celestialascent verify)
+        step(300, "trade_city", 0, 40, "effect clear @s", "execute in minecraft:overworld run tp @s -343 105 -380 0 40");
+        step(300, "frost_shrine_view", 0, 38, "execute in minecraft:overworld run tp @s -1152 140 470 0 38");
+        step(300, "tide_shrine", 0, 35, "execute in minecraft:overworld run tp @s -160 95 10 0 35");
+        step(300, "storm_shrine_view", 0, 40, "execute in minecraft:overworld run tp @s -256 190 505 0 40");
+        step(300, "magma_shrine_view", 0, 15, "execute in minecraft:the_nether run tp @s -336 40 176 0 15");
+        step(300, "ruined_capital", 0, 35, "execute in minecraft:the_end run tp @s -1316 85 60 0 35");
+        step(300, "star_gate", 0, 35, "execute in minecraft:the_end run tp @s -1052 75 -725 0 35");
     }
 
     @SubscribeEvent

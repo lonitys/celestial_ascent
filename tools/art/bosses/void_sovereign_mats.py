@@ -197,12 +197,12 @@ def _w(fn):
     return sh
 
 
-def shade_shard(ctx, cracks=0.0, core=False, seed=0, tipcol=0.35):
+def shade_shard(ctx, cracks=0.0, core=False, seed=0, tipcol=0.35, lift=0.26, base=0.33):
     """Crystal prism along a spike: darker base, lighter violet tip, lit vertical edges,
-    optional glowing violet core (crown shards)."""
+    optional glowing violet core seen through dark glass (crown shards)."""
     prog = spike_prog(ctx)
-    v = crystal_v(ctx, seed, freq=0.24, stretch=0.35, base=0.33, striate=0.14, rim=0.0)
-    v += 0.26 * prog ** 1.6
+    v = crystal_v(ctx, seed, freq=0.24, stretch=0.35, base=base, striate=0.14, rim=0.0)
+    v += lift * prog ** 1.6
     side = ctx.face not in ("up", "down")
     if side:
         ei = np.minimum(ctx.i, ctx.tw - 1 - ctx.i)
@@ -212,28 +212,25 @@ def shade_shard(ctx, cracks=0.0, core=False, seed=0, tipcol=0.35):
     rgb = rgb * (1 - tint) + sramp(VIO, 0.2 + 0.45 * v) * tint
     glow = np.zeros(ctx.N, dtype=bool)
     if core:
-        # a glowing core seen through the glass: soft violet column, hottest mid-length,
-        # fading out towards the dark base and the clear tip
-        along = np.sin(np.pi * np.clip(prog * 1.1, 0, 1)) ** 0.7
+        # a glowing core seen through the dark glass: a narrow violet column with a soft halo,
+        # hottest mid-length, fading towards the base and the clear tip
+        along = np.sin(np.pi * np.clip(prog * 1.05, 0, 1)) ** 0.6
         if side:
-            w = np.abs(ctx.s - 0.5)
-            k = np.clip(1 - w / 0.34, 0, 1) * along
+            w = np.abs(ctx.s - 0.5) * ctx.tw / 2.0          # units from the face centre line
+            k = np.clip(1 - w / 0.55, 0, 1) * along
         else:
             x, y = plane_xy(ctx)
-            k = np.clip(1 - np.maximum(np.abs(x), np.abs(y)) / 0.6, 0, 1) * along
-        rgb = mix(rgb, sramp(VIO, 0.2 + 0.5 * k), np.clip(k * 1.2, 0, 0.75))
-        hot = k > 0.78
-        rgb[hot] = sramp(VIO, 0.62 + 0.3 * k[hot])
-        glow = k > 0.38
+            k = np.clip(1 - np.maximum(np.abs(x), np.abs(y)) / 0.5, 0, 1) * along
+        halo = np.clip(1 - (np.abs(ctx.s - 0.5) * ctx.tw / 2.0) / 1.4, 0, 1) * along if side else k
+        rgb = mix(rgb, sramp(VIO, 0.15 + 0.35 * halo), halo * 0.45)
+        line = k > 0.35
+        rgb[line] = sramp(VIO, 0.5 + 0.45 * k[line])
+        hot = k > 0.8
+        rgb[hot] = VIO[7]
+        glow = line
     if cracks:
         rgb, glow = void_cracks(ctx, rgb, glow, cracks, seed + 3, width=0.9)
     return rgb, 255, glow
-
-
-def shade_tooth(ctx):
-    rgb, a, glow = shade_shard(ctx, seed=8, tipcol=0.2)
-    rgb, glow = cavity_light(ctx, rgb, glow, R=6.0, strength=0.9)
-    return rgb, a, glow
 
 
 def shade_claw(ctx):
@@ -442,13 +439,11 @@ SHADERS = {
     "frame": _w(lambda c: crystal(c, seed=3, cracks=0.6, cav=True)),
     "belt": _w(lambda c: crystal(c, seed=4, rune_band=True, base=0.28)),
     "bracer": _w(lambda c: crystal(c, seed=6, rune_band=True, cracks=0.35)),
-    "abs": _w(lambda c: crystal(c, seed=7, base=0.33)),
     "shard": lambda c: shade_shard(c),
-    "shard_dark": lambda c: shade_shard(c, seed=9, tipcol=0.08),
+    "shard_dark": lambda c: shade_shard(c, seed=9, tipcol=0.05, lift=0.06, base=0.27),
     "shard_cracked": lambda c: shade_shard(c, cracks=0.7, seed=2),
-    "crown": lambda c: shade_shard(c, core=True, seed=4, tipcol=0.5),
+    "crown": lambda c: shade_shard(c, core=True, seed=4, tipcol=0.25, lift=0.12, base=0.26),
     "claw": shade_claw,
-    "tooth": shade_tooth,
     "head": shade_head,
     "void_wall": shade_void_wall,
     "swirl": shade_swirl,
