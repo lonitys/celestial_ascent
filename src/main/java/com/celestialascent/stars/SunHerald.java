@@ -47,6 +47,7 @@ public class SunHerald extends CelestialBoss {
     @Override protected float[] phaseThresholds() { return new float[]{0.66f, 0.33f}; }
     @Override protected BossEvent.BossBarColor barColor() { return BossEvent.BossBarColor.YELLOW; }
     @Override protected ParticleOptions ambientParticle() { return ParticleTypes.FLAME; }
+    @Override protected int animTransition() { return 0; } // spinning halo/crown parts
 
     private ServerLevel sl() { return (ServerLevel) level(); }
 

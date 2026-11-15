@@ -3,6 +3,7 @@ package com.celestialascent.test;
 import com.celestialascent.CelestialAscent;
 import com.celestialascent.armor.ArmorSets;
 import com.celestialascent.armor.SetId;
+import com.celestialascent.boss.CelestialBoss;
 import com.celestialascent.progress.Progress;
 import com.celestialascent.titans.Element;
 import com.celestialascent.titans.FrostTitan;
@@ -76,7 +77,9 @@ public final class TitanTests {
         p.moveTo(h.absoluteVec(new net.minecraft.world.phys.Vec3(8, 1, 3)));
         FrostTitan titan = h.spawn(Titans.FROST_TITAN.get(), new BlockPos(8, 1, 10));
         h.runAfterDelay(5, () -> {
-            CoreTests.eq(h, 400.0f, titan.getMaxHealth(), "solo max health");
+            int near = Math.max(1, h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.player.Player.class,
+                    titan.getBoundingBox().inflate(64), pl -> !pl.isSpectator() && pl.isAlive()).size());
+            CoreTests.eq(h, (float) CelestialBoss.scaledHealth(400, near, 0.5), (float) titan.effectiveMaxHealth(), "scaled max health");
             titan.creditDamage(p, 100);
             titan.hurt(h.getLevel().damageSources().genericKill(), Float.MAX_VALUE);
         });

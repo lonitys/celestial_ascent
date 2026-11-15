@@ -50,6 +50,7 @@ public class VoidSovereign extends CelestialBoss {
     @Override protected float[] phaseThresholds() { return new float[]{0.75f, 0.5f, 0.25f}; }
     @Override protected BossEvent.BossBarColor barColor() { return BossEvent.BossBarColor.PURPLE; }
     @Override protected ParticleOptions ambientParticle() { return VOID; }
+    @Override protected int animTransition() { return 0; } // spinning halo/crown parts
 
     private ServerLevel sl() { return (ServerLevel) level(); }
 

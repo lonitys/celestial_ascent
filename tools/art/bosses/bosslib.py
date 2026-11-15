@@ -796,10 +796,70 @@ def _simplify(times, vals, tol):
     return sorted(keep)
 
 
-def export_anims(clips, path):
+# Spinning parts: (bone, axis, symmetry step in degrees). GeckoLib blends between clips by lerping raw
+# Euler angles, so a halo that ends an attack at 157.5 deg would visibly spin back to the next clip's 0.
+# wrap_spins keeps each listed angle inside [-step/2, step/2) by inserting invisible 0.1 ms micro-steps
+# of exactly one symmetry step. That's exact for single-axis spins, and a 360 step is exact for any bone.
+SPIN_WRAP = {
+    "sentinel_construct": [("right_pauldron", 1, 360.0), ("left_pauldron", 1, 360.0)],
+    "ender_colossus": [("crown", 1, 360.0)],
+    "astral_seraph": [("halo", 2, 30.0), ("halo_inner", 2, 45.0)],
+    "sun_herald": [("halo", 2, 15.0), ("halo_rays", 2, 22.5), ("staff", 0, 360.0), ("staff", 2, 360.0)],
+    "void_sovereign": [("chest_star", 2, 180.0), ("halo", 2, 60.0)],
+}
+_SPIN_EPS = 0.0001
+
+
+def _wrap_channel(ch, axis, step):
+    keys = sorted(((float(t), list(v)) for t, v in ch.items()), key=lambda kv: kv[0])
+    if not keys or not all(isinstance(v, list) and len(v) == 3 for _, v in keys):
+        return ch
+    kidx = lambda a: math.floor((a + step / 2) / step + 1e-9)
+    out = []
+    for n, (t, v) in enumerate(keys):
+        if n > 0:
+            (t0, v0), a0, a1 = keys[n - 1], keys[n - 1][1][axis], v[axis]
+            k0, k1 = kidx(a0), kidx(a1)
+            if k0 != k1 and abs(a1 - a0) > 1e-9:
+                rng = range(k0, k1) if k1 > k0 else range(k0 - 1, k1 - 1, -1)
+                for kb in rng:
+                    b = (kb + 0.5) * step                       # boundary value crossed
+                    f = (b - a0) / (a1 - a0)
+                    tc = t0 + f * (t - t0)
+                    base = [v0[i] + (v[i] - v0[i]) * f for i in range(3)]
+                    before, after = (kb, kb + 1) if k1 > k0 else (kb + 1, kb)
+                    pa, pb = list(base), list(base)
+                    pa[axis] = b - before * step
+                    pb[axis] = b - after * step
+                    ta, tb = tc, tc + _SPIN_EPS
+                    if tb >= t - 1e-9:
+                        ta, tb = tc - _SPIN_EPS, tc
+                    out.append((ta, pa))
+                    out.append((tb, pb))
+        w = list(v)
+        w[axis] = v[axis] - kidx(v[axis]) * step
+        out.append((t, w))
+    res = OrderedDict()
+    for t, v in out:
+        res[repr(round(t, 5))] = [_num(x) for x in v]
+    return res
+
+
+def wrap_spins(data, spinners):
+    for an, a in data["animations"].items():
+        for bone, axis, step in spinners:
+            ch = a.get("bones", {}).get(bone, {}).get("rotation")
+            if isinstance(ch, dict) and not any(k in ch for k in ("vector", "pre", "post")):
+                a["bones"][bone]["rotation"] = _wrap_channel(ch, axis, step)
+    return data
+
+
+def export_anims(clips, path, name=None):
     data = OrderedDict([("format_version", "1.8.0"), ("animations", OrderedDict())])
     for c in clips:
         data["animations"][c.name] = c.bake()
+    if name in SPIN_WRAP:
+        wrap_spins(data, SPIN_WRAP[name])
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=1)
@@ -833,7 +893,7 @@ def build(name, model, shaders, clips, painter_kw=None, visible=(5, 6, 2.5)):
     rgba, glow = Painter(model, shaders, **(painter_kw or {})).paint()
     write_png(rgba, paths["tex"])
     write_png(glow, paths["glow"])
-    anims = export_anims(clips, paths["anim"])
+    anims = export_anims(clips, paths["anim"], name)
     return geo, rgba, glow, anims
 
 

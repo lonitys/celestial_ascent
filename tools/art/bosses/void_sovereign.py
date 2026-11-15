@@ -1,6 +1,6 @@
 """Void Sovereign: the final boss. A towering monarch of black-violet void crystal: asymmetric
 crystal spikes jutting from the shoulders and back, magenta void fractures, a crown of floating
-shards orbiting above a horned skull-helm, a hollow chest rift holding a swirling star,
+shards fanned around a broken halo behind a skull-helm, a hollow chest cavity holding a swirling star,
 long clawed arms and a tattered cloak that dissolves into the starry void.
 
 Run: python void_sovereign.py [--preview [--all]]
@@ -21,65 +21,86 @@ from rig import TAU, knee_bend, sides, tremor
 NAME = "void_sovereign"
 HITBOX = (2.6, 5.4)
 THIGH, SHIN = 15.0, 17.0
-CAV = (0.0, 59.5, -1.5)                 # chest star centre (torso space, before the torso lean)
-SHARD_ANG = [math.radians(30 + 60 * i) for i in range(6)]   # i=4 sits at the front (270 deg)
-SHARDS = [f"shard_{i}" for i in range(6)]
+CAV = (0.0, 59.75, 0.0)                 # chest star centre (torso space, before the torso lean)
 CLOAK = [("cloak_right", "cloak_right_low"), ("cloak_mid", "cloak_mid_low"), ("cloak_left", "cloak_left_low")]
 LEGS = [("right_leg", "right_shin"), ("left_leg", "left_shin")]
 FEET = ["right_foot", "left_foot"]
-CROWN_C = (0.0, 88.0, -1.5)
-CROWN_R = 6.2
+# fan crown: jagged shards radiating from a broken halo behind and above the head (head space)
+CROWN_C = (0.0, 78.5, 4.0)
+CROWN_R = 6.8
+#             angle from vertical (deg, + towards the model left), length, width, segments
+SHARD_SPEC = [(0, 17, 4, [0.44, 0.32, 0.24]),
+              (-23, 9, 3, [0.58, 0.48]),
+              (25, 10, 3, [0.56, 0.48]),
+              (-48, 7, 3, [0.6, 0.5]),
+              (52, 6, 2, [0.6, 0.55]),
+              (-76, 5, 2, [0.6, 0.55]),
+              (74, 7, 3, [0.6, 0.5])]
+SHARDS = [f"shard_{i}" for i in range(len(SHARD_SPEC))]
+
+
+def shard_dir(i):
+    a = math.radians(SHARD_SPEC[i][0])
+    return tl.unit(np.array([math.sin(a), math.cos(a), 0.25]))
+
+
+def shard_base(i):
+    a = math.radians(SHARD_SPEC[i][0])
+    return np.array([CROWN_C[0] + CROWN_R * math.sin(a), CROWN_C[1] + CROWN_R * math.cos(a), CROWN_C[2]])
+
+
+def shard_hover(i, t, L, amp=0.6):
+    """Local hover offset of a crown shard: breathing in and out along its own ray."""
+    m = max(1, int(round(L / 2.0)))
+    return shard_dir(i) * amp * math.sin(TAU * m * t / L + i * 1.7)
+
 
 # =============================================================================== geometry
 
 
 def build_model():
     m = tl.Model(NAME)
-    # ------------------------------------------------------------------ pelvis + legs
+    # ------------------------------------------------------------------ pelvis + armoured legs
     body = m.bone("body", "root", (0, 36, 0.5))
     body.boxb(0, 32, 0.5, 13, 7, 9, "crystal")                                     # pelvis
     body.boxb(0, 37.5, 0.5, 14, 3, 10, "belt")                                     # rune belt
-    for s in (-1, 1):
-        body.spike((10.4 * s, 39.0, 0.8), (0.34 * s, -1, 0.08), 12, 4, "shard", segs=[0.6, 0.48])   # hip shards
     tab = m.bone("tabard", "body", (0, 39.0, -5.4))
     tab.plane_from((0, 39.0, -5.4), 9, 24, "tabard", pid=3, v0=0.0, v1=1.0, total=24.0)
 
     for s, nm in sides():
-        leg = m.bone(f"{nm}_leg", "body", (6 * s, 35.5, 0.5))
-        leg.boxb(6 * s, 20.5, 0.5, 7, 15, 7, "crystal_cracked")                     # thigh
-        leg.box((9.9 * s, 28.0, 0.5), (2, 11, 7), "crystal", rot=[0, 0, -9 * s], pivot=(9.9 * s, 33.5, 0.5))   # outer tasset
-        shin = m.bone(f"{nm}_shin", f"{nm}_leg", (6.2 * s, 20.5, 0.5))
-        shin.box((6.2 * s, 20.8, -1.4), (6, 5, 5), "crystal")                      # knee cop
-        shin.spike((6.2 * s, 21.6, -3.4), (0, 0.6, -1), 6, 3, "shard", segs=[0.62, 0.5])   # knee spike
-        shin.boxb(6.2 * s, 3.5, 0.8, 6, 17, 6, "crystal")                          # greave
-        shin.box((6.2 * s, 11.5, -2.3), (2, 13, 2), "crystal", rot=[-3, 0, 0])     # shin ridge
-        foot = m.bone(f"{nm}_foot", f"{nm}_shin", (6.3 * s, 3.5, 0.5))
-        foot.boxb(6.3 * s, 0, -1.2, 6, 4, 10, "crystal")                           # sabaton
-        foot.spike((6.3 * s, 1.7, -5.6), (0, -0.06, -1), 6, 3, "claw", segs=[0.55, 0.55])   # toe talon
+        leg = m.bone(f"{nm}_leg", "body", (6.5 * s, 35.5, 0.5))
+        leg.boxb(6.5 * s, 20.5, 0.5, 8, 15, 8, "crystal_cracked")                   # thigh
+        leg.box((11.2 * s, 27.5, 0.5), (2, 12, 8), "crystal", rot=[0, 0, -10 * s], pivot=(11.2 * s, 33.5, 0.5))   # outer tasset
+        shin = m.bone(f"{nm}_shin", f"{nm}_leg", (6.6 * s, 20.5, 0.5))
+        shin.box((6.6 * s, 20.8, -1.8), (7, 6, 6), "crystal")                      # knee cop
+        shin.spike((6.6 * s, 22.0, -4.3), (0.08 * s, 0.6, -1), 8, 4, "shard", segs=[0.6, 0.5])   # knee spike
+        shin.boxb(6.6 * s, 3.5, 0.8, 7, 17, 7, "crystal")                          # greave
+        shin.box((6.6 * s, 12.0, -3.0), (5, 13, 2), "crystal", rot=[-4, 0, 0])     # shin guard
+        shin.spike((9.6 * s, 11.0, 3.2), (0.8 * s, 0.45, 0.7), 7, 3, "shard", segs=[0.6, 0.5])   # calf spur
+        foot = m.bone(f"{nm}_foot", f"{nm}_shin", (6.7 * s, 3.5, 0.5))
+        foot.boxb(6.7 * s, 0, -1.2, 7, 4, 11, "crystal")                           # sabaton
+        foot.spike((6.7 * s, 2.0, -6.2), (0, 0.0, -1), 7, 3, "claw", segs=[0.55, 0.55])    # toe talon
 
     # ------------------------------------------------------------------ torso + chest cavity
     torso = m.bone("torso", "body", (0, 40, 1), rotation=[8, 0, 0])
     torso.boxb(0, 39.5, 1, 11, 9, 8, "crystal")                                    # waist
     torso.boxb(0, 48, 1, 18, 5, 11, "crystal_cracked")                             # lower ribcage
     for s in (-1, 1):
-        torso.box((9.0 * s, 59.5, 0.5), (8, 13, 12), "frame")                      # chest halves (x 5..13)
-    torso.box((0, 66.0, 0.5), (10, 2, 12), "frame")                                # sternum bridge
-    torso.box((0, 53.0, 0.5), (10, 2, 12), "frame")                                # lower bridge
-    torso.box((0, 59.5, 4.5), (10, 11, 4), "void_wall")                            # cavity back wall
+        torso.box((10.0 * s, 59.75, 0.5), (8, 13, 12), "frame")                    # chest halves (x 6..14)
+    torso.box((0, 67.0, 0.5), (12, 2, 12), "frame")                                # sternum bridge
+    torso.box((0, 52.5, 0.5), (12, 2, 12), "frame")                                # lower bridge
+    torso.box((0, 59.75, 5.25), (12, 13, 3), "void_wall")                          # deep cavity back wall
     for s in (-1, 1):
-        torso.box((9.6 * s, 60.5, -6.1), (8, 10, 2), "crystal_cracked_hi", rot=[-8, -14 * s, 5 * s])   # pectoral slabs
-    torso.boxb(0, 65.5, 1.5, 26, 3, 11, "crystal")                                 # shoulder yoke
-    for s in (-1, 1):
-        torso.box((4.6 * s, 72.5, 4.2), (6, 10, 1), "crystal_cracked", rot=[-16, 0, 24 * s], pivot=(3.0 * s, 67.5, 4.2))   # standing collar
+        torso.box((10.6 * s, 60.5, -6.1), (8, 10, 2), "crystal_cracked_hi", rot=[-8, -14 * s, 5 * s])   # pectoral slabs
+    torso.boxb(0, 65.5, 1.5, 28, 3, 11, "crystal")                                 # shoulder yoke
     torso.box((0, 57.5, 7.2), (15, 15, 2), "crystal_cracked")                      # back plate
-    for s in (-1, 1):   # slanted lips turn the opening into a rift that narrows downward
-        torso.box((4.6 * s, 59.5, -3.5), (2, 12, 5), "frame", rot=[0, 0, 7 * s])
 
     star = m.bone("chest_star", "torso", CAV)
-    star.plane(CAV, 12, 12, "swirl")
-    star.plane((CAV[0], CAV[1], CAV[2] - 0.35), 13, 13, "flare", rot=[0, 0, 45])
-    star.plane(CAV, 10, 10, "flare", rot=[0, 90, 0])
-    star.box(CAV, (2, 2, 2), "core", rot=[45, 0, 45])
+    star.plane(CAV, 15, 15, "swirl")
+    star.plane((CAV[0], CAV[1], CAV[2] + 0.4), 13, 13, "swirl2", rot=[0, 0, 90])
+    star.plane((CAV[0], CAV[1], CAV[2] - 0.4), 15, 15, "flare", rot=[0, 0, 45])
+    star.plane(CAV, 11, 11, "flare", rot=[0, 90, 0])
+    star.box(CAV, (3, 3, 3), "core", rot=[45, 0, 45])
 
     sp = m.bone("spines", "torso", (0, 61, 7.5))
     sp.spike((-5.0, 63.0, 7.2), (-0.55, 1, 0.75), 24, 5, "shard_cracked")
@@ -89,13 +110,15 @@ def build_model():
 
     # ------------------------------------------------------------------ floating pauldron clusters (asymmetric)
     rp = m.bone("right_pauldron", "torso", (-16, 69.5, 1))
-    rp.box((-16.5, 69.5, 1.0), (10, 4, 11), "crystal_cracked", rot=[0, 0, -16])
-    rp.spike((-18.0, 70.5, 1.5), (-0.42, 1, 0.15), 23, 6, "shard_cracked", segs=[0.44, 0.33, 0.27])
-    rp.spike((-20.5, 69.0, 3.5), (-1, 0.55, 0.5), 12, 3.5, "shard", segs=[0.6, 0.5])
+    rp.box((-17.0, 69.5, 1.0), (11, 4, 12), "crystal_cracked", rot=[0, 0, -16])
+    rp.spike((-18.5, 70.5, 1.5), (-0.4, 1, 0.12), 28, 7, "shard_cracked", segs=[0.42, 0.33, 0.25])
+    rp.spike((-21.5, 69.0, 3.5), (-1, 0.6, 0.5), 15, 4.5, "shard", segs=[0.55, 0.45])
+    rp.spike((-17.0, 71.0, -3.0), (-0.35, 1, -0.65), 10, 3.5, "shard", segs=[0.6, 0.5])
     lp = m.bone("left_pauldron", "torso", (16, 69.5, 1))
-    lp.box((16.5, 69.5, 1.0), (10, 4, 11), "crystal_cracked", rot=[0, 0, 16])
-    lp.spike((18.0, 70.5, 2.5), (0.5, 1, 0.6), 16, 5, "shard", segs=[0.46, 0.33, 0.27])
-    lp.spike((20.5, 69.0, -1.0), (1, 0.38, -0.3), 10, 3.5, "shard", segs=[0.6, 0.5])
+    lp.box((17.0, 69.5, 1.0), (11, 4, 12), "crystal_cracked", rot=[0, 0, 16])
+    lp.spike((18.5, 70.5, 2.5), (0.55, 1, 0.55), 20, 6, "shard", segs=[0.44, 0.33, 0.25])
+    lp.spike((21.5, 69.0, -1.0), (1, 0.4, -0.3), 13, 4, "shard", segs=[0.55, 0.45])
+    lp.spike((17.5, 70.5, 5.5), (0.3, 0.8, 1), 9, 3, "shard", segs=[0.6, 0.5])
 
     # ------------------------------------------------------------------ long clawed arms
     for s, nm in sides():
@@ -109,12 +132,12 @@ def build_model():
         hand = m.bone(f"{nm}_hand", f"{nm}_forearm", (16.7 * s, 38.5, 0.8))
         hand.box((16.7 * s, 36.0, 0.8), (5, 5, 5), "crystal")                       # palm
         for dz, fz in ((-1.6, -0.35), (0.3, 0.0), (2.0, 0.3)):
-            hand.curve_spike((16.7 * s - 0.6 * s, 34.0, 0.8 + dz), [(-0.12 * s, -1, fz), (-0.55 * s, -1, fz - 0.25)],
-                             [5, 6], [2, 1], "claw")
+            hand.curve_spike((16.7 * s - 0.6 * s, 34.0, 0.8 + dz), [(-0.1 * s, -1, fz), (-0.5 * s, -1, fz - 0.25)],
+                             [6, 9], [2, 1], "claw")                                 # long talons
         hand.curve_spike((16.7 * s - 2.2 * s, 35.0, -1.2), [(-0.6 * s, -0.6, -0.6), (-0.35 * s, -1, -0.45)],
-                         [4, 4], [2, 1], "claw")                                     # thumb talon
+                         [4, 6], [2, 1], "claw")                                     # thumb talon
 
-    # ------------------------------------------------------------------ neck, skull-helm, floating crown
+    # ------------------------------------------------------------------ neck, skull-helm, fan crown + broken halo
     neck = m.bone("neck", "torso", (0, 66.5, 0), rotation=[-6, 0, 0])
     neck.boxb(0, 65.5, 0, 5, 7, 5, "crystal")
     head = m.bone("head", "neck", (0, 70.5, -1))
@@ -123,58 +146,51 @@ def build_model():
     head.spike((0, 71.2, -4.2), (0, -1, -0.6), 5, 4, "shard_dark", segs=[0.55, 0.6])     # pointed chin
     for s in (-1, 1):
         head.box((2.5 * s, 79.7, -5.7), (5, 2, 2), "crystal", rot=[8, 0, -17 * s])  # angry V brow
-        head.curve_spike((4.0 * s, 80.0, -1.5), [(0.85 * s, 0.55, 0.25), (0.45 * s, 0.45, 1.0), (0.1 * s, 0.3, 1.0)],
-                         [6, 6, 5], [3, 2, 1], "shard")                              # swept horns
     crown = m.bone("crown", "head", CROWN_C)
     halo = m.bone("halo", "crown", CROWN_C)
-    halo.plane((CROWN_C[0], CROWN_C[1] - 1.8, CROWN_C[2]), 17, 17, "halo", rot=[90, 0, 0])
-    for i, a in enumerate(SHARD_ANG):
-        tall = i % 2 == 0
-        bx, bz = CROWN_R * math.cos(a), CROWN_C[2] + CROWN_R * math.sin(a)
-        by = CROWN_C[1] - (1.0 if tall else 0.0)
-        sh = m.bone(SHARDS[i], "crown", (bx, by, bz))
-        if tall:
-            sh.spike((bx, by, bz), (0.2 * math.cos(a), 1, 0.2 * math.sin(a)), 11, 3, "crown", segs=[0.42, 0.36, 0.32])
-        else:
-            sh.spike((bx, by, bz), (0.24 * math.cos(a), 1, 0.24 * math.sin(a)), 7, 2, "crown", segs=[0.6, 0.55])
+    halo.plane(CROWN_C, 17, 17, "halo")                                            # vertical broken halo
+    for i, (ang, ln, wd, segs) in enumerate(SHARD_SPEC):
+        b = shard_base(i)
+        sh = m.bone(SHARDS[i], "crown", tuple(b))
+        sh.spike(b, shard_dir(i), ln, wd, "crown", segs=segs)
 
-    # ------------------------------------------------------------------ tattered cloak (double-sided planes)
+    # ------------------------------------------------------------------ tattered cloak (double-sided planes), near the ground
     cm = m.bone("cloak_mid", "torso", (0, 65.5, 8.8), rotation=[4, 0, 0])
-    cm.plane_from((0, 65.5, 8.8), 14, 30, "cloak", pid=0, v0=0.0, v1=0.52)
+    cm.plane_from((0, 65.5, 8.8), 16, 30, "cloak", pid=0, v0=0.0, v1=0.45, total=66.0)
     cml = m.bone("cloak_mid_low", "cloak_mid", (0, 35.5, 8.8), rotation=[-2, 0, 0])
-    cml.plane_from((0, 35.5, 8.8), 14, 28, "cloak", pid=0, v0=0.52, v1=1.0)
+    cml.plane_from((0, 35.5, 8.8), 16, 36, "cloak", pid=0, v0=0.45, v1=1.0, total=66.0)
     for s, nm in sides():
-        cs = m.bone(f"cloak_{nm}", "torso", (11.0 * s, 65.5, 7.0), rotation=[4, 25 * s, -8 * s])
-        cs.plane_from((11.0 * s, 65.5, 7.0), 12, 30, "cloak", pid=1 if s < 0 else 2, v0=0.0, v1=0.54, taper=1)
-        csl = m.bone(f"cloak_{nm}_low", f"cloak_{nm}", (11.0 * s, 35.5, 7.0), rotation=[-2, 0, 0])
-        csl.plane_from((11.0 * s, 35.5, 7.0), 12, 26, "cloak", pid=1 if s < 0 else 2, v0=0.54, v1=1.0)
+        cs = m.bone(f"cloak_{nm}", "torso", (11.5 * s, 65.5, 7.0), rotation=[4, 25 * s, -8 * s])
+        cs.plane_from((11.5 * s, 65.5, 7.0), 14, 30, "cloak", pid=1 if s < 0 else 2, v0=0.0, v1=0.47, taper=1, total=64.0)
+        csl = m.bone(f"cloak_{nm}_low", f"cloak_{nm}", (11.5 * s, 35.5, 7.0), rotation=[-2, 0, 0])
+        csl.plane_from((11.5 * s, 35.5, 7.0), 14, 34, "cloak", pid=1 if s < 0 else 2, v0=0.47, v1=1.0, total=64.0)
     return m
 
 
 # =============================================================================== animation helpers
 
 
-def ambient(c, L, crown_turn=None, star_turn=None, bob=0.7, star_pulse=0.06, cloak=1.0, pauld=0.6,
+def ambient(c, L, crown_turn=None, star_turn=None, bob=0.6, star_pulse=0.06, cloak=1.0, pauld=0.6,
             radial=None, lift=None, star_scale=None):
     """Bones that idle keeps moving; every clip drives them (the attack controller stops 'main').
-    The crown is 3-fold symmetric (tall/short alternating) so a 120 deg orbit loops seamlessly;
-    the star is 2-fold symmetric so 180 deg loops."""
+    The crown shards hover along their rays; the 6-fold symmetric halo turns 60 deg per loop and the
+    2-fold symmetric star 180 deg per loop, so loops are seamless."""
     m = max(1, int(round(L / 2.0)))
     ct = crown_turn or (lambda t: t / L)
     st = star_turn or (lambda t: t / L)
-    c.f("crown", "rotation", lambda t: (0, -120.0 * ct(t), 0))
+    # the crown sways and breathes; the broken halo (6-fold symmetric) turns 60 deg per loop
+    c.f("crown", "rotation", lambda t: (0, 0, 2.5 * math.sin(TAU * m * t / L + 0.6)))
     c.f("crown", "position", lambda t: (0, 0.45 * math.sin(TAU * m * t / L), 0))
+    c.f("halo", "rotation", lambda t: (0, 0, -60.0 * ct(t)))
     for i, nm in enumerate(SHARDS):
-        ph = 0.0 if i % 2 == 0 else math.pi
-        a = SHARD_ANG[i]
+        d = shard_dir(i)
 
-        def fn(t, ph=ph, a=a):
+        def fn(t, i=i, d=d):
             r = radial(t) if radial else 0.0
             h = lift(t) if lift else 0.0
-            return (r * math.cos(a), h + bob * math.sin(TAU * m * t / L + ph), r * math.sin(a))
+            return tuple(shard_hover(i, t, L, bob) + d * r + np.array([0, h, 0]))
         c.f(nm, "position", fn)
-        c.f(nm, "rotation", lambda t, ph=ph, a=a: (4 * math.sin(TAU * m * t / L + ph) * math.sin(a), 0,
-                                                  -4 * math.sin(TAU * m * t / L + ph) * math.cos(a)))
+        c.f(nm, "rotation", lambda t, i=i: (0, 0, 3 * math.sin(TAU * m * t / L + i * 2.3)))
     c.f("chest_star", "rotation", lambda t: (0, 0, -180.0 * st(t)))
     c.f("chest_star", "scale", lambda t: (1 + star_pulse * math.sin(TAU * 2 * m * t / L),) * 3)
     if star_scale:
@@ -395,7 +411,7 @@ def anim_collapse():
     c.rot("torso", [(0, (0, 0, 0)), (0.35, (-14, 0, 0), "io"), (0.5, (54, 0, 0), "in3"), (1.2, (52, 0, 0)), (2.0, (0, 0, 0), "io")])
     c.f("torso", "rotation", lambda t: (tremor(t, 0.5, 0.53, 1.0, 1.25, 1.5, 24), tremor(t, 0.5, 0.53, 1.0, 1.25, 1.0, 20, 3), 0))
     c.rot("neck", [(0, (0, 0, 0)), (0.35, (-10, 0, 0)), (0.5, (-36, 0, 0), "in3"), (1.2, (-34, 0, 0)), (2.0, (0, 0, 0))])
-    crouch(c, lambda t: float(tr([(0, 0), (0.35, 2.5), (0.5, 14.0, "in3"), (1.2, 13.5), (2.0, 0, "io")])(t)), spread=1.2)
+    crouch(c, lambda t: float(tr([(0, 0), (0.35, 2.5), (0.5, 12.5, "in3"), (1.2, 12.0), (2.0, 0, "io")])(t)), spread=1.2)
     c.f("body", "position", lambda t: (0, tremor(t, 0.5, 0.52, 0.9, 1.1, 0.4, 30), 0))
     for s, nm in sides():
         c.rot(f"{nm}_arm", [(0, (0, 0, 0)), (0.35, (-150, 0, s * 8), "out"), (0.5, (-60, 0, -s * 14), "in3"), (1.2, (-58, 0, -s * 14)),
@@ -425,7 +441,7 @@ def anim_unmaking():
             star_scale=lambda t: 1 + 0.4 * up(t) + 0.6 * bl(t) - 0.3 * pre(t))
     c.f("body", "position", lambda t: (0, 3.5 * up(t) + 0.8 * math.sin(TAU * t / 1.5) * up(t), 0))
     c.f("root", "scale", lambda t: (1 - 0.18 * wp(t), 1 + 0.22 * wp(t), 1 - 0.18 * wp(t)))
-    c.f("halo", "scale", lambda t: (1 + 0.5 * up(t) + 0.3 * bl(t), 1, 1 + 0.5 * up(t) + 0.3 * bl(t)))
+    c.f("halo", "scale", lambda t: (1 + 0.4 * up(t) + 0.25 * bl(t), 1 + 0.4 * up(t) + 0.25 * bl(t), 1))
     c.f("torso", "rotation", lambda t: (-8 * up(t) + 10 * pre(t) - 6 * bl(t), 0, 0))
     c.f("neck", "rotation", lambda t: (-14 * up(t) + 8 * pre(t) - 8 * bl(t), 0, 0))
     for s, nm in sides():
@@ -468,7 +484,7 @@ def anim_phase():
                                  (2.0, (0, 0, 0), "io")])
         c.rot(f"{nm}_pauldron", [(0, (0, 0, 0)), (0.75, (0, 0, -s * 14), "snap"), (1.5, (0, 0, -s * 12)), (2.0, (0, 0, 0))])
     c.rot("spines", [(0, (0, 0, 0)), (0.5, (6, 0, 0)), (0.75, (-10, 0, 0), "snap"), (1.5, (-9, 0, 0)), (2.0, (0, 0, 0))])
-    c.scl("halo", [(0, (1, 1, 1)), (0.5, (0.7, 1, 0.7)), (0.75, (1.6, 1, 1.6), "snap"), (1.5, (1.5, 1, 1.5)), (2.0, (1, 1, 1), "io")])
+    c.scl("halo", [(0, (1, 1, 1)), (0.5, (0.75, 0.75, 1)), (0.75, (1.45, 1.45, 1), "snap"), (1.5, (1.38, 1.38, 1)), (2.0, (1, 1, 1), "io")])
     c.scl("spines", [(0, (1, 1, 1)), (0.75, (1.08, 1.12, 1.08), "snap"), (1.5, (1.06, 1.1, 1.06)), (2.0, (1, 1, 1))])
     cloak_keys(c, [(0, 0), (0.5, -4), (0.75, 14, "snap"), (1.5, 12), (2.0, 0)], [(0, 0), (0.55, -6), (0.85, 18, "snap"), (1.5, 14), (2.0, 0)],
                [(0, 0), (0.5, -4), (0.75, 15, "snap"), (1.5, 13), (2.0, 0)])
@@ -493,11 +509,11 @@ def anim_death(m):
         c.f(f"{nm}_foot", "rotation", lambda t: (80 * kneel(t), 0, 0))
     c.rot("right_arm", [(0, (0, 0, 0)), (0.22, (-30, 0, 36), "out"), (0.7, (-30, -45, 0)), (1.2, (-28, -40, 4)), (1.75, (-20, 0, 12)),
                         (2.35, (-44, 0, 6), "io"), (2.8, (-44, 0, 6))])
-    c.rot("right_forearm", [(0, (0, 0, 0)), (0.22, (-30, 0, 0)), (0.7, (-80, 0, 0)), (1.2, (-76, 0, 0)), (1.75, (-20, 0, 0)), (2.35, (-6, 0, 0)),
-                            (2.8, (-6, 0, 0))])
+    c.rot("right_forearm", [(0, (0, 0, 0)), (0.22, (-30, 0, 0)), (0.7, (-80, 0, 0)), (1.2, (-76, 0, 0)), (1.75, (-20, 0, 0)), (2.35, (-26, 0, 0)),
+                            (2.8, (-26, 0, 0))])
     c.rot("left_arm", [(0, (0, 0, 0)), (0.22, (-30, 0, -36), "out"), (0.7, (-14, 0, -30)), (1.2, (-24, 0, -22)), (1.75, (-10, 0, -10)),
                        (2.35, (-40, 0, -8), "io"), (2.8, (-40, 0, -8))])
-    c.rot("left_forearm", [(0, (0, 0, 0)), (0.22, (-40, 0, 0)), (0.7, (-20, 0, 0)), (1.75, (-10, 0, 0)), (2.35, (-4, 0, 0)), (2.8, (-4, 0, 0))])
+    c.rot("left_forearm", [(0, (0, 0, 0)), (0.22, (-40, 0, 0)), (0.7, (-20, 0, 0)), (1.75, (-10, 0, 0)), (2.35, (-32, 0, 0)), (2.8, (-32, 0, 0))])
     c.rot("right_hand", [(0, (0, 0, 0)), (0.22, (-30, 0, 30), "out"), (0.7, (55, 0, 0)), (1.2, (50, 0, 0)), (1.75, (0, 0, 0)), (2.35, (20, 0, 0)),
                          (2.8, (20, 0, 0))])
     c.rot("left_hand", [(0, (0, 0, 0)), (0.22, (-30, 0, -30), "out"), (1.2, (-10, 0, -10)), (2.35, (20, 0, 0)), (2.8, (20, 0, 0))])
@@ -512,13 +528,14 @@ def anim_death(m):
     c.f("chest_star", "rotation", lambda t: (0, 0, -180 * ease("out", t / 2.2)))
     c.f("chest_star", "scale", lambda t: (max(0.01, float(tr([(0, 1), (0.22, 1.8, "out"), (0.9, 1.1), (2.1, 0.0, "in")])(t))
                                               * (1 + 0.35 * math.sin(t * 61) * env(t, 0.25, 0.4, 1.6, 2.0))),) * 3)
-    c.f("crown", "rotation", lambda t: (0, -50 * ease("out", t / 0.9), 0))
-    c.scl("halo", [(0, (1, 1, 1)), (0.22, (1.25, 1, 1.25), "out"), (0.85, (1.1, 1, 1.1)), (1.3, (0.01, 0.01, 0.01), "in"), (2.8, (0.01, 0.01, 0.01))])
+    c.f("crown", "rotation", lambda t: (0, 0, 2.5 * math.sin(TAU * t / L + 0.6) * (1 - ease("io", t / 0.9))))
+    c.f("halo", "rotation", lambda t: (0, 0, -70 * ease("out", t / 1.3)))
+    c.scl("halo", [(0, (1, 1, 1)), (0.22, (1.3, 1.3, 1), "out"), (0.85, (1.1, 1.1, 1)), (1.3, (0.01, 0.01, 0.01), "in"), (2.8, (0.01, 0.01, 0.01))])
     # cloak sags back into a drape; tabard settles over the thighs
     for k, (up, low) in enumerate(CLOAK):
         c.rot(up, [(0, (0, 0, 0)), (0.22, (-8, 0, 0), "out"), (1.2, (2, 0, 0)), (1.8, (-12, 0, 0)), (2.35, (-30, 0, 0), "io"), (2.8, (-30, 0, 0))])
-        c.rot(low, [(0, (0, 0, 0)), (0.3, (-10, 0, 0), "out"), (1.2, (4, 0, 0)), (1.9, (20, 0, 0)), (2.4, (34 + 4 * k, 0, 0), "io"),
-                    (2.8, (34 + 4 * k, 0, 0))])
+        c.rot(low, [(0, (0, 0, 0)), (0.3, (-10, 0, 0), "out"), (1.2, (4, 0, 0)), (1.9, (24, 0, 0)), (2.4, (42 + 4 * k, 0, 0), "io"),
+                    (2.8, (42 + 4 * k, 0, 0))])
     c.rot("tabard", [(0, (0, 0, 0)), (1.2, (0, 0, 0)), (1.8, (-36, 0, 0), "io"), (2.8, (-36, 0, 0))])
     falling_shards(c, m, L)
     return c
@@ -542,25 +559,21 @@ def falling_shards(c, m, L, t0=0.85):
 
     mats = [gp.bone_matrices(geo, pose_at(t)) for t in times]
     bones = {b["name"]: b for b in geo["bones"]}
-    order = [4, 1, 3, 0, 5, 2]
+    order = [0, 2, 1, 4, 3, 6, 5]
     out = {}
     for i, nm in enumerate(SHARDS):
         piv = np.array(bones[nm]["pivot"], dtype=float)
-        a = SHARD_ANG[i]
-        d_loc = tl.unit(np.array([0.22 * math.cos(a), 1.0, 0.22 * math.sin(a)]))
-        bob0 = np.array([0.0, 0.7 * math.sin(TAU * 1 * t0 / L + (0 if i % 2 == 0 else math.pi)), 0.0])
+        d_loc = shard_dir(i)
         k0 = int(round(t0 / 0.005))
         M0 = mats[k0]["crown"]
-        P0 = M0[:3, :3] @ (piv + bob0) + M0[:3, 3]
+        P0 = M0[:3, :3] @ (piv + shard_hover(i, t0, L)) + M0[:3, 3]
         W0 = M0[:3, :3]
-        C0 = M0[:3, :3] @ np.array(CROWN_C) + M0[:3, 3]
-        rad = P0 - C0
-        rad[1] = 0
-        rad = tl.unit(rad)
+        # land in a fan around the front and sides of the kneeling body, tips pointing outward
+        th = math.radians(max(-135.0, min(135.0, SHARD_SPEC[i][0] * 1.7)) + (15 if i == 0 else 0))
         jit = (i * 0.37) % 1 - 0.5
-        land_r = 14.0 + 3.0 * ((i * 0.61) % 1)
-        P1 = np.array([C0[0] + rad[0] * land_r, 1.5 if i % 2 == 0 else 1.0,C0[2] + rad[2] * land_r - 2.0])
-        d_tgt = tl.unit(tl.axis_angle([0, 1, 0], jit * 50) @ np.array([rad[0], -0.04, rad[2]]))
+        land_r = 15.0 + 4.0 * ((i * 0.61) % 1)
+        P1 = np.array([land_r * math.sin(th), SHARD_SPEC[i][2] / 2.0 + 0.1, -1.0 - land_r * math.cos(th)])
+        d_tgt = tl.unit(tl.axis_angle([0, 1, 0], jit * 40) @ np.array([math.sin(th), -0.03, -math.cos(th)]))
         W1 = tl.align_y(d_tgt) @ np.linalg.inv(tl.align_y(d_loc))
         Rd = W1 @ W0.T
         ang = math.degrees(math.acos(max(-1.0, min(1.0, (np.trace(Rd) - 1) / 2))))
@@ -573,7 +586,7 @@ def falling_shards(c, m, L, t0=0.85):
             M = mats[k]["crown"]
             R, T = M[:3, :3], M[:3, 3]
             if t < t0:
-                pos[k] = [0, 0.7 * math.sin(TAU * t / L + (0 if i % 2 == 0 else math.pi)), 0]
+                pos[k] = shard_hover(i, t, L)
                 continue
             f = min(1.0, (t - t0) / (t1 - t0))
             fy = f * f

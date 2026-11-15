@@ -71,7 +71,14 @@ public final class Showcase {
 
     private static void build() {
         String stage = "fill -24 199 -12 24 199 24 minecraft:smooth_quartz";
-        step(60, null, 0, 0, "gamemode creative", "time set 6000", "weather clear", "gamerule doDaylightCycle false",
+        // Go there first and hover so the chunks load before the stage is built.
+        STEPS.add(new Step(120, p -> {
+            cmd(p, "gamemode creative");
+            cmd(p, "tp @s 0 210 -8 0 0");
+            p.getAbilities().flying = true;
+            p.onUpdateAbilities();
+        }, null, 0, 0, CameraType.FIRST_PERSON));
+        step(40, null, 0, 0, "time set 6000", "weather clear", "gamerule doDaylightCycle false",
                 "gamerule doMobSpawning false", "gamerule doWeatherCycle false", "gamerule sendCommandFeedback false",
                 "gamerule doEntityDrops false", "gamerule doMobLoot false",
                 "fill -24 200 -12 24 230 24 minecraft:air", stage, "tp @s 0 200 -8 0 0");

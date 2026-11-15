@@ -297,7 +297,7 @@ def anim_void_bite():
     L = 1.3
     c = begin(Clip("attack.void_bite", L))
     damp = lambda t: 1 - 0.65 * env(t, 0.05, 0.3, 0.5, 1.1)
-    add_wave(c, IDLE_YA, IDLE_PA, 2.0, amp=damp)
+    add_wave(c, IDLE_YA, IDLE_PA, L, amp=damp)      # period = clip length: ends on idle's first frame
     ambient(c, 2.0, k=0.6)
     # wind-up: the front body folds into a snake-strike S (a coiled spring), then whips straight
     zz = joints_from_headings([0, 42, 58, 12, -44, -56, -20, 26, 42, 22])
@@ -361,7 +361,7 @@ def anim_coil():
     c = begin(Clip("attack.coil", L))
     curl = lambda t: env(t, 0.0, 0.7, 2.4, 3.0, "io", "io")
     pulse = lambda t: max(0.0, math.sin(TAU * (t - 0.6) / 0.5)) ** 3 * env(t, 0.6, 0.75, 2.35, 2.5)
-    add_wave(c, (2.0, 10.0), (0.0, 4.0), 2.0, amp=lambda t: 1 - 0.8 * curl(t), static=lambda t: 1 - curl(t))
+    add_wave(c, IDLE_YA, IDLE_PA, L / 2, amp=lambda t: 1 - 0.8 * curl(t), static=lambda t: 1 - curl(t))
     ambient(c, 3.0, k=0.5, jaw=(0, 0))
     for k, b in enumerate(CHAIN[1:], 1):
         yaw = 30 + 10 * k / 9

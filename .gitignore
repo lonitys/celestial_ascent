@@ -41,3 +41,4 @@ repo/
 run-data/
 tools/art/__pycache__/
 *.pyc
+dist/

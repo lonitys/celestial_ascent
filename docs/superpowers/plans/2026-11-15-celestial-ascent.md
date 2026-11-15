@@ -12,6 +12,10 @@
 
 ---
 
+**Status (2026-11-15):** Stages 0–6 implemented. 32/32 GameTests pass (incl. AI fights for all 10 bosses);
+all 10 structures verified in a generated world (`/celestialascent verify`); in-game screenshot tour reviewed
+(`./gradlew runClient -Pshowcase`). Release jar: `./gradlew build` → `build/libs/`.
+
 ## File structure (locked)
 
 ```

@@ -47,6 +47,7 @@ public class AstralSeraph extends FlyingBoss {
     @Override protected BossEvent.BossBarColor barColor() { return BossEvent.BossBarColor.WHITE; }
     @Override protected ParticleOptions ambientParticle() { return ParticleTypes.END_ROD; }
     @Override protected String moveAnimation() { return "fly"; }
+    @Override protected int animTransition() { return 0; } // spinning halo/crown parts
 
     private ServerLevel sl() { return (ServerLevel) level(); }
 

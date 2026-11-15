@@ -2,8 +2,9 @@
 the glass, magenta void fractures with subsurface bleed, a starlit cavity, a swirling chest star,
 crown shards with glowing cores and a tattered cloak that dissolves into the starry void.
 
-Accent discipline: the body is almost entirely black-violet crystal. Magenta is reserved for the
-void cracks, the eyes and the chest star; violet light for the crown-shard cores and runes."""
+Accent discipline: the body is dark violet crystal whose form is carried by cold lavender edge
+light, facet ridges and glassy streaks. Magenta is reserved for the void cracks, the eyes, the crown
+cores and the chest star (by far the brightest element); violet light for runes, halo and hem."""
 import math
 
 import numpy as np
@@ -13,8 +14,9 @@ from bossfx import bevel, dither, dramp, edge_dist, runes, smoothstep, sramp, sp
 
 TAU = 2 * math.pi
 
-VC = palette("#020104", "#05030a", "#090611", "#0e0919", "#140d23", "#1b112e", "#24163b", "#2e1c4b",
-             "#3b245e", "#4b2e74", "#5e3a8e", "#774dab", "#9468c8", "#b892e2")
+# void crystal: deep violet (not black) in the depths, cold lavender on edges and highlights
+VC = palette("#05030b", "#0a0516", "#100821", "#170b2c", "#1e0f38", "#271345", "#311854", "#3c1e64",
+             "#492576", "#582e8a", "#6a3aa0", "#7f4cb6", "#9864cb", "#b285de", "#cdaaee", "#e6d6fa")
 MG = palette("#1a0216", "#3a0632", "#640c56", "#93147e", "#c21fa2", "#e83dc2", "#ff6edb", "#ffa8ec", "#ffe0f8")
 VIO = palette("#0f0526", "#230b4d", "#3d1784", "#5c28b8", "#8048e0", "#a679f4", "#cdb0ff", "#efe4ff")
 CLOTH = palette("#020103", "#06040b", "#0b0714", "#120b1f", "#1a102b", "#231638", "#2e1d47", "#3b2658", "#4b316b")
@@ -58,10 +60,26 @@ def face_uv(ctx):
     return p[:, 0], p[:, 2]
 
 
-def crystal_v(ctx, seed=0, freq=0.14, stretch=0.6, base=0.36, striate=0.0, rim=0.07):
-    """Value field of faceted black glass: flat facets each tilted at random (lit by a fixed key
-    light so facets on one face differ in brightness), crisp ridge lines, ghost facets deeper inside
-    (offset by the face normal so each face shows a different 'depth')."""
+FACE_ID = {"north": 0, "south": 1, "east": 2, "west": 3, "up": 4, "down": 5}
+
+
+def glass_streaks(ctx):
+    """A few diagonal glassy specular streaks (about half the faces get one)."""
+    if ctx.plane or ctx.face == "down" or min(ctx.tw, ctx.th) < 6:
+        return 0.0
+    hh = float(hash3(np.array([ctx.index]), np.array([FACE_ID[ctx.face]]), np.array([0]), 77)[0])
+    if hh > 0.5:
+        return 0.0
+    diag = ctx.i + ctx.j * 0.7
+    period = (ctx.tw + ctx.th) * 0.9
+    ph = np.mod(diag - hh * 200.0, period)
+    return (ph < 1.4) * 0.26 + ((ph > 2.8) & (ph < 3.5)) * 0.1
+
+
+def crystal_v(ctx, seed=0, freq=0.14, stretch=0.6, base=0.25, striate=0.0, rim=0.16):
+    """Value field of faceted void glass: flat facets each tilted at random (lit by a fixed key
+    light), a refraction gradient (lighter towards the top of each face, deep violet below), crisp
+    cold ridge lines, ghost facets deeper inside, bright cube-edge rims and glassy streaks."""
     p = ctx.p
     q = p * np.array([1.0, stretch, 1.0])
     f1, f2, cid = worley(q, freq, seed + 3)
@@ -71,19 +89,26 @@ def crystal_v(ctx, seed=0, freq=0.14, stretch=0.6, base=0.36, striate=0.0, rim=0
     nf = ctx.nw[None, :] + rv
     nf /= np.linalg.norm(nf, axis=1, keepdims=True)
     lam = np.clip(nf @ LDIR, -0.2, 1)
-    v = base + (lam - 0.35) * 0.36 + (cid - 0.5) * 0.08
+    v = base + (lam - 0.35) * 0.34 + (cid - 0.5) * 0.06
+    if ctx.face in ("up",):
+        v += 0.12
+    elif ctx.face == "down":
+        v -= 0.08
+    else:
+        v += 0.18 * (1 - ctx.t) ** 2.0 - 0.06
     de = tex_dist(ctx, e)
-    v += (de < 0.6) * 0.14 - ((de >= 0.6) & (de < 1.7)) * 0.05
+    v += (de < 0.7) * 0.17 - ((de >= 0.7) & (de < 1.9)) * 0.05
     g1, g2, _ = worley(q * 1.45 + ctx.nw * 2.3 + 17.0, freq, seed + 7)
-    v += (tex_dist(ctx, g2 - g1) < 0.5) * 0.045
-    v += (fbm(p, 0.12, 3, seed + 9) - 0.5) * 0.1
+    v += (tex_dist(ctx, g2 - g1) < 0.5) * 0.06
+    v += (fbm(p, 0.12, 3, seed + 9) - 0.5) * 0.08
     if striate:
         v += (vnoise(p * np.array([1.4, 0.07, 1.4]), 1.0, seed + 11) - 0.5) * striate
-    if ctx.face not in ("up", "down"):
-        v += 0.06 * np.exp(-((ctx.t - 0.15) / 0.18) ** 2)
-    v += bevel(ctx, 2.2, 0.2, 0.1) + tone(ctx) + 0.16 * spec(ctx, 10)
+    v += bevel(ctx, 2.0, 0.26, 0.12) + tone(ctx) + 0.18 * spec(ctx, 10)
     if not ctx.plane and rim:
-        v += (edge_dist(ctx) == 0) * rim
+        d = edge_dist(ctx)
+        v += (d == 0) * rim * 0.75 + (d == 1) * rim * 0.2
+        v += (ctx.j == 0) * rim * 0.7 + (ctx.i == 0) * rim * 0.3
+    v += glass_streaks(ctx)
     return v
 
 
@@ -93,8 +118,8 @@ def crystal_rgb(ctx, v, seed=0):
     hz = (np.clip((h - 0.45) * 2.5, 0, 1) * 0.35)[:, None]
     rgb = rgb * (1 - hz) + rgb * np.array([0.82, 0.9, 1.5]) * hz
     p = ctx.p
-    gl = hash3(np.floor(p[:, 0] * 2 + .01), np.floor(p[:, 1] * 2 + .01), np.floor(p[:, 2] * 2 + .01), 47 + seed) > 0.993
-    rgb[gl] = VC[11]
+    gl = hash3(np.floor(p[:, 0] * 2 + .01), np.floor(p[:, 1] * 2 + .01), np.floor(p[:, 2] * 2 + .01), 47 + seed) > 0.994
+    rgb[gl] = VC[14]
     return rgb
 
 
@@ -140,7 +165,7 @@ def void_cracks(ctx, rgb, glow, density=0.5, seed=0, freq=0.075, width=1.0):
     return rgb, glow | crack
 
 
-def cavity_light(ctx, rgb, glow, R=5.5, strength=1.0):
+def cavity_light(ctx, rgb, glow, R=7.0, strength=1.0):
     """Faces turned toward the chest star pick up its magenta light (emissive where strong)."""
     d = ctx.pw - CAVITY["c"][None, :]
     dist = np.sqrt((d * d).sum(1)) + 1e-6
@@ -150,7 +175,7 @@ def cavity_light(ctx, rgb, glow, R=5.5, strength=1.0):
     return rgb, glow | (L > 0.38)
 
 
-def crystal(ctx, seed=0, cracks=0.0, crack_w=1.0, cav=False, rune_band=False, striate=0.0, base=0.31):
+def crystal(ctx, seed=0, cracks=0.0, crack_w=1.0, cav=False, rune_band=False, striate=0.0, base=0.25):
     v = crystal_v(ctx, seed, striate=striate, base=base)
     rgb = crystal_rgb(ctx, v, seed)
     glow = np.zeros(ctx.N, dtype=bool)
@@ -197,16 +222,16 @@ def _w(fn):
     return sh
 
 
-def shade_shard(ctx, cracks=0.0, core=False, seed=0, tipcol=0.35, lift=0.26, base=0.33):
+def shade_shard(ctx, cracks=0.0, core=False, seed=0, tipcol=0.35, lift=0.26, base=0.25, core_pal=None):
     """Crystal prism along a spike: darker base, lighter violet tip, lit vertical edges,
     optional glowing violet core seen through dark glass (crown shards)."""
     prog = spike_prog(ctx)
-    v = crystal_v(ctx, seed, freq=0.24, stretch=0.35, base=base, striate=0.14, rim=0.0)
+    v = crystal_v(ctx, seed, freq=0.24, stretch=0.35, base=base, striate=0.14, rim=0.1)
     v += lift * prog ** 1.6
     side = ctx.face not in ("up", "down")
     if side:
         ei = np.minimum(ctx.i, ctx.tw - 1 - ctx.i)
-        v += (ctx.i == 0) * 0.16 + (ctx.i == ctx.tw - 1) * 0.06 - ((ei == 1) * 0.03)
+        v += (ctx.i == 0) * 0.24 + (ctx.i == ctx.tw - 1) * 0.08 - ((ei == 1) * 0.04)
     rgb = crystal_rgb(ctx, v, seed)
     tint = (prog ** 2 * tipcol)[:, None]
     rgb = rgb * (1 - tint) + sramp(VIO, 0.2 + 0.45 * v) * tint
@@ -216,17 +241,19 @@ def shade_shard(ctx, cracks=0.0, core=False, seed=0, tipcol=0.35, lift=0.26, bas
         # hottest mid-length, fading towards the base and the clear tip
         along = np.sin(np.pi * np.clip(prog * 1.05, 0, 1)) ** 0.6
         if side:
-            w = np.abs(ctx.s - 0.5) * ctx.tw / 2.0          # units from the face centre line
-            k = np.clip(1 - w / 0.55, 0, 1) * along
+            w = np.abs(ctx.s - 0.5) * 2                     # 0 centre line .. 1 face edge
+            k = np.clip(1 - w / 0.42, 0, 1) * along
+            halo = np.clip(1 - w / 0.8, 0, 1) * along
         else:
             x, y = plane_xy(ctx)
-            k = np.clip(1 - np.maximum(np.abs(x), np.abs(y)) / 0.5, 0, 1) * along
-        halo = np.clip(1 - (np.abs(ctx.s - 0.5) * ctx.tw / 2.0) / 1.4, 0, 1) * along if side else k
-        rgb = mix(rgb, sramp(VIO, 0.15 + 0.35 * halo), halo * 0.45)
-        line = k > 0.35
-        rgb[line] = sramp(VIO, 0.5 + 0.45 * k[line])
-        hot = k > 0.8
-        rgb[hot] = VIO[7]
+            k = np.clip(1 - np.maximum(np.abs(x), np.abs(y)) / 0.45, 0, 1) * along
+            halo = k
+        cp = core_pal if core_pal is not None else VIO
+        rgb = mix(rgb, sramp(cp, 0.1 + 0.25 * halo), halo * 0.55)
+        line = k > 0.3
+        rgb[line] = sramp(cp, 0.4 + 0.5 * k[line])
+        hot = k > 0.85
+        rgb[hot] = cp[-2]
         glow = line
     if cracks:
         rgb, glow = void_cracks(ctx, rgb, glow, cracks, seed + 3, width=0.9)
@@ -235,19 +262,19 @@ def shade_shard(ctx, cracks=0.0, core=False, seed=0, tipcol=0.35, lift=0.26, bas
 
 def shade_claw(ctx):
     prog = spike_prog(ctx)
-    v = crystal_v(ctx, 5, freq=0.3, stretch=0.4, base=0.3, striate=0.1, rim=0.0) + 0.3 * prog ** 2
+    v = crystal_v(ctx, 5, freq=0.3, stretch=0.4, base=0.2, striate=0.08, rim=0.0) + 0.3 * prog ** 2.5
     if ctx.face not in ("up", "down"):
-        v += (ctx.i == 0) * 0.2
+        v += (ctx.i == 0) * 0.2 - (ctx.i == ctx.tw - 1) * 0.06
     rgb = crystal_rgb(ctx, v, 5)
-    tip = prog > 0.82
-    rgb[tip] = mix(rgb[tip], sramp(VIO, np.full(tip.sum(), 0.55)), 0.5)
+    tip = prog > 0.86
+    rgb[tip] = mix(rgb[tip], sramp(VC, np.full(tip.sum(), 0.8)), 0.6)
     return rgb, 255, np.zeros(ctx.N, dtype=bool)
 
 
 def shade_head(ctx):
     """Crown-helm skull: smooth black glass; the face carries deep sockets with slanted
     white-hot slit eyes, void tears and a forehead fracture."""
-    v = crystal_v(ctx, 9, freq=0.16, base=0.32, rim=0.05)
+    v = crystal_v(ctx, 9, freq=0.16, base=0.25, rim=0.13)
     rgb = crystal_rgb(ctx, v, 9)
     glow = np.zeros(ctx.N, dtype=bool)
     if ctx.face == "north":
@@ -295,20 +322,30 @@ def shade_void_wall(ctx):
     return rgb, 255, np.ones(ctx.N, dtype=bool)
 
 
-def shade_swirl(ctx):
-    """Two-armed spiral galaxy (2-fold symmetric so a 180 degree spin loops seamlessly)."""
+def _swirl(ctx, wind=2.4, gain=1.0, core_r=0.22, thr=0.15, seed=71):
     x, y = plane_xy(ctx)
     r = np.sqrt(x * x + y * y) + 1e-6
     a = np.arctan2(y, x)
-    arm = 0.5 + 0.5 * np.cos(2 * (a + 2.4 * np.log(r)))
-    v = np.exp(-(r / 0.2) ** 2) * 1.1 + arm ** 2.5 * np.exp(-r / 0.6) * 1.0
-    v += (vnoise(np.c_[x * 6, y * 6, np.zeros(ctx.N)], 1.0, 71) - 0.5) * 0.15
-    h = hash3(ctx.i, ctx.j, np.zeros(ctx.N), 73)
-    dots = (h > 0.93) & (r < 0.95)
-    a_on = ((v > 0.17) & (r < 0.97)) | dots
-    rgb = sramp(STAR, 0.1 + 0.9 * np.clip(v, 0, 1))
-    rgb[dots & (v <= 0.17)] = STAR[6]
-    return rgb, np.where(a_on, 255, 0), a_on
+    arm = 0.5 + 0.5 * np.cos(2 * (a + wind * np.log(r)))
+    v = np.exp(-(r / core_r) ** 2) * 1.25 + arm ** 2.2 * np.exp(-r / 0.62) * 1.15 * gain
+    v += (vnoise(np.c_[x * 6, y * 6, np.zeros(ctx.N)], 1.0, seed) - 0.5) * 0.14
+    h = hash3(ctx.i, ctx.j, np.zeros(ctx.N), seed + 2)
+    dots = (h > 0.92) & (r < 0.95)
+    on = ((v > thr) & (r < 0.97)) | dots
+    rgb = sramp(STAR, 0.2 + 0.85 * np.clip(v, 0, 1))
+    rgb[dots & (v <= thr)] = STAR[6]
+    rgb[r < core_r * 0.55] = STAR[7]
+    return rgb, np.where(on, 255, 0), on
+
+
+def shade_swirl(ctx):
+    """Two-armed spiral galaxy (2-fold symmetric so a 180 degree spin loops seamlessly)."""
+    return _swirl(ctx)
+
+
+def shade_swirl2(ctx):
+    """Second, tighter and fainter spiral layer turned 90 degrees: four arms in total."""
+    return _swirl(ctx, wind=3.2, gain=0.75, core_r=0.15, thr=0.2, seed=75)
 
 
 def shade_flare(ctx):
@@ -371,7 +408,7 @@ def shade_cloak(ctx):
     # alpha: ragged hem strips + holes + frayed sides
     strip = vnoise(np.c_[X * 0.55 + pid * 13, np.zeros(ctx.N), np.zeros(ctx.N)], 1.0, 91)
     strip2 = vnoise(np.c_[X * 1.7 + pid * 7, Y * 0.05, np.zeros(ctx.N)], 1.0, 92)
-    hem = 1.0 - (0.04 + 0.22 * strip ** 1.5 + 0.05 * strip2)
+    hem = 1.0 - (0.02 + 0.12 * strip ** 1.5 + 0.035 * strip2)
     holes_f = fbm(P * np.array([0.9, 0.45, 1.0]), 0.22, 3, 93)
     hole_thr = 0.8 - 0.15 * smoothstep(0.3, 1.0, v)
     sx = np.abs(ctx.s - 0.5) * 2
@@ -380,11 +417,17 @@ def shade_cloak(ctx):
     if prm.get("taper"):
         # side panels narrow towards the shoulder
         cut |= sx > 0.55 + 0.45 * smoothstep(0.0, 0.35, v)
+    # ragged glowing hem: a violet ember line along the torn edge (exact texel width), dimmer around holes
+    dh = tex_dist(ctx, np.maximum(hem - v, 0.0))
+    hem_glow = (dh < 1.7) & ~cut & (v > 0.6)
+    hem_hot = (dh < 0.7) & ~cut & (v > 0.6)
+    rgb[hem_glow] = sramp(VIO, np.full(hem_glow.sum(), 0.55))
+    rgb[hem_hot] = VIO[7]
     near = (holes_f > hole_thr - 0.008) & ~cut & (v > 0.35)
-    rgb[near] = sramp(MG, np.full(near.sum(), 0.25))
+    rgb[near] = sramp(VIO, np.full(near.sum(), 0.35))
     ember = near & (holes_f > hole_thr - 0.004) & (v > 0.5)
-    rgb[ember] = MG[4]
-    glow |= ember
+    rgb[ember] = VIO[5]
+    glow |= ember | hem_glow
     alpha = np.where(cut, 0, 255)
     return rgb, alpha, glow & ~cut
 
@@ -415,20 +458,21 @@ def shade_tabard(ctx):
 
 
 def shade_halo(ctx):
-    """Thin violet rune ring the crown shards orbit on (seen from below by the player)."""
+    """Broken violet halo behind the head: a bold outer ring cut by six gaps, a thin inner ring and
+    short rune ticks between them; 6-fold symmetric so a 60 degree turn loops seamlessly."""
     x, y = plane_xy(ctx)
     r = np.sqrt(x * x + y * y)
-    a = np.arctan2(y, x)
-    ring1 = np.abs(r - 0.93) < 0.028
-    ring2 = np.abs(r - 0.8) < 0.018
-    band = (r > 0.82) & (r < 0.91)
-    gx = (a / TAU + 0.5) * 48
-    gl, _ = runes(gx * 6.0, (r - 0.82) / 0.09 * 6.0, cell=6.0, seed=31, density=0.38, stroke=0.5, gap=0.12)
-    ticks = (np.abs(np.mod(a * 6 / TAU, 1) - 0.5) < 0.035) & (r > 0.6) & (r < 0.8)
-    on = ring1 | ring2 | (band & gl) | ticks
+    a = np.mod(np.arctan2(y, x), TAU / 6)            # angle within one 60 degree sector
+    sec = a / (TAU / 6)
+    gap = np.abs(sec - 0.5) < 0.1
+    ring1 = (np.abs(r - 0.92) < 0.055) & ~gap
+    ring2 = (np.abs(r - 0.72) < 0.03) & ~(np.abs(sec - 0.0) < 0.04) & ~(np.abs(sec - 1.0) < 0.04)
+    tick = (np.abs(np.mod(sec * 5, 1) - 0.5) < 0.12) & (r > 0.77) & (r < 0.84) & ~gap
+    stud = (np.abs(sec - 0.5) < 0.04) & (np.abs(r - 0.92) < 0.07)
+    on = ring1 | ring2 | tick | stud
     rgb = np.zeros((ctx.N, 3)) + VIO[4]
-    rgb[ring1] = VIO[5]
-    rgb[band & gl] = VIO[6]
+    rgb[ring1] = sramp(VIO, 0.62 + 0.25 * (1 - np.abs(r[ring1] - 0.92) / 0.055))
+    rgb[stud] = VIO[7]
     return rgb, np.where(on, 255, 0), on
 
 
@@ -437,16 +481,17 @@ SHADERS = {
     "crystal_cracked": _w(lambda c: crystal(c, seed=1, cracks=0.55)),
     "crystal_cracked_hi": _w(lambda c: crystal(c, seed=2, cracks=0.85, crack_w=1.15)),
     "frame": _w(lambda c: crystal(c, seed=3, cracks=0.6, cav=True)),
-    "belt": _w(lambda c: crystal(c, seed=4, rune_band=True, base=0.28)),
+    "belt": _w(lambda c: crystal(c, seed=4, rune_band=True, base=0.25)),
     "bracer": _w(lambda c: crystal(c, seed=6, rune_band=True, cracks=0.35)),
     "shard": lambda c: shade_shard(c),
-    "shard_dark": lambda c: shade_shard(c, seed=9, tipcol=0.05, lift=0.06, base=0.27),
+    "shard_dark": lambda c: shade_shard(c, seed=9, tipcol=0.05, lift=0.06, base=0.25),
     "shard_cracked": lambda c: shade_shard(c, cracks=0.7, seed=2),
-    "crown": lambda c: shade_shard(c, core=True, seed=4, tipcol=0.25, lift=0.12, base=0.26),
+    "crown": lambda c: shade_shard(c, core=True, seed=4, tipcol=0.3, lift=0.16, base=0.27, core_pal=MG),
     "claw": shade_claw,
     "head": shade_head,
     "void_wall": shade_void_wall,
     "swirl": shade_swirl,
+    "swirl2": shade_swirl2,
     "flare": shade_flare,
     "core": shade_core,
     "cloak": shade_cloak,

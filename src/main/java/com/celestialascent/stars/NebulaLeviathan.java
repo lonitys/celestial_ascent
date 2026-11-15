@@ -56,6 +56,12 @@ public class NebulaLeviathan extends FlyingBoss {
     @Override protected double orbitRadius() { return 12; }
     @Override protected double flySpeed() { return 0.6; }
 
+    /** The serpent body trails far beyond the hitbox; keep rendering while any of it is on screen. */
+    @Override
+    public net.minecraft.world.phys.AABB getBoundingBoxForCulling() {
+        return getBoundingBox().inflate(8, 4, 8);
+    }
+
     private ServerLevel sl() { return (ServerLevel) level(); }
 
     @Override

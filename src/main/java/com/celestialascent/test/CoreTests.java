@@ -102,6 +102,8 @@ public final class CoreTests {
         eq(h, 400.0, CelestialBoss.scaledHealth(400, 1, 0.5), "solo");
         eq(h, 800.0, CelestialBoss.scaledHealth(400, 3, 0.5), "three players");
         eq(h, 400.0, CelestialBoss.scaledHealth(400, 0, 0.5), "no players counts as one");
+        eq(h, 1.0, CelestialBoss.damageScaleFor(900), "under the cap: no scaling");
+        h.assertTrue(Math.abs(CelestialBoss.damageScaleFor(3000) - 3000 / 1024.0) < 1e-9, "Void Sovereign keeps 3000 effective HP");
         h.succeed();
     }
 

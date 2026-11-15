@@ -82,6 +82,7 @@ public abstract class CelestialBoss extends Monster implements GeoEntity {
     private int globalCooldown = 40;
     private int unreachableTicks;
     private boolean scaledOnce;
+    private float damageScale = 1f;
     private BlockPos home;
 
     protected CelestialBoss(EntityType<? extends Monster> type, Level level) {
@@ -281,16 +282,31 @@ public abstract class CelestialBoss extends Monster implements GeoEntity {
         onPhaseChange(newPhase);
     }
 
+    /** Vanilla caps the max-health attribute at 1024; health beyond that becomes damage resistance. */
+    public static final double ATTRIBUTE_CAP = 1024;
+
+    /** Damage divisor for bosses whose effective health exceeds the attribute cap (1 otherwise). */
+    public static double damageScaleFor(double effectiveMax) {
+        return effectiveMax > ATTRIBUTE_CAP ? effectiveMax / ATTRIBUTE_CAP : 1.0;
+    }
+
+    /** True maximum health: base x config x player scaling (may exceed the 1024 attribute cap). */
+    public double effectiveMaxHealth() {
+        return getMaxHealth() * damageScale;
+    }
+
     private void updateScaling() {
         scaledOnce = true;
         int players = Math.max(1, level().getEntitiesOfClass(Player.class, getBoundingBox().inflate(64),
                 p -> !p.isSpectator() && p.isAlive()).size());
-        double max = scaledHealth(baseMaxHealth() * ModConfig.BOSS_HEALTH_MULT.get(), players, ModConfig.BOSS_SCALE_PER_PLAYER.get());
+        double effective = scaledHealth(baseMaxHealth() * ModConfig.BOSS_HEALTH_MULT.get(), players, ModConfig.BOSS_SCALE_PER_PLAYER.get());
+        double attribute = Math.min(effective, ATTRIBUTE_CAP);
         AttributeInstance inst = getAttribute(Attributes.MAX_HEALTH);
-        if (inst != null && Math.abs(inst.getBaseValue() - max) > 0.5) {
+        damageScale = (float) damageScaleFor(effective);
+        if (inst != null && Math.abs(inst.getBaseValue() - attribute) > 0.5) {
             float fraction = getHealth() / getMaxHealth();
-            inst.setBaseValue(max);
-            setHealth((float) (fraction * max));
+            inst.setBaseValue(attribute);
+            setHealth((float) (fraction * attribute));
         }
     }
 
@@ -341,7 +357,7 @@ public abstract class CelestialBoss extends Monster implements GeoEntity {
         if (!bypass) {
             if (transitionTicks > 0 || isDeadOrDying()) return false;
             // A single hit can never take more than 8% of max health (one-shot weapons, exploits).
-            amount = Math.min(amount, getMaxHealth() * 0.08f);
+            amount = Math.min(amount, getMaxHealth() * 0.08f * damageScale) / damageScale;
         }
         float before = getHealth();
         boolean hit = super.hurt(src, amount);
@@ -488,6 +504,7 @@ public abstract class CelestialBoss extends Monster implements GeoEntity {
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         tag.putInt("Phase", phase());
+        tag.putFloat("DamageScale", damageScale);
         if (home != null) tag.put("Home", NbtUtils.writeBlockPos(home));
     }
 
@@ -495,6 +512,7 @@ public abstract class CelestialBoss extends Monster implements GeoEntity {
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
         entityData.set(PHASE, tag.getInt("Phase"));
+        damageScale = tag.contains("DamageScale") ? Math.max(1f, tag.getFloat("DamageScale")) : 1f;
         NbtUtils.readBlockPos(tag, "Home").ifPresent(p -> home = p);
         if (hasCustomName()) bossEvent.setName(getDisplayName());
     }
