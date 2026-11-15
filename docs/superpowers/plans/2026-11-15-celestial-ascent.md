@@ -6,7 +6,7 @@
 
 **Architecture:** One NeoForge mod (`celestialascent`) with shared frameworks (`boss`, `armor`, `progress`) and content modules (`economy`, `titans`, `empire`, `stars`, `abyss`). Each module owns its registry class and datagen providers. Art is produced by Python generators in `tools/art/` into `src/main/resources/assets`.
 
-**Tech Stack:** Java 21, NeoForge 21.1.262 (MC 1.21.1), ModDevGradle 2.0.148, Parchment 2024.11.17, GeckoLib 4.9.3, Python 3 + Pillow/numpy for art, NeoForge GameTest for tests.
+**Tech Stack:** Java 21, NeoForge 21.1.219+ (MC 1.21.1), ModDevGradle 2.0.148, Parchment 2024.11.17, GeckoLib 4.9.3, Python 3 + Pillow/numpy for art, NeoForge GameTest for tests.
 
 **Execution note:** executed inline by the same agent that wrote the spec, so code lives in the source tree rather than being duplicated here. Every task lists exact files, the interfaces it exposes, and how it is verified.
 

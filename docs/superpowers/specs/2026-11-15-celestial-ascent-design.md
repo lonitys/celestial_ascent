@@ -2,7 +2,7 @@
 
 Date: 2026-11-15
 Mod id: `celestialascent` · Package: `com.celestialascent`
-Platform: Minecraft Java 1.21.1, NeoForge 21.1.262, Java 21
+Platform: Minecraft Java 1.21.1, NeoForge 21.1.219 or newer, Java 21
 Location: `C:\modwork\celestial_ascent`
 
 ## 1. Goal
