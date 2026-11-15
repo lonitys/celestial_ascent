@@ -29,7 +29,7 @@ public class StationScreen extends AbstractContainerScreen<StationMenu> {
         g.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, 0xBFB49A, false);
         if (!menu.conditionOk() && menu.type.conditionKey() != null) {
             Component c = Component.translatable(menu.type.conditionKey());
-            g.drawString(font, c, (imageWidth - font.width(c)) / 2, 62, 0xFF8080, false);
+            g.drawString(font, c, imageWidth - 8 - font.width(c), titleLabelY, 0xFF8080, false);
         }
     }
 

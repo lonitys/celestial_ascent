@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "F": {
+      "item": "celestialascent:titan_forge"
+    },
+    "G": {
+      "item": "celestialascent:ender_gear"
+    },
+    "O": {
+      "item": "minecraft:obsidian"
+    },
+    "P": {
+      "item": "celestialascent:imperial_plating"
+    }
+  },
+  "pattern": [
+    "PGP",
+    "GFG",
+    "OOO"
+  ],
+  "result": {
+    "count": 1,
+    "id": "celestialascent:imperial_forge"
+  }
+}

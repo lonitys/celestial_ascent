@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "C": {
+      "item": "minecraft:lightning_rod"
+    },
+    "E": {
+      "item": "minecraft:amethyst_shard"
+    },
+    "N": {
+      "item": "minecraft:netherite_scrap"
+    }
+  },
+  "pattern": [
+    "CEC",
+    "ENE",
+    "CEC"
+  ],
+  "result": {
+    "count": 1,
+    "id": "celestialascent:storm_sigil"
+  }
+}

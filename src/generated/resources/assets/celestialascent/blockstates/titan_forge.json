@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "celestialascent:block/titan_forge",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "celestialascent:block/titan_forge"
+    },
+    "facing=south": {
+      "model": "celestialascent:block/titan_forge",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "celestialascent:block/titan_forge",
+      "y": 270
+    }
+  }
+}

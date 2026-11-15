@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "minecraft:book"
+    },
+    "P": {
+      "tag": "minecraft:planks"
+    }
+  },
+  "pattern": [
+    "PPP",
+    "PBP",
+    "PPP"
+  ],
+  "result": {
+    "count": 1,
+    "id": "celestialascent:quest_board"
+  }
+}

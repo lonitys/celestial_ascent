@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "celestialascent:void_aster"
+    }
+  ],
+  "result": {
+    "count": 10,
+    "id": "celestialascent:star_aster"
+  }
+}

@@ -1,0 +1,327 @@
+{
+  "comment": "Celestial Ascent fixed EMC values",
+  "values": {
+    "before": [
+      {
+        "type": "projecte:item",
+        "emc_value": 32,
+        "id": "celestialascent:copper_aster"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 320,
+        "id": "celestialascent:silver_aster"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 3200,
+        "id": "celestialascent:gold_aster"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 32000,
+        "id": "celestialascent:titan_aster"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 320000,
+        "id": "celestialascent:ender_aster"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 3200000,
+        "id": "celestialascent:star_aster"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 32000000,
+        "id": "celestialascent:void_aster"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 2048,
+        "id": "celestialascent:bank_counter"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 1024,
+        "id": "celestialascent:shop_stall"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 512,
+        "id": "celestialascent:quest_board"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 12000,
+        "id": "celestialascent:titan_anvil"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 250000,
+        "id": "celestialascent:titan_shard"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 2000000,
+        "id": "celestialascent:frost_core"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 150000,
+        "id": "celestialascent:frost_sigil"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 2000000,
+        "id": "celestialascent:tide_core"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 150000,
+        "id": "celestialascent:tide_sigil"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 2000000,
+        "id": "celestialascent:storm_core"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 150000,
+        "id": "celestialascent:storm_sigil"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 2000000,
+        "id": "celestialascent:magma_core"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 150000,
+        "id": "celestialascent:magma_sigil"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 12000000,
+        "id": "celestialascent:titan_helmet"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 19200000,
+        "id": "celestialascent:titan_chestplate"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 16800000,
+        "id": "celestialascent:titan_leggings"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 9600000,
+        "id": "celestialascent:titan_boots"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 1500000,
+        "id": "celestialascent:titan_forge"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 5000000,
+        "id": "celestialascent:dragon_heart"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 1500000,
+        "id": "celestialascent:imperial_plating"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 1000000,
+        "id": "celestialascent:ender_gear"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 15000000,
+        "id": "celestialascent:colossus_core"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 25000000,
+        "id": "celestialascent:imperial_seal"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 40000000,
+        "id": "celestialascent:imperial_helmet"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 64000000,
+        "id": "celestialascent:imperial_chestplate"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 56000000,
+        "id": "celestialascent:imperial_leggings"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 32000000,
+        "id": "celestialascent:imperial_boots"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 6000000,
+        "id": "celestialascent:imperial_forge"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 800000,
+        "id": "celestialascent:stardust"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 20000000,
+        "id": "celestialascent:dormant_star_core"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 40000000,
+        "id": "celestialascent:star_core"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 6000000,
+        "id": "celestialascent:star_compass"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 64,
+        "id": "celestialascent:starstone"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 96,
+        "id": "celestialascent:starlit_starstone"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 64,
+        "id": "celestialascent:starstone_bricks"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 4096,
+        "id": "celestialascent:star_crystal"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 120000000,
+        "id": "celestialascent:stellar_helmet"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 192000000,
+        "id": "celestialascent:stellar_chestplate"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 168000000,
+        "id": "celestialascent:stellar_leggings"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 96000000,
+        "id": "celestialascent:stellar_boots"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 24000000,
+        "id": "celestialascent:sky_altar"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 5000000,
+        "id": "celestialascent:void_essence"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 250000000,
+        "id": "celestialascent:void_heart"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 30000000,
+        "id": "celestialascent:primordial_core"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 90000000,
+        "id": "celestialascent:abyssal_beacon"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 6000000,
+        "id": "celestialascent:ascension_pearl"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 64,
+        "id": "celestialascent:abyssal_stone"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 250000000,
+        "id": "celestialascent:void_helmet"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 400000000,
+        "id": "celestialascent:void_chestplate"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 350000000,
+        "id": "celestialascent:void_leggings"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 200000000,
+        "id": "celestialascent:void_boots"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 1000000000,
+        "id": "celestialascent:ascendant_helmet"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 1600000000,
+        "id": "celestialascent:ascendant_chestplate"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 1400000000,
+        "id": "celestialascent:ascendant_leggings"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 800000000,
+        "id": "celestialascent:ascendant_boots"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 40000000,
+        "id": "celestialascent:void_infuser"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 150000000,
+        "id": "celestialascent:ascension_altar"
+      }
+    ]
+  }
+}

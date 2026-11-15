@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=east,head=false": {
+      "model": "celestialascent:block/star_gate_pedestal",
+      "y": 90
+    },
+    "facing=east,head=true": {
+      "model": "celestialascent:block/star_gate_pedestal_head",
+      "y": 90
+    },
+    "facing=north,head=false": {
+      "model": "celestialascent:block/star_gate_pedestal"
+    },
+    "facing=north,head=true": {
+      "model": "celestialascent:block/star_gate_pedestal_head"
+    },
+    "facing=south,head=false": {
+      "model": "celestialascent:block/star_gate_pedestal",
+      "y": 180
+    },
+    "facing=south,head=true": {
+      "model": "celestialascent:block/star_gate_pedestal_head",
+      "y": 180
+    },
+    "facing=west,head=false": {
+      "model": "celestialascent:block/star_gate_pedestal",
+      "y": 270
+    },
+    "facing=west,head=true": {
+      "model": "celestialascent:block/star_gate_pedestal_head",
+      "y": 270
+    }
+  }
+}

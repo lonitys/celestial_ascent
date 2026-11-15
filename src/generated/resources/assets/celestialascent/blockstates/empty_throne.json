@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "celestialascent:block/empty_throne",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "celestialascent:block/empty_throne"
+    },
+    "facing=south": {
+      "model": "celestialascent:block/empty_throne",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "celestialascent:block/empty_throne",
+      "y": 270
+    }
+  }
+}

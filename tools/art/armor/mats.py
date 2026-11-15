@@ -10,6 +10,7 @@ import numpy as np
 
 from armorlib import fbm, hash3, hexcol, palette, vnoise, worley
 
+FACE_ID = {"north": 0, "south": 1, "west": 2, "east": 3, "up": 4, "down": 5}
 BAYER2 = np.array([[0.0, 0.5], [0.75, 0.25]])
 BAYER4 = np.array([[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]]) / 16.0
 
@@ -241,8 +242,8 @@ def trim_band(ctx, width=2, edges=("top", "bottom", "left", "right"), faces=None
 def gold(ctx, p, mask=None, base=0.62, engrave=True, dither=0.4):
     """Polished gold trim colour: strong bevel + engraved dots."""
     dl, dr, dt, db = edist(ctx)
-    v = base + face_tone(ctx, 0.12, -0.25) + vgrad(ctx, 0.18) + bevel(ctx, 0.30, 0.26, 0.06)
-    v += (fbm(ctx.p, 0.9, 2, 77) - 0.5) * 0.14
+    v = base + face_tone(ctx, 0.10, -0.25) + vgrad(ctx, 0.18) + bevel(ctx, 0.22, 0.26, 0.06)
+    v += (fbm(ctx.p, 0.9, 2, 77) - 0.5) * 0.10
     v += sheen(ctx, 0.2, phase=0.4)
     v -= ctx.ao * 0.5
     if engrave and side_face(ctx):

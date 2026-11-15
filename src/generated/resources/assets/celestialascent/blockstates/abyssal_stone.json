@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "crack=0": {
+      "model": "celestialascent:block/abyssal_stone"
+    },
+    "crack=1": {
+      "model": "celestialascent:block/abyssal_stone_crack1"
+    },
+    "crack=2": {
+      "model": "celestialascent:block/abyssal_stone_crack2"
+    },
+    "crack=3": {
+      "model": "celestialascent:block/abyssal_stone_crack3"
+    }
+  }
+}

@@ -62,7 +62,7 @@ def fallen_stars():
 
     dump(os.path.join(ROOT, NS, 'dimension_type', 'fallen_stars.json'), {
         'ultrawarm': False, 'natural': False, 'coordinate_scale': 1.0, 'has_skylight': True, 'has_ceiling': False,
-        'ambient_light': 0.08, 'fixed_time': 18000, 'monster_spawn_light_level': 0, 'monster_spawn_block_light_limit': 0,
+        'ambient_light': 0.3, 'fixed_time': 18000, 'monster_spawn_light_level': 0, 'monster_spawn_block_light_limit': 0,
         'piglin_safe': False, 'bed_works': False, 'respawn_anchor_works': False, 'has_raids': False,
         'logical_height': 256, 'min_y': 0, 'height': 256, 'infiniburn': '#minecraft:infiniburn_end',
         'effects': ns('fallen_stars')})

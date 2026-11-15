@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "celestialascent:block/leviathan_altar",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "celestialascent:block/leviathan_altar"
+    },
+    "facing=south": {
+      "model": "celestialascent:block/leviathan_altar",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "celestialascent:block/leviathan_altar",
+      "y": 270
+    }
+  }
+}

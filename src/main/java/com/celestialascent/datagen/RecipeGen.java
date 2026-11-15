@@ -33,8 +33,7 @@ public class RecipeGen extends RecipeProvider {
         CoinTier[] tiers = CoinTier.values();
         for (int i = 0; i + 1 < tiers.length; i++) {
             Item low = Economy.coin(tiers[i]), high = Economy.coin(tiers[i + 1]);
-            ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, high).requires(low, 9).requires(low)
-                    .unlockedBy("has_coin", has(low)).save(out, id(tiers[i + 1].id + "_from_" + tiers[i].id));
+            // Ten coins cannot fit a crafting grid; combining coins upward happens at a Bank Counter.
             ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, low, 10).requires(high)
                     .unlockedBy("has_coin", has(high)).save(out, id(tiers[i].id + "_from_" + tiers[i + 1].id));
         }

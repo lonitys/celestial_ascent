@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "N": {
+      "item": "minecraft:nether_star"
+    },
+    "S": {
+      "item": "celestialascent:stardust"
+    },
+    "V": {
+      "item": "celestialascent:void_essence"
+    }
+  },
+  "pattern": [
+    "VSV",
+    "SNS",
+    "VSV"
+  ],
+  "result": {
+    "count": 1,
+    "id": "celestialascent:abyssal_beacon"
+  }
+}

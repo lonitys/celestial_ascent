@@ -41,7 +41,7 @@ def build_model():
     sym(H, H, (-6.0, 25.8, -1.6), (1, 3, 3), "stone")                            # ear bosses
     sym(H, H, (-6.5, 26.8, -0.6), (1, 1, 1), "gem")                              # ear crystals
     crest = m.bone("helmCrystal", "armorHead", (0, 34, -3.6))
-    crest.spike((0, 34.0, -3.6), (0, 1.0, -0.42), 6, 2, "crystal", segs=[0.62, 0.45], spin=45)
+    crest.spike((0, 34.0, -3.6), (0, 1.0, -0.42), 5, 2, "crystal", segs=[0.62, 0.45], spin=45)
     tl_ = m.bone("helmHornR", "armorHead", (-5.2, 30.8, 0.6))
     tr_ = m.bone("helmHornL", "armorHead", (5.2, 30.8, 0.6))
     sym_spike(tl_, tr_, (-5.2, 30.8, 0.6), (-0.8, 1.0, 0.7), 4, 2, "crystal", segs=[0.62, 0.45])
@@ -182,12 +182,13 @@ def make_shaders(theme):
         n = fbm(ctx.p, 0.5, 3, seed=41)
         side = M.side_face(ctx)
         top = (ctx.j < 2) if side else np.zeros(ctx.N, dtype=bool)
-        r = (n * 0.6 + up * 0.5 + top * 0.36 - ctx.ao * 0.4) > (0.74 - 0.04 * strength)
+        top1 = (ctx.j < 1) if side else np.zeros(ctx.N, dtype=bool)
+        r = (n * 0.6 + up * 0.5 + top * 0.2 + top1 * 0.2 - ctx.ao * 0.4) > (0.76 - 0.04 * strength)
         if side:
             # icicle drips hanging from the frosted top edge
             col = np.floor(ctx.p[:, 0] * 2 + ctx.p[:, 2] * 2 + 0.01)
-            ln = np.floor(hash3(col, ctx.index, 0, 5) * 5)
-            drip = (ctx.j < 2 + ln) & (hash3(col, ctx.index, 1, 6) > 0.62) & (n > 0.45)
+            ln = np.floor(hash3(col, ctx.index, 0, 5) * 3)
+            drip = (ctx.j < 1 + ln) & (hash3(col, ctx.index, 1, 6) > 0.7) & (n > 0.5)
             r |= drip
         rv = 0.55 + (fbm(ctx.p, 1.3, 2, 9) - 0.5) * 0.7 + M.bevel(ctx, 0.3, 0.1) - (ctx.j * 0.06 if side else 0)
         rgb[r] = M.ramp(T["rime"], rv[r])
@@ -320,7 +321,7 @@ def make_shaders(theme):
             rgb[hi] = STONE[-1]
             rgb[lo] = STONE[2]
         else:
-            v, rgb = M.stone(ctx, STONE, base=0.56)
+            v, rgb = M.stone(ctx, STONE, base=0.62)
         rune = prm.get("rune")
         if rune and M.side_face(ctx) and ctx.tw >= 6 and ctx.th >= 6:
             side = ctx.params.get("side", 0)
@@ -337,11 +338,11 @@ def make_shaders(theme):
             rgb = rgb * 0.75
         if theme == "_tide":
             # coral growths on stone
-            f1, f2, cid = worley(ctx.p, 0.42, seed=29)
-            gate = fbm(ctx.p, 0.2, 2, seed=11) > 0.52
+            f1, f2, cid = worley(ctx.p, 0.3, seed=29)
+            gate = fbm(ctx.p, 0.2, 2, seed=11) > 0.5
             branch = worley(ctx.p, 1.1, seed=30)
-            cor = (f1 < 0.42) & gate & ((branch[1] - branch[0]) > 0.12)
-            cv = 0.85 - f1 * 1.3 + (M.texel_hash(ctx, 5) - 0.5) * 0.15
+            cor = (f1 < 0.5) & gate & ((branch[1] - branch[0]) > 0.1)
+            cv = 1.02 - f1 * 1.0 + (M.texel_hash(ctx, 5) - 0.5) * 0.12
             rgb[cor] = M.ramp(T["coral"], cv[cor])
             polyp = cor & (M.texel_hash(ctx, 12) > 0.86)
             rgb[polyp] = T["coral"][-1]

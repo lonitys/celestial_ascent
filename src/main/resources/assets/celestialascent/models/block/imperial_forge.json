@@ -1,0 +1,1081 @@
+{
+  "parent": "block/block",
+  "textures": {
+    "particle": "celestialascent:block/imperial_forge_front",
+    "front": "celestialascent:block/imperial_forge_front",
+    "side": "celestialascent:block/imperial_forge_side",
+    "top": "celestialascent:block/imperial_forge_top",
+    "inner": "celestialascent:block/imperial_forge_inner",
+    "gold": "celestialascent:block/imperial_forge_gold"
+  },
+  "elements": [
+    {
+      "name": "body",
+      "from": [
+        0,
+        0,
+        2
+      ],
+      "to": [
+        16,
+        13,
+        16
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            14
+          ],
+          "texture": "#top"
+        },
+        "up": {
+          "uv": [
+            0,
+            2,
+            16,
+            16
+          ],
+          "texture": "#top"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            8
+          ],
+          "texture": "#inner",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "south": {
+          "uv": [
+            0,
+            3,
+            16,
+            16
+          ],
+          "texture": "#side"
+        },
+        "west": {
+          "uv": [
+            2,
+            3,
+            16,
+            16
+          ],
+          "texture": "#side"
+        },
+        "east": {
+          "uv": [
+            0,
+            3,
+            14,
+            16
+          ],
+          "texture": "#side"
+        }
+      }
+    },
+    {
+      "name": "frame_left",
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        4,
+        13,
+        2
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            14,
+            4,
+            16
+          ],
+          "texture": "#top"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            4,
+            2
+          ],
+          "texture": "#top"
+        },
+        "north": {
+          "uv": [
+            12,
+            3,
+            16,
+            16
+          ],
+          "texture": "#front"
+        },
+        "south": {
+          "uv": [
+            0,
+            3,
+            4,
+            16
+          ],
+          "texture": "#side"
+        },
+        "west": {
+          "uv": [
+            0,
+            3,
+            2,
+            16
+          ],
+          "texture": "#side"
+        },
+        "east": {
+          "uv": [
+            0,
+            12,
+            2,
+            15
+          ],
+          "texture": "#inner"
+        }
+      }
+    },
+    {
+      "name": "frame_right",
+      "from": [
+        12,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        13,
+        2
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            12,
+            14,
+            16,
+            16
+          ],
+          "texture": "#top"
+        },
+        "up": {
+          "uv": [
+            12,
+            0,
+            16,
+            2
+          ],
+          "texture": "#top"
+        },
+        "north": {
+          "uv": [
+            0,
+            3,
+            4,
+            16
+          ],
+          "texture": "#front"
+        },
+        "south": {
+          "uv": [
+            0,
+            3,
+            4,
+            16
+          ],
+          "texture": "#side"
+        },
+        "west": {
+          "uv": [
+            0,
+            12,
+            2,
+            15
+          ],
+          "texture": "#inner"
+        },
+        "east": {
+          "uv": [
+            14,
+            3,
+            16,
+            16
+          ],
+          "texture": "#side"
+        }
+      }
+    },
+    {
+      "name": "frame_sill",
+      "from": [
+        4,
+        0,
+        0
+      ],
+      "to": [
+        12,
+        3,
+        2
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            4,
+            14,
+            12,
+            16
+          ],
+          "texture": "#top"
+        },
+        "up": {
+          "uv": [
+            4,
+            8,
+            12,
+            10
+          ],
+          "texture": "#inner",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "north": {
+          "uv": [
+            4,
+            13,
+            12,
+            16
+          ],
+          "texture": "#front"
+        },
+        "south": {
+          "uv": [
+            4,
+            13,
+            12,
+            16
+          ],
+          "texture": "#side"
+        },
+        "west": {
+          "uv": [
+            0,
+            13,
+            2,
+            16
+          ],
+          "texture": "#side"
+        },
+        "east": {
+          "uv": [
+            0,
+            13,
+            2,
+            16
+          ],
+          "texture": "#side"
+        }
+      }
+    },
+    {
+      "name": "frame_lintel",
+      "from": [
+        4,
+        9,
+        0
+      ],
+      "to": [
+        12,
+        13,
+        2
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            4,
+            12,
+            12,
+            14
+          ],
+          "texture": "#inner"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            12,
+            2
+          ],
+          "texture": "#top"
+        },
+        "north": {
+          "uv": [
+            4,
+            3,
+            12,
+            7
+          ],
+          "texture": "#front"
+        },
+        "south": {
+          "uv": [
+            4,
+            3,
+            12,
+            7
+          ],
+          "texture": "#side"
+        },
+        "west": {
+          "uv": [
+            0,
+            3,
+            2,
+            7
+          ],
+          "texture": "#side"
+        },
+        "east": {
+          "uv": [
+            0,
+            3,
+            2,
+            7
+          ],
+          "texture": "#side"
+        }
+      }
+    },
+    {
+      "name": "deck",
+      "from": [
+        1,
+        13,
+        1
+      ],
+      "to": [
+        15,
+        14,
+        15
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            1,
+            1,
+            15,
+            15
+          ],
+          "texture": "#top"
+        },
+        "up": {
+          "uv": [
+            1,
+            1,
+            15,
+            15
+          ],
+          "texture": "#top"
+        },
+        "north": {
+          "uv": [
+            1,
+            0,
+            15,
+            1
+          ],
+          "texture": "#gold"
+        },
+        "south": {
+          "uv": [
+            1,
+            0,
+            15,
+            1
+          ],
+          "texture": "#gold"
+        },
+        "west": {
+          "uv": [
+            1,
+            0,
+            15,
+            1
+          ],
+          "texture": "#gold"
+        },
+        "east": {
+          "uv": [
+            1,
+            0,
+            15,
+            1
+          ],
+          "texture": "#gold"
+        }
+      }
+    },
+    {
+      "name": "grate",
+      "from": [
+        3,
+        14,
+        3
+      ],
+      "to": [
+        13,
+        15,
+        13
+      ],
+      "light_emission": 15,
+      "faces": {
+        "down": {
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "texture": "#top",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "up": {
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "texture": "#top",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "north": {
+          "uv": [
+            3,
+            3,
+            13,
+            4
+          ],
+          "texture": "#top",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "south": {
+          "uv": [
+            3,
+            3,
+            13,
+            4
+          ],
+          "texture": "#top",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "west": {
+          "uv": [
+            3,
+            3,
+            13,
+            4
+          ],
+          "texture": "#top",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "east": {
+          "uv": [
+            3,
+            3,
+            13,
+            4
+          ],
+          "texture": "#top",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        }
+      }
+    },
+    {
+      "name": "finial",
+      "from": [
+        0,
+        13,
+        0
+      ],
+      "to": [
+        3,
+        15,
+        3
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            0,
+            3,
+            3
+          ],
+          "texture": "#gold"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            3,
+            3
+          ],
+          "texture": "#gold"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            3,
+            2
+          ],
+          "texture": "#side"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            3,
+            2
+          ],
+          "texture": "#side"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            3,
+            2
+          ],
+          "texture": "#side"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            3,
+            2
+          ],
+          "texture": "#side"
+        }
+      }
+    },
+    {
+      "name": "finial_cap",
+      "from": [
+        0.75,
+        15,
+        0.75
+      ],
+      "to": [
+        2.25,
+        16,
+        2.25
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            0,
+            1.5,
+            1.5
+          ],
+          "texture": "#gold"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1.5,
+            1.5
+          ],
+          "texture": "#gold"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            1.5,
+            1
+          ],
+          "texture": "#gold"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1.5,
+            1
+          ],
+          "texture": "#gold"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1.5,
+            1
+          ],
+          "texture": "#gold"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            1.5,
+            1
+          ],
+          "texture": "#gold"
+        }
+      }
+    },
+    {
+      "name": "finial",
+      "from": [
+        13,
+        13,
+        0
+      ],
+      "to": [
+        16,
+        15,
+        3
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            0,
+            3,
+            3
+          ],
+          "texture": "#gold"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            3,
+            3
+          ],
+          "texture": "#gold"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            3,
+            2
+          ],
+          "texture": "#side"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            3,
+            2
+          ],
+          "texture": "#side"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            3,
+            2
+          ],
+          "texture": "#side"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            3,
+            2
+          ],
+          "texture": "#side"
+        }
+      }
+    },
+    {
+      "name": "finial_cap",
+      "from": [
+        13.75,
+        15,
+        0.75
+      ],
+      "to": [
+        15.25,
+        16,
+        2.25
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            0,
+            1.5,
+            1.5
+          ],
+          "texture": "#gold"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1.5,
+            1.5
+          ],
+          "texture": "#gold"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            1.5,
+            1
+          ],
+          "texture": "#gold"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1.5,
+            1
+          ],
+          "texture": "#gold"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1.5,
+            1
+          ],
+          "texture": "#gold"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            1.5,
+            1
+          ],
+          "texture": "#gold"
+        }
+      }
+    },
+    {
+      "name": "finial",
+      "from": [
+        0,
+        13,
+        13
+      ],
+      "to": [
+        3,
+        15,
+        16
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            0,
+            3,
+            3
+          ],
+          "texture": "#gold"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            3,
+            3
+          ],
+          "texture": "#gold"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            3,
+            2
+          ],
+          "texture": "#side"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            3,
+            2
+          ],
+          "texture": "#side"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            3,
+            2
+          ],
+          "texture": "#side"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            3,
+            2
+          ],
+          "texture": "#side"
+        }
+      }
+    },
+    {
+      "name": "finial_cap",
+      "from": [
+        0.75,
+        15,
+        13.75
+      ],
+      "to": [
+        2.25,
+        16,
+        15.25
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            0,
+            1.5,
+            1.5
+          ],
+          "texture": "#gold"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1.5,
+            1.5
+          ],
+          "texture": "#gold"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            1.5,
+            1
+          ],
+          "texture": "#gold"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1.5,
+            1
+          ],
+          "texture": "#gold"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1.5,
+            1
+          ],
+          "texture": "#gold"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            1.5,
+            1
+          ],
+          "texture": "#gold"
+        }
+      }
+    },
+    {
+      "name": "finial",
+      "from": [
+        13,
+        13,
+        13
+      ],
+      "to": [
+        16,
+        15,
+        16
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            0,
+            3,
+            3
+          ],
+          "texture": "#gold"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            3,
+            3
+          ],
+          "texture": "#gold"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            3,
+            2
+          ],
+          "texture": "#side"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            3,
+            2
+          ],
+          "texture": "#side"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            3,
+            2
+          ],
+          "texture": "#side"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            3,
+            2
+          ],
+          "texture": "#side"
+        }
+      }
+    },
+    {
+      "name": "finial_cap",
+      "from": [
+        13.75,
+        15,
+        13.75
+      ],
+      "to": [
+        15.25,
+        16,
+        15.25
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            0,
+            1.5,
+            1.5
+          ],
+          "texture": "#gold"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1.5,
+            1.5
+          ],
+          "texture": "#gold"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            1.5,
+            1
+          ],
+          "texture": "#gold"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1.5,
+            1
+          ],
+          "texture": "#gold"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1.5,
+            1
+          ],
+          "texture": "#gold"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            1.5,
+            1
+          ],
+          "texture": "#gold"
+        }
+      }
+    }
+  ]
+}

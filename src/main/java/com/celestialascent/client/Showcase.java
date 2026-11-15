@@ -67,12 +67,13 @@ public final class Showcase {
         return "summon celestialascent:" + id + " " + x + " " + y + " " + z + " {NoAI:1b,Rotation:[180f,0f],PersistenceRequired:1b}";
     }
 
-    private static final String CLEAR = "kill @e[type=!player]";
+    private static final String CLEAR = "tp @e[type=!player] 0 -500 0";
 
     private static void build() {
         String stage = "fill -24 199 -12 24 199 24 minecraft:smooth_quartz";
         step(60, null, 0, 0, "gamemode creative", "time set 6000", "weather clear", "gamerule doDaylightCycle false",
                 "gamerule doMobSpawning false", "gamerule doWeatherCycle false", "gamerule sendCommandFeedback false",
+                "gamerule doEntityDrops false", "gamerule doMobLoot false",
                 "fill -24 200 -12 24 230 24 minecraft:air", stage, "tp @s 0 200 -8 0 0");
         // Titans
         step(80, "titans", 0, 8, CLEAR, boss("frost_titan", -9, 200, 8), boss("tide_titan", -3, 200, 8),
@@ -116,8 +117,10 @@ public final class Showcase {
                 p.serverLevel().setBlockAndUpdate(new BlockPos(x, 200, z), b.get().defaultBlockState());
                 i++;
             }
-            cmd(p, "tp @s 0 205 -6 0 28");
-        }, "blocks", 0, 28, CameraType.FIRST_PERSON));
+            cmd(p, "tp @s -8 202.2 1 0 20");
+        }, "blocks", 0, 20, CameraType.FIRST_PERSON));
+        step(30, "blocks_2", 0, 20, "tp @s 8 202.2 1 0 20");
+        step(30, "blocks_3", 0, 25, "tp @s 0 202.6 4 0 25");
         // GUIs
         String[][] guis = {{"bank_counter", "gui_bank"}, {"shop_stall", "gui_shop"}, {"titan_forge", "gui_titan_forge"},
                 {"quest_board", "gui_quest_board"}, {"imperial_forge", "gui_imperial_forge"}, {"sky_altar", "gui_sky_altar"},
@@ -143,22 +146,42 @@ public final class Showcase {
         }, "constellations_1", 30, -55, CameraType.FIRST_PERSON));
         step(30, "constellations_2", 200, -50, "tp @s 0 200 0 200 -50");
         step(30, "constellations_3", 300, -70, "tp @s 0 200 0 300 -70");
-        // Dimensions
-        step(160, "fallen_stars", 0, 5, "time set 6000", "execute in celestialascent:fallen_stars run tp @s -150 170 140 30 15");
-        step(40, "fallen_stars_sky", 0, -40, "execute in celestialascent:fallen_stars run tp @s -150 170 140 120 -40");
-        step(160, "abyss", 0, 0, "execute in celestialascent:abyss run tp @s 0 60 0 0 0", "effect give @s night_vision 999 0 true");
-        // Structures (devworld seed)
-        step(220, "trade_city", 0, 40, "effect clear @s", "execute in minecraft:overworld run tp @s -320 150 -390 0 40");
-        step(220, "tide_shrine", 0, 40, "execute in minecraft:overworld run tp @s -880 110 -400 0 40");
-        step(220, "ruined_capital", 0, 35, "execute in minecraft:the_end run tp @s -1316 110 60 0 35");
-        step(220, "star_gate", 0, 40, "execute in minecraft:the_end run tp @s -1028 90 -720 0 40");
-        step(220, "sanctum", 0, 25, "execute in celestialascent:fallen_stars run tp @s -145 165 135 0 25");
+        // Dimensions and structures, seen as a spectator from above
+        step(200, "fallen_stars", 0, 15, "gamemode spectator", "time set 6000",
+                "execute in celestialascent:fallen_stars run tp @s 0 235 0 0 15");
+        step(40, "fallen_stars_sky", 0, -35, "execute in celestialascent:fallen_stars run tp @s 0 235 0 135 -35");
+        step(200, "sanctum", 0, 70, "execute in celestialascent:fallen_stars run tp @s -145 185 175 0 70");
+        STEPS.add(new Step(200, p -> {
+            var abyss = p.server.getLevel(com.celestialascent.core.Travel.ABYSS);
+            BlockPos at = com.celestialascent.abyss.Abyss.cavePos(abyss, 0, 0);
+            cmd(p, "effect give @s night_vision 999 0 true");
+            cmd(p, "execute in celestialascent:abyss run tp @s " + at.getX() + " " + (at.getY() + 1) + " " + at.getZ() + " 0 10");
+        }, "abyss", 0, 10, CameraType.FIRST_PERSON));
+        step(260, "trade_city", 0, 85, "effect clear @s", "execute in minecraft:overworld run tp @s -300 150 -330 0 85");
+        step(260, "tide_shrine", 0, 85, "execute in minecraft:overworld run tp @s -880 110 -352 0 85");
+        step(260, "ruined_capital", 0, 85, "execute in minecraft:the_end run tp @s -1316 140 108 0 85");
+        step(260, "star_gate", 0, 80, "execute in minecraft:the_end run tp @s -1028 110 -692 0 80");
     }
 
     @SubscribeEvent
     public static void tick(ClientTickEvent.Post e) {
         if (!ENABLED) return;
         Minecraft mc = Minecraft.getInstance();
+        // The dev world was made by the dedicated server, so NeoForge asks once about experimental settings.
+        if (mc.screen instanceof net.minecraft.client.gui.screens.BackupConfirmScreen screen) {
+            for (var child : screen.children()) {
+                if (child instanceof net.minecraft.client.gui.components.Button b
+                        && b.getMessage().getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents tc
+                        && tc.getKey().equals("selectWorld.backupJoinSkipButton")) {
+                    b.onPress();
+                    return;
+                }
+            }
+        }
+        if (mc.screen instanceof net.minecraft.client.gui.screens.DeathScreen && mc.player != null) {
+            mc.player.respawn();
+            mc.setScreen(null);
+        }
         if (mc.player == null || mc.getSingleplayerServer() == null) return;
         if (STEPS.isEmpty()) build();
         if (startDelay-- > 0) return;
@@ -175,14 +198,22 @@ public final class Showcase {
             return;
         }
         Step s = STEPS.get(index);
+        while (s.shot() != null && !ONLY.isEmpty() && !s.shot().matches(ONLY)) {
+            if (++index >= STEPS.size()) {
+                mc.stop();
+                return;
+            }
+            s = STEPS.get(index);
+        }
+        Step step = s;
         mc.options.hideGui = true;
-        mc.options.setCameraType(s.camera());
-        timer = s.ticks();
+        mc.options.setCameraType(step.camera());
+        timer = step.ticks();
         MinecraftServer server = mc.getSingleplayerServer();
         var uuid = mc.player.getUUID();
         server.execute(() -> {
             ServerPlayer p = server.getPlayerList().getPlayer(uuid);
-            if (p != null) s.server().accept(p);
+            if (p != null) step.server().accept(p);
         });
     }
 }

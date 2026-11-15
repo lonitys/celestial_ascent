@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "celestialascent:block/star_crystal",
+      "x": 180
+    },
+    "facing=east": {
+      "model": "celestialascent:block/star_crystal",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north": {
+      "model": "celestialascent:block/star_crystal",
+      "x": 90
+    },
+    "facing=south": {
+      "model": "celestialascent:block/star_crystal",
+      "x": 90,
+      "y": 180
+    },
+    "facing=up": {
+      "model": "celestialascent:block/star_crystal"
+    },
+    "facing=west": {
+      "model": "celestialascent:block/star_crystal",
+      "x": 90,
+      "y": 270
+    }
+  }
+}

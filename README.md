@@ -1,0 +1,74 @@
+# Celestial Ascent
+
+An endgame ladder past netherite and the Ender Dragon: four Elemental Titans, the Lost Ender Empire, the Fallen Stars, the Abyss, and the Ascendant armor, which outclasses everything, including creative flight. Also adds an economy (Aster coins, banks, player shops, quest boards, growing villages, trade cities). ProjectE support is optional.
+
+**Minecraft 1.21.1 · NeoForge 21.1.x · requires GeckoLib 4.9+ · ProjectE optional**
+
+## Install
+
+1. Install NeoForge 21.1.x for Minecraft 1.21.1.
+2. Put these in `.minecraft/mods`:
+   - `celestialascent-<version>.jar` (from `build/libs/` after `./gradlew build`)
+   - GeckoLib for NeoForge 1.21.1 (4.9 or newer)
+   - optional: ProjectE for 1.21.1, which gives every Celestial item an EMC value and adds EMC armor repair
+
+## The ladder
+
+| Step | Where | What you do | What you get |
+|---|---|---|---|
+| 1. Elemental Titans | Overworld + Nether shrines | Craft an Elemental Sigil, use it on the shrine altar, defeat the titan | Titan Cores, Titan Shards → **Titan armor** (Titan Forge: netherite piece + core + 4 shards) |
+| ★ Ender Dragon | The End | Kill it | Every player nearby gets a **Dragon Heart** |
+| 2. Lost Ender Empire | Ruined Capital, outer End islands | Beat the Sentinel Constructs; restore the 3 Imperial Pylons (4 Imperial Plating + 16 purpur + 3,000 ✦ each); offer a Dragon Heart to the Empty Throne | Imperial Forge, an Ender Merchant, the **Ender Colossus** → Colossus Core + Imperial Seal → **Imperial armor** |
+| 3. Fallen Stars | Star Gate, outer End (use the Star Compass to find it) | Put a Dragon Head on the pedestal, present the Imperial Seal, and step through. Offer 16 Stardust at a sanctum altar | Astral Seraph, Nebula Leviathan, then the Sun Herald → Dormant Star Cores. Charge them in a **Sky Altar** at night → **Stellar armor** |
+| 4. The Abyss | Fall off the bottom of the Fallen Stars (after beating the Sun Herald) | Mine Void Essence while the ground crumbles under you; use an Abyssal Beacon below y=40 | **Void Sovereign** (3,000 HP) → Void Heart → **Void armor** (Void Infuser) |
+| ★ Ascendant | Ascension Altar | Void piece + Primordial Core + Star Core (+ Void Heart for the chest) | **Ascendant armor** |
+
+Every boss kill adds a **constellation** to your night sky and gives a small permanent bonus.
+
+### Titan elements
+
+Each Titan armor piece carries one element. With a full set, an element on one piece is level I and on two or more pieces is level II.
+
+- **Frost:** freeze immunity, frost walking, attackers are slowed (II: frozen)
+- **Tide:** water breathing, fast swimming (II: dolphin's grace, underwater night vision)
+- **Storm:** speed (II: lightning strikes back at attackers)
+- **Magma:** fire immunity (II: walk on lava, burn attackers)
+
+You can re-infuse a piece with a different element at the Titan Forge (core + 2 shards).
+
+### Ascendant armor (full set)
+
+- Creative flight, +10 hearts, +6 attack damage, +25% speed, +2 reach, faster mining
+- Immune to fire, lava, falling, drowning, freezing, wither and the void
+- Never hungry, constant Regeneration II, unbreakable
+- All four titan elements at level II
+- **H:** Ender Blink · **Sneak+H:** Void Dash · **G:** toggle night vision
+
+## Economy
+
+- **Aster coins:** Copper 1 · Silver 10 · Gold 100 · Titan 1,000 · Ender 10,000 · Star 100,000 · Void 1,000,000. Craft any coin into 10 of the tier below. To combine small coins into big ones, deposit them at a Bank Counter and withdraw the bigger coins.
+- **Bank Counter:** deposit and withdraw. Your balance survives death and works at every bank.
+- **Shop Stall:** stock it and set a price. Buyers pay with coins or their bank balance, and you're paid into your bank even while offline. Unclaimed stalls in trade cities can be rented for 100 ✦ (sneak + right-click).
+- **Quest Board:** three delivery quests per day. They pay coins and raise the village's prosperity, and at each prosperity threshold the village constructs a new building.
+- **New villager jobs:** Banker (Bank Counter), Titansmith (Titan Anvil; sells maps to shrines), Relic Dealer (Relic Pedestal; trade cities and the Ender Empire).
+- **Trade Cities:** rare walled towns with a bank, a market and a relic pavilion.
+
+## Keys
+
+- **H:** armor ability
+- **G:** armor toggle
+
+Both can be rebound under *Options → Controls → Celestial Ascent*.
+
+## Config (`config/celestialascent-common.toml`)
+
+You can tune boss health and damage, how much health bosses gain per extra player (default +50% each), the share of damage a player must deal to get loot, Abyss crumble speed, the emerald→coin rate, and ProjectE EMC repair.
+
+## Development
+
+- `./gradlew build`: build the jar
+- `./gradlew runGameTestServer`: run the automated tests
+- `./gradlew runData`: regenerate models, loot tables, recipes, tags, language and EMC values
+- `python tools/art/build_all.py`, `tools/art/*/build_all.py`: regenerate the art
+- `python tools/make_*.py`: regenerate structures and dimensions
+- `./gradlew runClient -Pshowcase`: scripted screenshot tour of `run/saves/devworld`

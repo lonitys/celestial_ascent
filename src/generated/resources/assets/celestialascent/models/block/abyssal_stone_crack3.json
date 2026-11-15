@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "celestialascent:block/abyssal_stone_crack3"
+  }
+}

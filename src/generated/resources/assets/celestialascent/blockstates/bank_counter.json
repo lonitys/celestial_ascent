@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "celestialascent:block/bank_counter",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "celestialascent:block/bank_counter"
+    },
+    "facing=south": {
+      "model": "celestialascent:block/bank_counter",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "celestialascent:block/bank_counter",
+      "y": 270
+    }
+  }
+}

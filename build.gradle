@@ -62,7 +62,7 @@ neoForge {
             if (project.hasProperty('showcase')) {
                 systemProperty 'celestialascent.showcase', 'true'
                 systemProperty 'celestialascent.showcase.only', project.findProperty('showcaseOnly') ?: ''
-                programArguments.addAll '--quickPlaySingleplayer', 'devworld'
+                programArguments.addAll '--quickPlaySingleplayer', 'devworld', '--width', '1600', '--height', '900'
             }
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
@@ -84,6 +84,7 @@ neoForge {
 
         data {
             data()
+            if (project.hasProperty('lenient')) systemProperty 'celestialascent.datagen.lenient', 'true'
             // example of overriding the workingDirectory set in configureEach above, uncomment if you want to use it
             // gameDirectory = project.file('run-data')
 

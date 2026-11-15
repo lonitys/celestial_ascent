@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "minecraft:polished_blackstone_bricks"
+    },
+    "F": {
+      "item": "minecraft:blast_furnace"
+    },
+    "N": {
+      "item": "minecraft:netherite_ingot"
+    },
+    "O": {
+      "item": "minecraft:obsidian"
+    },
+    "S": {
+      "item": "celestialascent:titan_shard"
+    }
+  },
+  "pattern": [
+    "SNS",
+    "BFB",
+    "OOO"
+  ],
+  "result": {
+    "count": 1,
+    "id": "celestialascent:titan_forge"
+  }
+}

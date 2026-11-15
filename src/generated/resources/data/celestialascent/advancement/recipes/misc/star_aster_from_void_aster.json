@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_coin": {
+      "conditions": {
+        "items": [
+          {
+            "items": "celestialascent:void_aster"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "celestialascent:star_aster_from_void_aster"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_coin"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "celestialascent:star_aster_from_void_aster"
+    ]
+  }
+}

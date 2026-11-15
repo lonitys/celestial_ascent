@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "celestialascent:block/void_infuser",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "celestialascent:block/void_infuser"
+    },
+    "facing=south": {
+      "model": "celestialascent:block/void_infuser",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "celestialascent:block/void_infuser",
+      "y": 270
+    }
+  }
+}

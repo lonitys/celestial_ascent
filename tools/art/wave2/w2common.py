@@ -9,7 +9,7 @@ import os
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.abspath(os.path.join(HERE, '..')))
+sys.path.append(os.path.abspath(os.path.join(HERE, '..')))   # after wave2, so local modules win
 
 import numpy as np                     # noqa: E402
 from PIL import Image, ImageDraw       # noqa: E402

@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "celestialascent:block/shop_stall",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "celestialascent:block/shop_stall"
+    },
+    "facing=south": {
+      "model": "celestialascent:block/shop_stall",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "celestialascent:block/shop_stall",
+      "y": 270
+    }
+  }
+}

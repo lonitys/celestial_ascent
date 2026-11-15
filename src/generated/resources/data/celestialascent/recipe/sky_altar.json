@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "minecraft:amethyst_block"
+    },
+    "B": {
+      "item": "minecraft:beacon"
+    },
+    "O": {
+      "item": "minecraft:obsidian"
+    },
+    "S": {
+      "item": "celestialascent:stardust"
+    }
+  },
+  "pattern": [
+    "ASA",
+    "SBS",
+    "OOO"
+  ],
+  "result": {
+    "count": 1,
+    "id": "celestialascent:sky_altar"
+  }
+}

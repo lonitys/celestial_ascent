@@ -150,7 +150,7 @@ public final class Abyss {
     }
 
     /** First open pocket (solid floor, two air blocks) scanning down from the upper Abyss, else a platform. */
-    static BlockPos cavePos(ServerLevel level, int x, int z) {
+    public static BlockPos cavePos(ServerLevel level, int x, int z) {
         level.getChunk(x >> 4, z >> 4);
         for (int dx = 0; dx <= 24; dx += 4) {
             for (int y = 110; y > level.getMinBuildHeight() + 8; y--) {

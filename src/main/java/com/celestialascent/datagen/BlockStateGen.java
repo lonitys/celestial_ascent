@@ -24,6 +24,9 @@ import java.util.Set;
 
 /** Blockstates. Shaped block models are authored by tools/art; simple cubes are generated here. */
 public class BlockStateGen extends BlockStateProvider {
+    /** Blocks skipped in lenient mode (their item models are skipped too). */
+    public static final java.util.Set<String> SKIPPED = new java.util.HashSet<>();
+
     public BlockStateGen(PackOutput out, ExistingFileHelper files) {
         super(out, CelestialAscent.MODID, files);
     }
@@ -36,6 +39,19 @@ public class BlockStateGen extends BlockStateProvider {
         return models().getExistingFile(modLoc("block/" + name));
     }
 
+    /** -Dcelestialascent.datagen.lenient=true skips blocks whose art is not finished yet. */
+    static final boolean LENIENT = Boolean.getBoolean("celestialascent.datagen.lenient");
+
+    private boolean ready(String model, String... textures) {
+        if (!LENIENT) return true;
+        var files = models().existingFileHelper;
+        if (model != null && !files.exists(modLoc("block/" + model), net.minecraft.server.packs.PackType.CLIENT_RESOURCES, ".json", "models")) return false;
+        for (String t : textures) {
+            if (!files.exists(modLoc("block/" + t), net.minecraft.server.packs.PackType.CLIENT_RESOURCES, ".png", "textures")) return false;
+        }
+        return true;
+    }
+
     @Override
     protected void registerStatesAndModels() {
         Set<Block> cubes = Set.of(Stars.STARSTONE.get(), Stars.STARLIT_STARSTONE.get(), Stars.STARSTONE_BRICKS.get(), Stars.STARDUST_ORE.get(),
@@ -43,6 +59,15 @@ public class BlockStateGen extends BlockStateProvider {
         for (var holder : Content.BLOCKS) {
             Block block = holder.get();
             String name = name(block);
+            boolean generated = cubes.contains(block) || block == Empire.IMPERIAL_BARRIER.get() || block instanceof AmethystClusterBlock;
+            if (block instanceof AbyssalStoneBlock ? !ready(null, name, name + "_crack1", name + "_crack2", name + "_crack3")
+                    : generated ? !ready(null, name)
+                    : block instanceof PylonBlock ? !ready(name) || !ready(name + "_restored")
+                    : block instanceof StarGatePedestalBlock ? !ready(name) || !ready(name + "_head")
+                    : !ready(name)) {
+                SKIPPED.add(name);
+                continue;
+            }
             if (cubes.contains(block)) {
                 simpleBlock(block);
             } else if (block == Empire.IMPERIAL_BARRIER.get()) {
@@ -77,6 +102,6 @@ public class BlockStateGen extends BlockStateProvider {
             }
         }
         simpleBlock(Titans.COOLED_MAGMA.get(), models().cubeAll("cooled_magma", mcLoc("block/magma")));
-        simpleBlock(Stars.STAR_PORTAL.get(), existing("star_portal"));
+        if (ready("star_portal")) simpleBlock(Stars.STAR_PORTAL.get(), existing("star_portal"));
     }
 }

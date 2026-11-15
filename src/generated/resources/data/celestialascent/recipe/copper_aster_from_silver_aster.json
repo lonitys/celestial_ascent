@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "celestialascent:silver_aster"
+    }
+  ],
+  "result": {
+    "count": 10,
+    "id": "celestialascent:copper_aster"
+  }
+}

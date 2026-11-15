@@ -146,10 +146,17 @@ def ender_gear():
             if 2.9 < r <= 3.7:
                 dot = light_dot(x + 0.5 - cx, y + 0.5 - cy)
                 cv.put(x, y, VIOLET[4] if dot < -0.4 else VIOLET[3] if dot < 0.3 else VIOLET[2])
-    vals = sphere(cx, cy, 2.95, glow=0.1)
-    paint_levels(cv, vals, [PEARL[1], PEARL[2], PEARL[3], PEARL[4], PEARL[5]], [0.25, 0.45, 0.62, 0.8])
-    cv.put(6, 6, PEARL[6])
-    cv.put(9, 8, PEARL[2])
+    # hand-placed ender pearl: round, lit top-left, with a crisp sheen
+    pearl = [
+        ".LLm.",
+        "LWLmd",
+        "LLmmd",
+        "mmmdd",
+        ".ddd.",
+    ]
+    cv.grid(pearl, {'W': PEARL[6], 'L': PEARL[4], 'm': PEARL[3], 'd': PEARL[2]}, 5, 5)
+    for (x, y) in ((5, 5), (9, 5), (5, 9), (9, 9)):
+        cv.put(x, y, VIOLET[2])
     outline(cv, '#160c26', '#0a0514')
     return cv
 
@@ -381,23 +388,6 @@ def star_core():
         if d < 3.6:
             cv.put(x, y, mix(cv.get(x, y), WGOLD[4], 0.55 if d > 2.4 else 0.8))
     star = [
-        ".......a.......",
-        ".......a.......",
-        ".......b.......",
-        "......aba......",
-        "......bWb......",
-        ".....bWWWb.....",
-        "..ab.bWWWb.ba..",
-        "aabbWWWWWWWbbaa",
-        "..ab.bWWWb.ba..",
-        ".....bWWWb.....",
-        "......bWb......",
-        "......aba......",
-        ".......b.......",
-        ".......a.......",
-        ".......a.......",
-    ]
-    star = [
         "......a......",
         "......b......",
         ".....aba.....",
@@ -446,8 +436,6 @@ def star_compass():
     # bail ring at the top
     cv.grid([".aa.", "a..b", ".bb."], {'a': WGOLD[5], 'b': WGOLD[3]}, 6, 0)
     # tick marks N/E/S/W
-    for (x, y) in ((7, 4), (8, 4), (3, 8), (12, 8), (7, 13), (8, 13)):
-        pass
     for (x, y) in ((7, 3), (3, 8), (12, 9), (8, 13)):
         cv.put(x, y, WGOLD[4])
     # stars on the face

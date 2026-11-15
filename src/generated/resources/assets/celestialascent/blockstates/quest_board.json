@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "celestialascent:block/quest_board",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "celestialascent:block/quest_board"
+    },
+    "facing=south": {
+      "model": "celestialascent:block/quest_board",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "celestialascent:block/quest_board",
+      "y": 270
+    }
+  }
+}

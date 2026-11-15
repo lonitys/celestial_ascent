@@ -1,0 +1,702 @@
+{
+  "parent": "block/block",
+  "textures": {
+    "particle": "celestialascent:block/empty_throne_purpur",
+    "purpur": "celestialascent:block/empty_throne_purpur",
+    "obsidian": "celestialascent:block/empty_throne_obsidian",
+    "cushion": "celestialascent:block/empty_throne_cushion",
+    "gold": "celestialascent:block/empty_throne_gold"
+  },
+  "elements": [
+    {
+      "name": "seat_base",
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        6,
+        16
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#purpur"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#purpur"
+        },
+        "north": {
+          "uv": [
+            0,
+            10,
+            16,
+            16
+          ],
+          "texture": "#purpur"
+        },
+        "south": {
+          "uv": [
+            0,
+            10,
+            16,
+            16
+          ],
+          "texture": "#purpur"
+        },
+        "west": {
+          "uv": [
+            0,
+            10,
+            16,
+            16
+          ],
+          "texture": "#purpur"
+        },
+        "east": {
+          "uv": [
+            0,
+            10,
+            16,
+            16
+          ],
+          "texture": "#purpur"
+        }
+      }
+    },
+    {
+      "name": "armrest",
+      "from": [
+        0,
+        6,
+        0
+      ],
+      "to": [
+        2,
+        9,
+        12
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            0,
+            2,
+            12
+          ],
+          "texture": "#gold"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            2,
+            12
+          ],
+          "texture": "#gold"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            2,
+            3
+          ],
+          "texture": "#gold"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            2,
+            3
+          ],
+          "texture": "#gold"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            12,
+            3
+          ],
+          "texture": "#gold"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            12,
+            3
+          ],
+          "texture": "#gold"
+        }
+      }
+    },
+    {
+      "name": "arm_finial",
+      "from": [
+        0.5,
+        9,
+        0.5
+      ],
+      "to": [
+        1.5,
+        10,
+        1.5
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "texture": "#gold"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "texture": "#gold"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "texture": "#gold"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "texture": "#gold"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "texture": "#gold"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "texture": "#gold"
+        }
+      }
+    },
+    {
+      "name": "armrest",
+      "from": [
+        14,
+        6,
+        0
+      ],
+      "to": [
+        16,
+        9,
+        12
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            14,
+            0,
+            16,
+            12
+          ],
+          "texture": "#gold"
+        },
+        "up": {
+          "uv": [
+            14,
+            0,
+            16,
+            12
+          ],
+          "texture": "#gold"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            2,
+            3
+          ],
+          "texture": "#gold"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            2,
+            3
+          ],
+          "texture": "#gold"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            12,
+            3
+          ],
+          "texture": "#gold"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            12,
+            3
+          ],
+          "texture": "#gold"
+        }
+      }
+    },
+    {
+      "name": "arm_finial",
+      "from": [
+        14.5,
+        9,
+        0.5
+      ],
+      "to": [
+        15.5,
+        10,
+        1.5
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "texture": "#gold"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "texture": "#gold"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "texture": "#gold"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "texture": "#gold"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "texture": "#gold"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "texture": "#gold"
+        }
+      }
+    },
+    {
+      "name": "seat_cushion",
+      "from": [
+        2,
+        6,
+        0.5
+      ],
+      "to": [
+        14,
+        8,
+        12
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            2,
+            2,
+            14,
+            13.5
+          ],
+          "texture": "#cushion"
+        },
+        "up": {
+          "uv": [
+            2,
+            2,
+            14,
+            13.5
+          ],
+          "texture": "#cushion"
+        },
+        "north": {
+          "uv": [
+            2,
+            0,
+            14,
+            2
+          ],
+          "texture": "#cushion"
+        },
+        "south": {
+          "uv": [
+            2,
+            0,
+            14,
+            2
+          ],
+          "texture": "#cushion"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            11.5,
+            2
+          ],
+          "texture": "#cushion"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            11.5,
+            2
+          ],
+          "texture": "#cushion"
+        }
+      }
+    },
+    {
+      "name": "backrest",
+      "from": [
+        0,
+        6,
+        12
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            12,
+            16,
+            16
+          ],
+          "texture": "#obsidian"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ],
+          "texture": "#obsidian"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            10
+          ],
+          "texture": "#obsidian"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            10
+          ],
+          "texture": "#obsidian"
+        },
+        "west": {
+          "uv": [
+            12,
+            0,
+            16,
+            10
+          ],
+          "texture": "#obsidian"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            10
+          ],
+          "texture": "#obsidian"
+        }
+      }
+    },
+    {
+      "name": "back_cushion",
+      "from": [
+        2,
+        8,
+        11
+      ],
+      "to": [
+        14,
+        15,
+        12
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            2,
+            1,
+            14,
+            2
+          ],
+          "texture": "#cushion"
+        },
+        "up": {
+          "uv": [
+            2,
+            0,
+            14,
+            1
+          ],
+          "texture": "#cushion"
+        },
+        "north": {
+          "uv": [
+            2,
+            2,
+            14,
+            9
+          ],
+          "texture": "#cushion"
+        },
+        "south": {
+          "uv": [
+            2,
+            2,
+            14,
+            9
+          ],
+          "texture": "#cushion"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1,
+            7
+          ],
+          "texture": "#cushion"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            1,
+            7
+          ],
+          "texture": "#cushion"
+        }
+      }
+    },
+    {
+      "name": "crest",
+      "from": [
+        6,
+        15,
+        11.5
+      ],
+      "to": [
+        10,
+        16,
+        12
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            6,
+            0,
+            10,
+            1
+          ],
+          "texture": "#gold"
+        },
+        "up": {
+          "uv": [
+            6,
+            0,
+            10,
+            1
+          ],
+          "texture": "#gold"
+        },
+        "north": {
+          "uv": [
+            6,
+            0,
+            10,
+            1
+          ],
+          "texture": "#gold"
+        },
+        "south": {
+          "uv": [
+            6,
+            0,
+            10,
+            1
+          ],
+          "texture": "#gold"
+        },
+        "west": {
+          "uv": [
+            6,
+            0,
+            10,
+            1
+          ],
+          "texture": "#gold"
+        },
+        "east": {
+          "uv": [
+            6,
+            0,
+            10,
+            1
+          ],
+          "texture": "#gold"
+        }
+      }
+    },
+    {
+      "name": "crest_gem",
+      "from": [
+        7,
+        14,
+        11.25
+      ],
+      "to": [
+        9,
+        16,
+        11.5
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            7,
+            0,
+            9,
+            2
+          ],
+          "texture": "#gold"
+        },
+        "up": {
+          "uv": [
+            7,
+            0,
+            9,
+            2
+          ],
+          "texture": "#gold"
+        },
+        "north": {
+          "uv": [
+            7,
+            0,
+            9,
+            2
+          ],
+          "texture": "#gold"
+        },
+        "south": {
+          "uv": [
+            7,
+            0,
+            9,
+            2
+          ],
+          "texture": "#gold"
+        },
+        "west": {
+          "uv": [
+            7,
+            0,
+            9,
+            2
+          ],
+          "texture": "#gold"
+        },
+        "east": {
+          "uv": [
+            7,
+            0,
+            9,
+            2
+          ],
+          "texture": "#gold"
+        }
+      }
+    }
+  ]
+}

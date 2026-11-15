@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "celestialascent:block/imperial_forge",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "celestialascent:block/imperial_forge"
+    },
+    "facing=south": {
+      "model": "celestialascent:block/imperial_forge",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "celestialascent:block/imperial_forge",
+      "y": 270
+    }
+  }
+}

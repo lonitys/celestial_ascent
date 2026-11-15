@@ -1,0 +1,33 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "C": {
+      "item": "celestialascent:colossus_core"
+    },
+    "F": {
+      "item": "celestialascent:frost_core"
+    },
+    "M": {
+      "item": "celestialascent:magma_core"
+    },
+    "S": {
+      "item": "celestialascent:storm_core"
+    },
+    "T": {
+      "item": "celestialascent:tide_core"
+    },
+    "V": {
+      "item": "celestialascent:void_essence"
+    }
+  },
+  "pattern": [
+    "FVT",
+    "VCV",
+    "SVM"
+  ],
+  "result": {
+    "count": 2,
+    "id": "celestialascent:primordial_core"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "E": {
+      "item": "minecraft:emerald_block"
+    },
+    "G": {
+      "item": "minecraft:gold_ingot"
+    },
+    "P": {
+      "item": "minecraft:dark_oak_planks"
+    }
+  },
+  "pattern": [
+    "GGG",
+    "PEP",
+    "PPP"
+  ],
+  "result": {
+    "count": 1,
+    "id": "celestialascent:bank_counter"
+  }
+}

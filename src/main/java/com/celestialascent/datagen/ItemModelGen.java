@@ -16,9 +16,14 @@ public class ItemModelGen extends ItemModelProvider {
 
     @Override
     protected void registerModels() {
-        for (var item : Content.FLAT_ITEMS) basicItem(item.get());
+        for (var item : Content.FLAT_ITEMS) {
+            ResourceLocation id = BuiltInRegistries.ITEM.getKey(item.get());
+            if (BlockStateGen.LENIENT && !existingFileHelper.exists(modLoc("item/" + id.getPath()), net.minecraft.server.packs.PackType.CLIENT_RESOURCES, ".png", "textures")) continue;
+            basicItem(item.get());
+        }
         for (var block : Content.BLOCKS) {
             ResourceLocation id = BuiltInRegistries.BLOCK.getKey(block.get());
+            if (BlockStateGen.SKIPPED.contains(id.getPath())) continue;
             if (block.get() == Stars.STAR_CRYSTAL.get()) {
                 withExistingParent(id.getPath(), mcLoc("item/generated")).texture("layer0", modLoc("block/" + id.getPath()));
             } else {

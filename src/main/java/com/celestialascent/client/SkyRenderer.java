@@ -42,7 +42,9 @@ public final class SkyRenderer {
     /** Unit direction for azimuth/altitude degrees in sky space (before the day-cycle rotation). */
     static Vector3f dir(float azimuth, float altitude) {
         double az = Math.toRadians(azimuth), alt = Math.toRadians(altitude);
-        return new Vector3f((float) (Math.cos(alt) * Math.sin(az)), (float) Math.sin(alt), (float) (Math.cos(alt) * Math.cos(az)));
+        // Sky space is rotated by the time of day; at midnight it is upside down, so stars meant to be
+        // overhead at night live in the negative-y half.
+        return new Vector3f((float) (Math.cos(alt) * Math.sin(az)), (float) -Math.sin(alt), (float) (Math.cos(alt) * Math.cos(az)));
     }
 
     /** Camera-facing quad on the sky sphere. */
@@ -74,11 +76,13 @@ public final class SkyRenderer {
         RenderSystem.enableBlend();
         RenderSystem.blendFunc(com.mojang.blaze3d.platform.GlStateManager.SourceFactor.SRC_ALPHA, com.mojang.blaze3d.platform.GlStateManager.DestFactor.ONE);
         RenderSystem.depthMask(false);
+        RenderSystem.disableCull();
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
     }
 
     static void end() {
         RenderSystem.depthMask(true);
+        RenderSystem.enableCull();
         RenderSystem.defaultBlendFunc();
         RenderSystem.disableBlend();
     }

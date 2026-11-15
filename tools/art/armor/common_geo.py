@@ -58,3 +58,25 @@ def sym_boxc(br, bl, center, size, mat, inflate=0.0, rot=None, pivot=None, **par
 def diamond(bone, center, size, mat, spin=(0, 0, 45), **params):
     """A small cube rotated 45 degrees (gem / star point look)."""
     return boxc(bone, center, size, mat, rot=list(spin), **params)
+
+
+def cross_sprite(bone, base, direction, length, width, mat, spin=0.0, **params):
+    """Two crossed zero-thickness planes along `direction` from `base` (amethyst-cluster style shard).
+    Plane A lies in the local XY plane (painted on 'north'), plane B in the local ZY plane ('east')."""
+    base = np.asarray(base, dtype=float)
+    R = al.orient(direction, spin)
+    e = al.euler(R)
+    w = int(round(width))
+    L = int(round(length))
+    a = cube(bone, (base + np.array([-w / 2, 0, 0])).tolist(), [w, L, 0], mat, rot=e, pivot=base.tolist(),
+             plane="north", spike_base=base.tolist(), spike_len=L, **params)
+    b = cube(bone, (base + np.array([0, 0, -w / 2])).tolist(), [0, L, w], mat, rot=e, pivot=base.tolist(),
+             plane="east", spike_base=base.tolist(), spike_len=L, **params)
+    return a, b
+
+
+def sym_cross_sprite(br, bl, base, direction, length, width, mat, **params):
+    a = cross_sprite(br, base, direction, length, width, mat, side=-1, **params)
+    b = cross_sprite(bl, [-base[0], base[1], base[2]], [-direction[0], direction[1], direction[2]], length, width, mat,
+                     side=1, **params)
+    return a, b
