@@ -4,19 +4,19 @@
       "model": "celestialascent:block/imperial_pylon"
     },
     "kind=craft,restored=true": {
-      "model": "celestialascent:block/imperial_pylon_restored"
+      "model": "celestialascent:block/imperial_pylon_restored_base"
     },
     "kind=throne,restored=false": {
       "model": "celestialascent:block/imperial_pylon"
     },
     "kind=throne,restored=true": {
-      "model": "celestialascent:block/imperial_pylon_restored"
+      "model": "celestialascent:block/imperial_pylon_restored_base"
     },
     "kind=trade,restored=false": {
       "model": "celestialascent:block/imperial_pylon"
     },
     "kind=trade,restored=true": {
-      "model": "celestialascent:block/imperial_pylon_restored"
+      "model": "celestialascent:block/imperial_pylon_restored_base"
     }
   }
 }

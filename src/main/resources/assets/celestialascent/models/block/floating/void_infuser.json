@@ -1,0 +1,390 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "celestialascent:block/void_infuser_body",
+    "base": "celestialascent:block/void_infuser_base",
+    "body": "celestialascent:block/void_infuser_body",
+    "top": "celestialascent:block/void_infuser_top",
+    "prong": "celestialascent:block/void_infuser_prong",
+    "orb": "celestialascent:block/void_infuser_orb"
+  },
+  "ambientocclusion": false,
+  "elements": [
+    {
+      "name": "void_orb",
+      "from": [
+        5.5,
+        15.5,
+        6.5
+      ],
+      "to": [
+        10.5,
+        18.5,
+        9.5
+      ],
+      "light_emission": 15,
+      "faces": {
+        "down": {
+          "uv": [
+            11,
+            0,
+            16,
+            3
+          ],
+          "texture": "#orb",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "up": {
+          "uv": [
+            0,
+            11,
+            5,
+            14
+          ],
+          "texture": "#orb",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            5,
+            3
+          ],
+          "texture": "#orb",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "south": {
+          "uv": [
+            6,
+            11,
+            11,
+            14
+          ],
+          "texture": "#orb",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            3,
+            3
+          ],
+          "texture": "#orb",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "east": {
+          "uv": [
+            13,
+            8,
+            16,
+            11
+          ],
+          "texture": "#orb",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        }
+      }
+    },
+    {
+      "name": "void_orb",
+      "from": [
+        6.5,
+        15.5,
+        5.5
+      ],
+      "to": [
+        9.5,
+        18.5,
+        10.5
+      ],
+      "light_emission": 15,
+      "faces": {
+        "down": {
+          "uv": [
+            11,
+            9,
+            14,
+            14
+          ],
+          "texture": "#orb",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "up": {
+          "uv": [
+            9,
+            11,
+            12,
+            16
+          ],
+          "texture": "#orb",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "north": {
+          "uv": [
+            9,
+            0,
+            12,
+            3
+          ],
+          "texture": "#orb",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "south": {
+          "uv": [
+            8,
+            11,
+            11,
+            14
+          ],
+          "texture": "#orb",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "west": {
+          "uv": [
+            0,
+            9,
+            5,
+            12
+          ],
+          "texture": "#orb",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "east": {
+          "uv": [
+            11,
+            8,
+            16,
+            11
+          ],
+          "texture": "#orb",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        }
+      }
+    },
+    {
+      "name": "void_orb",
+      "from": [
+        6.5,
+        14.5,
+        6.5
+      ],
+      "to": [
+        9.5,
+        19.5,
+        9.5
+      ],
+      "light_emission": 15,
+      "faces": {
+        "down": {
+          "uv": [
+            11,
+            4,
+            14,
+            7
+          ],
+          "texture": "#orb",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "up": {
+          "uv": [
+            4,
+            11,
+            7,
+            14
+          ],
+          "texture": "#orb",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "north": {
+          "uv": [
+            4,
+            0,
+            7,
+            5
+          ],
+          "texture": "#orb",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "south": {
+          "uv": [
+            8,
+            11,
+            11,
+            16
+          ],
+          "texture": "#orb",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "west": {
+          "uv": [
+            0,
+            4,
+            3,
+            9
+          ],
+          "texture": "#orb",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "east": {
+          "uv": [
+            13,
+            6,
+            16,
+            11
+          ],
+          "texture": "#orb",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        }
+      }
+    },
+    {
+      "name": "orb_core",
+      "from": [
+        7.25,
+        16.25,
+        7.25
+      ],
+      "to": [
+        8.75,
+        17.75,
+        8.75
+      ],
+      "light_emission": 15,
+      "faces": {
+        "down": {
+          "uv": [
+            7,
+            7,
+            8.5,
+            8.5
+          ],
+          "texture": "#orb",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "up": {
+          "uv": [
+            7,
+            7,
+            8.5,
+            8.5
+          ],
+          "texture": "#orb",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "north": {
+          "uv": [
+            7,
+            7,
+            8.5,
+            8.5
+          ],
+          "texture": "#orb",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "south": {
+          "uv": [
+            7,
+            7,
+            8.5,
+            8.5
+          ],
+          "texture": "#orb",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "west": {
+          "uv": [
+            7,
+            7,
+            8.5,
+            8.5
+          ],
+          "texture": "#orb",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "east": {
+          "uv": [
+            7,
+            7,
+            8.5,
+            8.5
+          ],
+          "texture": "#orb",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        }
+      }
+    }
+  ]
+}

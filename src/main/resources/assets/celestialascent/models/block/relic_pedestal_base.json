@@ -1,0 +1,201 @@
+{
+  "parent": "block/block",
+  "textures": {
+    "particle": "celestialascent:block/relic_pedestal_slab",
+    "slab": "celestialascent:block/relic_pedestal_slab",
+    "top": "celestialascent:block/relic_pedestal_top",
+    "column": "celestialascent:block/relic_pedestal_column",
+    "crystal": "celestialascent:block/relic_pedestal_crystal"
+  },
+  "elements": [
+    {
+      "name": "base",
+      "from": [
+        2,
+        0,
+        2
+      ],
+      "to": [
+        14,
+        3,
+        14
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            2,
+            2,
+            14,
+            14
+          ],
+          "texture": "#slab"
+        },
+        "up": {
+          "uv": [
+            2,
+            4,
+            14,
+            12
+          ],
+          "texture": "#slab"
+        },
+        "north": {
+          "uv": [
+            2,
+            13,
+            14,
+            16
+          ],
+          "texture": "#slab"
+        },
+        "south": {
+          "uv": [
+            2,
+            13,
+            14,
+            16
+          ],
+          "texture": "#slab"
+        },
+        "west": {
+          "uv": [
+            2,
+            13,
+            14,
+            16
+          ],
+          "texture": "#slab"
+        },
+        "east": {
+          "uv": [
+            2,
+            13,
+            14,
+            16
+          ],
+          "texture": "#slab"
+        }
+      }
+    },
+    {
+      "name": "column",
+      "from": [
+        4,
+        3,
+        4
+      ],
+      "to": [
+        12,
+        12,
+        12
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            4,
+            12,
+            13
+          ],
+          "texture": "#column"
+        },
+        "south": {
+          "uv": [
+            4,
+            4,
+            12,
+            13
+          ],
+          "texture": "#column"
+        },
+        "west": {
+          "uv": [
+            4,
+            4,
+            12,
+            13
+          ],
+          "texture": "#column"
+        },
+        "east": {
+          "uv": [
+            4,
+            4,
+            12,
+            13
+          ],
+          "texture": "#column"
+        }
+      }
+    },
+    {
+      "name": "top",
+      "from": [
+        2,
+        12,
+        2
+      ],
+      "to": [
+        14,
+        14,
+        14
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            2,
+            4,
+            14,
+            12
+          ],
+          "texture": "#slab"
+        },
+        "up": {
+          "uv": [
+            2,
+            2,
+            14,
+            14
+          ],
+          "texture": "#top"
+        },
+        "north": {
+          "uv": [
+            2,
+            2,
+            14,
+            4
+          ],
+          "texture": "#slab"
+        },
+        "south": {
+          "uv": [
+            2,
+            2,
+            14,
+            4
+          ],
+          "texture": "#slab"
+        },
+        "west": {
+          "uv": [
+            2,
+            2,
+            14,
+            4
+          ],
+          "texture": "#slab"
+        },
+        "east": {
+          "uv": [
+            2,
+            2,
+            14,
+            4
+          ],
+          "texture": "#slab"
+        }
+      }
+    }
+  ]
+}

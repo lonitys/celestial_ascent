@@ -5,21 +5,21 @@
       "y": 90
     },
     "facing=east,head=true": {
-      "model": "celestialascent:block/star_gate_pedestal_head",
+      "model": "celestialascent:block/star_gate_pedestal_head_base",
       "y": 90
     },
     "facing=north,head=false": {
       "model": "celestialascent:block/star_gate_pedestal"
     },
     "facing=north,head=true": {
-      "model": "celestialascent:block/star_gate_pedestal_head"
+      "model": "celestialascent:block/star_gate_pedestal_head_base"
     },
     "facing=south,head=false": {
       "model": "celestialascent:block/star_gate_pedestal",
       "y": 180
     },
     "facing=south,head=true": {
-      "model": "celestialascent:block/star_gate_pedestal_head",
+      "model": "celestialascent:block/star_gate_pedestal_head_base",
       "y": 180
     },
     "facing=west,head=false": {
@@ -27,7 +27,7 @@
       "y": 270
     },
     "facing=west,head=true": {
-      "model": "celestialascent:block/star_gate_pedestal_head",
+      "model": "celestialascent:block/star_gate_pedestal_head_base",
       "y": 270
     }
   }

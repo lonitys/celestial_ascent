@@ -22,6 +22,8 @@ public final class CelestialAscent {
         com.celestialascent.empire.Empire.init();
         com.celestialascent.stars.Stars.init();
         com.celestialascent.abyss.Abyss.init();
+        com.celestialascent.guide.Guide.init();
+        com.celestialascent.core.DisplayBlockEntity.TYPE.getClass();
         CAReg.register(modBus);
     }
 }

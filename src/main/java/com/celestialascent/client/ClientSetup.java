@@ -45,6 +45,16 @@ public final class ClientSetup {
     @SubscribeEvent
     public static void renderers(EntityRenderersEvent.RegisterRenderers e) {
         e.registerBlockEntityRenderer(Economy.SHOP_STALL_BE.get(), ShopStallRenderer::new);
+        e.registerBlockEntityRenderer(com.celestialascent.titans.Titans.ALTAR_BE.get(), FloatingRenderer::new);
+        e.registerBlockEntityRenderer(com.celestialascent.boss.SummonAltarBlock.BE.get(), FloatingRenderer::new);
+        e.registerBlockEntityRenderer(com.celestialascent.empire.Empire.PYLON_BE.get(), FloatingRenderer::new);
+        e.registerBlockEntityRenderer(com.celestialascent.core.station.Stations.BE.get(), FloatingRenderer::new);
+        e.registerBlockEntityRenderer(com.celestialascent.core.DisplayBlockEntity.TYPE.get(), FloatingRenderer::new);
+    }
+
+    @SubscribeEvent
+    public static void models(net.neoforged.neoforge.client.event.ModelEvent.RegisterAdditional e) {
+        FloatingRenderer.models().forEach(e::register);
     }
 
     @EventBusSubscriber(modid = CelestialAscent.MODID, value = Dist.CLIENT)

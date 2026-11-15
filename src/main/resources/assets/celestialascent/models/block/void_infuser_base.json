@@ -1,0 +1,848 @@
+{
+  "parent": "block/block",
+  "textures": {
+    "particle": "celestialascent:block/void_infuser_body",
+    "base": "celestialascent:block/void_infuser_base",
+    "body": "celestialascent:block/void_infuser_body",
+    "top": "celestialascent:block/void_infuser_top",
+    "prong": "celestialascent:block/void_infuser_prong",
+    "orb": "celestialascent:block/void_infuser_orb"
+  },
+  "elements": [
+    {
+      "name": "plinth",
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        3,
+        16
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#base"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#base"
+        },
+        "north": {
+          "uv": [
+            0,
+            13,
+            16,
+            16
+          ],
+          "texture": "#base"
+        },
+        "south": {
+          "uv": [
+            0,
+            13,
+            16,
+            16
+          ],
+          "texture": "#base"
+        },
+        "west": {
+          "uv": [
+            0,
+            13,
+            16,
+            16
+          ],
+          "texture": "#base"
+        },
+        "east": {
+          "uv": [
+            0,
+            13,
+            16,
+            16
+          ],
+          "texture": "#base"
+        }
+      }
+    },
+    {
+      "name": "body",
+      "from": [
+        2,
+        3,
+        2
+      ],
+      "to": [
+        14,
+        10,
+        14
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            2,
+            2,
+            14,
+            14
+          ],
+          "texture": "#body"
+        },
+        "up": {
+          "uv": [
+            2,
+            2,
+            14,
+            14
+          ],
+          "texture": "#body"
+        },
+        "north": {
+          "uv": [
+            2,
+            6,
+            14,
+            13
+          ],
+          "texture": "#body"
+        },
+        "south": {
+          "uv": [
+            2,
+            6,
+            14,
+            13
+          ],
+          "texture": "#body"
+        },
+        "west": {
+          "uv": [
+            2,
+            6,
+            14,
+            13
+          ],
+          "texture": "#body"
+        },
+        "east": {
+          "uv": [
+            2,
+            6,
+            14,
+            13
+          ],
+          "texture": "#body"
+        }
+      }
+    },
+    {
+      "name": "top",
+      "from": [
+        1,
+        10,
+        1
+      ],
+      "to": [
+        15,
+        12,
+        15
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            1,
+            1,
+            15,
+            15
+          ],
+          "texture": "#top"
+        },
+        "up": {
+          "uv": [
+            1,
+            1,
+            15,
+            15
+          ],
+          "texture": "#top",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "north": {
+          "uv": [
+            1,
+            0,
+            15,
+            2
+          ],
+          "texture": "#top"
+        },
+        "south": {
+          "uv": [
+            1,
+            0,
+            15,
+            2
+          ],
+          "texture": "#top"
+        },
+        "west": {
+          "uv": [
+            1,
+            0,
+            15,
+            2
+          ],
+          "texture": "#top"
+        },
+        "east": {
+          "uv": [
+            1,
+            0,
+            15,
+            2
+          ],
+          "texture": "#top"
+        }
+      }
+    },
+    {
+      "name": "prong",
+      "from": [
+        2,
+        12,
+        2
+      ],
+      "to": [
+        4,
+        16.5,
+        4
+      ],
+      "rotation": {
+        "angle": -22.5,
+        "axis": "z",
+        "origin": [
+          3,
+          12,
+          3
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            0,
+            2,
+            2
+          ],
+          "texture": "#prong"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            2,
+            2
+          ],
+          "texture": "#prong"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            2,
+            4.5
+          ],
+          "texture": "#prong"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            2,
+            4.5
+          ],
+          "texture": "#prong"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            2,
+            4.5
+          ],
+          "texture": "#prong"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            2,
+            4.5
+          ],
+          "texture": "#prong"
+        }
+      }
+    },
+    {
+      "name": "prong_tip",
+      "from": [
+        2.5,
+        16.5,
+        2.5
+      ],
+      "to": [
+        3.5,
+        18,
+        3.5
+      ],
+      "rotation": {
+        "angle": -22.5,
+        "axis": "z",
+        "origin": [
+          3,
+          12,
+          3
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "texture": "#prong"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "texture": "#prong"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            1,
+            1.5
+          ],
+          "texture": "#prong"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1,
+            1.5
+          ],
+          "texture": "#prong"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1,
+            1.5
+          ],
+          "texture": "#prong"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            1,
+            1.5
+          ],
+          "texture": "#prong"
+        }
+      }
+    },
+    {
+      "name": "prong",
+      "from": [
+        12,
+        12,
+        2
+      ],
+      "to": [
+        14,
+        16.5,
+        4
+      ],
+      "rotation": {
+        "angle": 22.5,
+        "axis": "z",
+        "origin": [
+          13,
+          12,
+          3
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            0,
+            2,
+            2
+          ],
+          "texture": "#prong"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            2,
+            2
+          ],
+          "texture": "#prong"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            2,
+            4.5
+          ],
+          "texture": "#prong"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            2,
+            4.5
+          ],
+          "texture": "#prong"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            2,
+            4.5
+          ],
+          "texture": "#prong"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            2,
+            4.5
+          ],
+          "texture": "#prong"
+        }
+      }
+    },
+    {
+      "name": "prong_tip",
+      "from": [
+        12.5,
+        16.5,
+        2.5
+      ],
+      "to": [
+        13.5,
+        18,
+        3.5
+      ],
+      "rotation": {
+        "angle": 22.5,
+        "axis": "z",
+        "origin": [
+          13,
+          12,
+          3
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "texture": "#prong"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "texture": "#prong"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            1,
+            1.5
+          ],
+          "texture": "#prong"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1,
+            1.5
+          ],
+          "texture": "#prong"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1,
+            1.5
+          ],
+          "texture": "#prong"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            1,
+            1.5
+          ],
+          "texture": "#prong"
+        }
+      }
+    },
+    {
+      "name": "prong",
+      "from": [
+        2,
+        12,
+        12
+      ],
+      "to": [
+        4,
+        16.5,
+        14
+      ],
+      "rotation": {
+        "angle": -22.5,
+        "axis": "z",
+        "origin": [
+          3,
+          12,
+          13
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            0,
+            2,
+            2
+          ],
+          "texture": "#prong"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            2,
+            2
+          ],
+          "texture": "#prong"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            2,
+            4.5
+          ],
+          "texture": "#prong"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            2,
+            4.5
+          ],
+          "texture": "#prong"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            2,
+            4.5
+          ],
+          "texture": "#prong"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            2,
+            4.5
+          ],
+          "texture": "#prong"
+        }
+      }
+    },
+    {
+      "name": "prong_tip",
+      "from": [
+        2.5,
+        16.5,
+        12.5
+      ],
+      "to": [
+        3.5,
+        18,
+        13.5
+      ],
+      "rotation": {
+        "angle": -22.5,
+        "axis": "z",
+        "origin": [
+          3,
+          12,
+          13
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "texture": "#prong"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "texture": "#prong"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            1,
+            1.5
+          ],
+          "texture": "#prong"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1,
+            1.5
+          ],
+          "texture": "#prong"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1,
+            1.5
+          ],
+          "texture": "#prong"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            1,
+            1.5
+          ],
+          "texture": "#prong"
+        }
+      }
+    },
+    {
+      "name": "prong",
+      "from": [
+        12,
+        12,
+        12
+      ],
+      "to": [
+        14,
+        16.5,
+        14
+      ],
+      "rotation": {
+        "angle": 22.5,
+        "axis": "z",
+        "origin": [
+          13,
+          12,
+          13
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            0,
+            2,
+            2
+          ],
+          "texture": "#prong"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            2,
+            2
+          ],
+          "texture": "#prong"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            2,
+            4.5
+          ],
+          "texture": "#prong"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            2,
+            4.5
+          ],
+          "texture": "#prong"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            2,
+            4.5
+          ],
+          "texture": "#prong"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            2,
+            4.5
+          ],
+          "texture": "#prong"
+        }
+      }
+    },
+    {
+      "name": "prong_tip",
+      "from": [
+        12.5,
+        16.5,
+        12.5
+      ],
+      "to": [
+        13.5,
+        18,
+        13.5
+      ],
+      "rotation": {
+        "angle": 22.5,
+        "axis": "z",
+        "origin": [
+          13,
+          12,
+          13
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "texture": "#prong"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "texture": "#prong"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            1,
+            1.5
+          ],
+          "texture": "#prong"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1,
+            1.5
+          ],
+          "texture": "#prong"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1,
+            1.5
+          ],
+          "texture": "#prong"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            1,
+            1.5
+          ],
+          "texture": "#prong"
+        }
+      }
+    }
+  ]
+}

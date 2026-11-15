@@ -1,0 +1,1028 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "celestialascent:block/star_gate_pedestal_base",
+    "base": "celestialascent:block/star_gate_pedestal_base",
+    "column": "celestialascent:block/star_gate_pedestal_column",
+    "top": "celestialascent:block/star_gate_pedestal_top",
+    "dragon": "celestialascent:block/star_gate_pedestal_dragon"
+  },
+  "ambientocclusion": false,
+  "elements": [
+    {
+      "name": "skull",
+      "from": [
+        5,
+        16,
+        7
+      ],
+      "to": [
+        11,
+        21,
+        13
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            3,
+            6,
+            9
+          ],
+          "texture": "#dragon"
+        },
+        "up": {
+          "uv": [
+            0,
+            3,
+            6,
+            9
+          ],
+          "texture": "#dragon"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            6,
+            5
+          ],
+          "texture": "#dragon"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            6,
+            5
+          ],
+          "texture": "#dragon"
+        },
+        "west": {
+          "uv": [
+            4,
+            0,
+            10,
+            5
+          ],
+          "texture": "#dragon"
+        },
+        "east": {
+          "uv": [
+            4,
+            0,
+            10,
+            5
+          ],
+          "texture": "#dragon"
+        }
+      }
+    },
+    {
+      "name": "snout",
+      "from": [
+        5.5,
+        18,
+        2
+      ],
+      "to": [
+        10.5,
+        20.25,
+        7
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            12,
+            5,
+            13
+          ],
+          "texture": "#dragon"
+        },
+        "up": {
+          "uv": [
+            8,
+            4,
+            13,
+            9
+          ],
+          "texture": "#dragon"
+        },
+        "north": {
+          "uv": [
+            8,
+            0,
+            13,
+            2.25
+          ],
+          "texture": "#dragon"
+        },
+        "south": {
+          "uv": [
+            8,
+            0,
+            13,
+            2.25
+          ],
+          "texture": "#dragon"
+        },
+        "west": {
+          "uv": [
+            8,
+            2,
+            13,
+            4.25
+          ],
+          "texture": "#dragon"
+        },
+        "east": {
+          "uv": [
+            8,
+            2,
+            13,
+            4.25
+          ],
+          "texture": "#dragon"
+        }
+      }
+    },
+    {
+      "name": "jaw",
+      "from": [
+        6,
+        16,
+        2.5
+      ],
+      "to": [
+        10,
+        17.5,
+        7
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            2,
+            6,
+            6,
+            10.5
+          ],
+          "texture": "#dragon"
+        },
+        "up": {
+          "uv": [
+            0,
+            12,
+            4,
+            13
+          ],
+          "texture": "#dragon"
+        },
+        "north": {
+          "uv": [
+            2,
+            6,
+            6,
+            7.5
+          ],
+          "texture": "#dragon"
+        },
+        "south": {
+          "uv": [
+            2,
+            6,
+            6,
+            7.5
+          ],
+          "texture": "#dragon"
+        },
+        "west": {
+          "uv": [
+            2,
+            6,
+            6.5,
+            7.5
+          ],
+          "texture": "#dragon"
+        },
+        "east": {
+          "uv": [
+            2,
+            6,
+            6.5,
+            7.5
+          ],
+          "texture": "#dragon"
+        }
+      }
+    },
+    {
+      "name": "nostril",
+      "from": [
+        6,
+        20.25,
+        2.5
+      ],
+      "to": [
+        7,
+        20.85,
+        3.75
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            12,
+            8,
+            13,
+            9.25
+          ],
+          "texture": "#dragon"
+        },
+        "up": {
+          "uv": [
+            12,
+            8,
+            13,
+            9.25
+          ],
+          "texture": "#dragon"
+        },
+        "north": {
+          "uv": [
+            12,
+            8,
+            13,
+            8.6
+          ],
+          "texture": "#dragon"
+        },
+        "south": {
+          "uv": [
+            12,
+            8,
+            13,
+            8.6
+          ],
+          "texture": "#dragon"
+        },
+        "west": {
+          "uv": [
+            12,
+            8,
+            13.25,
+            8.6
+          ],
+          "texture": "#dragon"
+        },
+        "east": {
+          "uv": [
+            12,
+            8,
+            13.25,
+            8.6
+          ],
+          "texture": "#dragon"
+        }
+      }
+    },
+    {
+      "name": "nostril",
+      "from": [
+        9,
+        20.25,
+        2.5
+      ],
+      "to": [
+        10,
+        20.85,
+        3.75
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            12,
+            8,
+            13,
+            9.25
+          ],
+          "texture": "#dragon"
+        },
+        "up": {
+          "uv": [
+            12,
+            8,
+            13,
+            9.25
+          ],
+          "texture": "#dragon"
+        },
+        "north": {
+          "uv": [
+            12,
+            8,
+            13,
+            8.6
+          ],
+          "texture": "#dragon"
+        },
+        "south": {
+          "uv": [
+            12,
+            8,
+            13,
+            8.6
+          ],
+          "texture": "#dragon"
+        },
+        "west": {
+          "uv": [
+            12,
+            8,
+            13.25,
+            8.6
+          ],
+          "texture": "#dragon"
+        },
+        "east": {
+          "uv": [
+            12,
+            8,
+            13.25,
+            8.6
+          ],
+          "texture": "#dragon"
+        }
+      }
+    },
+    {
+      "name": "eye",
+      "from": [
+        4.9,
+        19,
+        7.5
+      ],
+      "to": [
+        5,
+        20,
+        9.75
+      ],
+      "light_emission": 15,
+      "faces": {
+        "down": {
+          "uv": [
+            4,
+            14,
+            6.25,
+            15
+          ],
+          "texture": "#dragon",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "up": {
+          "uv": [
+            4,
+            14,
+            6.25,
+            15
+          ],
+          "texture": "#dragon",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "north": {
+          "uv": [
+            4,
+            14,
+            6.25,
+            15
+          ],
+          "texture": "#dragon",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "south": {
+          "uv": [
+            4,
+            14,
+            6.25,
+            15
+          ],
+          "texture": "#dragon",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "west": {
+          "uv": [
+            4,
+            14,
+            6.25,
+            15
+          ],
+          "texture": "#dragon",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "east": {
+          "uv": [
+            4,
+            14,
+            6.25,
+            15
+          ],
+          "texture": "#dragon",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        }
+      }
+    },
+    {
+      "name": "eye",
+      "from": [
+        11,
+        19,
+        7.5
+      ],
+      "to": [
+        11.1,
+        20,
+        9.75
+      ],
+      "light_emission": 15,
+      "faces": {
+        "down": {
+          "uv": [
+            4,
+            14,
+            6.25,
+            15
+          ],
+          "texture": "#dragon",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "up": {
+          "uv": [
+            4,
+            14,
+            6.25,
+            15
+          ],
+          "texture": "#dragon",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "north": {
+          "uv": [
+            4,
+            14,
+            6.25,
+            15
+          ],
+          "texture": "#dragon",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "south": {
+          "uv": [
+            4,
+            14,
+            6.25,
+            15
+          ],
+          "texture": "#dragon",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "west": {
+          "uv": [
+            4,
+            14,
+            6.25,
+            15
+          ],
+          "texture": "#dragon",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "east": {
+          "uv": [
+            4,
+            14,
+            6.25,
+            15
+          ],
+          "texture": "#dragon",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        }
+      }
+    },
+    {
+      "name": "eye_front",
+      "from": [
+        5.25,
+        19.25,
+        6.9
+      ],
+      "to": [
+        6.75,
+        20,
+        7
+      ],
+      "light_emission": 15,
+      "faces": {
+        "down": {
+          "uv": [
+            1,
+            14,
+            2.5,
+            14.75
+          ],
+          "texture": "#dragon",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "up": {
+          "uv": [
+            1,
+            14,
+            2.5,
+            14.75
+          ],
+          "texture": "#dragon",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "north": {
+          "uv": [
+            1,
+            14,
+            2.5,
+            14.75
+          ],
+          "texture": "#dragon",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "south": {
+          "uv": [
+            1,
+            14,
+            2.5,
+            14.75
+          ],
+          "texture": "#dragon",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "west": {
+          "uv": [
+            1,
+            14,
+            2.5,
+            14.75
+          ],
+          "texture": "#dragon",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "east": {
+          "uv": [
+            1,
+            14,
+            2.5,
+            14.75
+          ],
+          "texture": "#dragon",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        }
+      }
+    },
+    {
+      "name": "eye_front",
+      "from": [
+        9.25,
+        19.25,
+        6.9
+      ],
+      "to": [
+        10.75,
+        20,
+        7
+      ],
+      "light_emission": 15,
+      "faces": {
+        "down": {
+          "uv": [
+            1,
+            14,
+            2.5,
+            14.75
+          ],
+          "texture": "#dragon",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "up": {
+          "uv": [
+            1,
+            14,
+            2.5,
+            14.75
+          ],
+          "texture": "#dragon",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "north": {
+          "uv": [
+            1,
+            14,
+            2.5,
+            14.75
+          ],
+          "texture": "#dragon",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "south": {
+          "uv": [
+            1,
+            14,
+            2.5,
+            14.75
+          ],
+          "texture": "#dragon",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "west": {
+          "uv": [
+            1,
+            14,
+            2.5,
+            14.75
+          ],
+          "texture": "#dragon",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "east": {
+          "uv": [
+            1,
+            14,
+            2.5,
+            14.75
+          ],
+          "texture": "#dragon",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        }
+      }
+    },
+    {
+      "name": "horn",
+      "from": [
+        5.5,
+        20.5,
+        10
+      ],
+      "to": [
+        6.75,
+        24,
+        11.25
+      ],
+      "rotation": {
+        "angle": -22.5,
+        "axis": "x",
+        "origin": [
+          6.1,
+          20.5,
+          10.6
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            13,
+            0,
+            14.25,
+            1.25
+          ],
+          "texture": "#dragon"
+        },
+        "up": {
+          "uv": [
+            13,
+            0,
+            14.25,
+            1.25
+          ],
+          "texture": "#dragon"
+        },
+        "north": {
+          "uv": [
+            13,
+            0,
+            14.25,
+            3.5
+          ],
+          "texture": "#dragon"
+        },
+        "south": {
+          "uv": [
+            13,
+            0,
+            14.25,
+            3.5
+          ],
+          "texture": "#dragon"
+        },
+        "west": {
+          "uv": [
+            13,
+            0,
+            14.25,
+            3.5
+          ],
+          "texture": "#dragon"
+        },
+        "east": {
+          "uv": [
+            13,
+            0,
+            14.25,
+            3.5
+          ],
+          "texture": "#dragon"
+        }
+      }
+    },
+    {
+      "name": "horn",
+      "from": [
+        9.25,
+        20.5,
+        10
+      ],
+      "to": [
+        10.5,
+        24,
+        11.25
+      ],
+      "rotation": {
+        "angle": -22.5,
+        "axis": "x",
+        "origin": [
+          9.85,
+          20.5,
+          10.6
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            13,
+            0,
+            14.25,
+            1.25
+          ],
+          "texture": "#dragon"
+        },
+        "up": {
+          "uv": [
+            13,
+            0,
+            14.25,
+            1.25
+          ],
+          "texture": "#dragon"
+        },
+        "north": {
+          "uv": [
+            13,
+            0,
+            14.25,
+            3.5
+          ],
+          "texture": "#dragon"
+        },
+        "south": {
+          "uv": [
+            13,
+            0,
+            14.25,
+            3.5
+          ],
+          "texture": "#dragon"
+        },
+        "west": {
+          "uv": [
+            13,
+            0,
+            14.25,
+            3.5
+          ],
+          "texture": "#dragon"
+        },
+        "east": {
+          "uv": [
+            13,
+            0,
+            14.25,
+            3.5
+          ],
+          "texture": "#dragon"
+        }
+      }
+    },
+    {
+      "name": "spine",
+      "from": [
+        7.5,
+        21,
+        8.5
+      ],
+      "to": [
+        8.5,
+        22.25,
+        9.75
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            14,
+            4,
+            15,
+            5.25
+          ],
+          "texture": "#dragon"
+        },
+        "up": {
+          "uv": [
+            14,
+            4,
+            15,
+            5.25
+          ],
+          "texture": "#dragon"
+        },
+        "north": {
+          "uv": [
+            14,
+            4,
+            15,
+            5.25
+          ],
+          "texture": "#dragon"
+        },
+        "south": {
+          "uv": [
+            14,
+            4,
+            15,
+            5.25
+          ],
+          "texture": "#dragon"
+        },
+        "west": {
+          "uv": [
+            14,
+            4,
+            15.25,
+            5.25
+          ],
+          "texture": "#dragon"
+        },
+        "east": {
+          "uv": [
+            14,
+            4,
+            15.25,
+            5.25
+          ],
+          "texture": "#dragon"
+        }
+      }
+    },
+    {
+      "name": "spine",
+      "from": [
+        7.5,
+        21,
+        10.5
+      ],
+      "to": [
+        8.5,
+        22.75,
+        11.75
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            14,
+            4,
+            15,
+            5.25
+          ],
+          "texture": "#dragon"
+        },
+        "up": {
+          "uv": [
+            14,
+            4,
+            15,
+            5.25
+          ],
+          "texture": "#dragon"
+        },
+        "north": {
+          "uv": [
+            14,
+            4,
+            15,
+            5.75
+          ],
+          "texture": "#dragon"
+        },
+        "south": {
+          "uv": [
+            14,
+            4,
+            15,
+            5.75
+          ],
+          "texture": "#dragon"
+        },
+        "west": {
+          "uv": [
+            14,
+            4,
+            15.25,
+            5.75
+          ],
+          "texture": "#dragon"
+        },
+        "east": {
+          "uv": [
+            14,
+            4,
+            15.25,
+            5.75
+          ],
+          "texture": "#dragon"
+        }
+      }
+    }
+  ]
+}

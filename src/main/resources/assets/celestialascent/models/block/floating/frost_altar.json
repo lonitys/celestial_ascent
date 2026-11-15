@@ -1,0 +1,268 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "celestialascent:block/frost_altar_pillar",
+    "base": "celestialascent:block/frost_altar_base",
+    "pillar": "celestialascent:block/frost_altar_pillar",
+    "dish": "celestialascent:block/frost_altar_dish",
+    "inner": "celestialascent:block/frost_altar_inner",
+    "crystal": "celestialascent:block/frost_altar_crystal"
+  },
+  "ambientocclusion": false,
+  "elements": [
+    {
+      "name": "ice_spire",
+      "from": [
+        7,
+        15.5,
+        7
+      ],
+      "to": [
+        9,
+        23.5,
+        9
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          8,
+          19,
+          8
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            12,
+            14,
+            14,
+            16
+          ],
+          "texture": "#crystal"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            2,
+            2
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "north": {
+          "uv": [
+            4,
+            0,
+            6,
+            16
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "south": {
+          "uv": [
+            12,
+            0,
+            14,
+            16
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            2,
+            16
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "east": {
+          "uv": [
+            8,
+            0,
+            10,
+            16
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        }
+      }
+    },
+    {
+      "name": "ice_shard",
+      "from": [
+        5.2,
+        16,
+        7.4
+      ],
+      "to": [
+        6.4,
+        20,
+        8.6
+      ],
+      "rotation": {
+        "angle": 22.5,
+        "axis": "z",
+        "origin": [
+          5.8,
+          16,
+          8
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            12,
+            14,
+            13.2,
+            15.2
+          ],
+          "texture": "#crystal"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1.2,
+            1.2
+          ],
+          "texture": "#crystal"
+        },
+        "north": {
+          "uv": [
+            4,
+            2,
+            5.2,
+            10
+          ],
+          "texture": "#crystal"
+        },
+        "south": {
+          "uv": [
+            12,
+            2,
+            13.2,
+            10
+          ],
+          "texture": "#crystal"
+        },
+        "west": {
+          "uv": [
+            0,
+            2,
+            1.2,
+            10
+          ],
+          "texture": "#crystal"
+        },
+        "east": {
+          "uv": [
+            8,
+            2,
+            9.2,
+            10
+          ],
+          "texture": "#crystal"
+        }
+      }
+    },
+    {
+      "name": "ice_shard",
+      "from": [
+        9.6,
+        16,
+        7.4
+      ],
+      "to": [
+        10.8,
+        20,
+        8.6
+      ],
+      "rotation": {
+        "angle": -22.5,
+        "axis": "z",
+        "origin": [
+          10.2,
+          16,
+          8
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            12,
+            14,
+            13.2,
+            15.2
+          ],
+          "texture": "#crystal"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1.2,
+            1.2
+          ],
+          "texture": "#crystal"
+        },
+        "north": {
+          "uv": [
+            4,
+            2,
+            5.2,
+            10
+          ],
+          "texture": "#crystal"
+        },
+        "south": {
+          "uv": [
+            12,
+            2,
+            13.2,
+            10
+          ],
+          "texture": "#crystal"
+        },
+        "west": {
+          "uv": [
+            0,
+            2,
+            1.2,
+            10
+          ],
+          "texture": "#crystal"
+        },
+        "east": {
+          "uv": [
+            8,
+            2,
+            9.2,
+            10
+          ],
+          "texture": "#crystal"
+        }
+      }
+    }
+  ]
+}

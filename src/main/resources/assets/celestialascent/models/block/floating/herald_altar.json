@@ -1,0 +1,109 @@
+{
+  "parent": "minecraft:block/block",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "particle": "celestialascent:block/herald_altar_pillar",
+    "base": "celestialascent:block/herald_altar_base",
+    "pillar": "celestialascent:block/herald_altar_pillar",
+    "dish": "celestialascent:block/herald_altar_dish",
+    "inner": "celestialascent:block/herald_altar_inner",
+    "sun": "celestialascent:block/herald_altar_sun"
+  },
+  "ambientocclusion": false,
+  "elements": [
+    {
+      "name": "sun_disc",
+      "from": [
+        3,
+        15.5,
+        7.75
+      ],
+      "to": [
+        13,
+        25.5,
+        8.25
+      ],
+      "light_emission": 15,
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            0.5
+          ],
+          "texture": "#sun",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            0.5
+          ],
+          "texture": "#sun",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "north": {
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "texture": "#sun",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "south": {
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "texture": "#sun",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            0.5
+          ],
+          "texture": "#sun",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            0.5
+          ],
+          "texture": "#sun",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        }
+      }
+    }
+  ]
+}

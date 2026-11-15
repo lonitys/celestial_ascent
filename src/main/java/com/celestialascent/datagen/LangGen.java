@@ -8,6 +8,9 @@ import com.celestialascent.titans.Titans;
 import net.minecraft.data.PackOutput;
 import net.neoforged.neoforge.common.data.LanguageProvider;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 public class LangGen extends LanguageProvider {
     public LangGen(PackOutput out) {
         super(out, CelestialAscent.MODID, "en_us");
@@ -22,8 +25,16 @@ public class LangGen extends LanguageProvider {
         return sb.toString();
     }
 
-    private void prefixed(String key, String value) {
-        add(key, value);
+    /** All English entries, collected without writing a file (used to check the German translation). */
+    static Map<String, String> english() {
+        Map<String, String> out = new LinkedHashMap<>();
+        new LangGen(null) {
+            @Override
+            public void add(String key, String value) {
+                if (out.put(key, value) != null) throw new IllegalStateException("Duplicate key " + key);
+            }
+        }.addTranslations();
+        return out;
     }
 
     @Override
@@ -249,5 +260,11 @@ public class LangGen extends LanguageProvider {
         add("constellation.celestialascent.leviathan", "The Nebula Coil");
         add("constellation.celestialascent.herald", "The Sun's Herald");
         add("constellation.celestialascent.sovereign", "The Void Sovereign");
+
+        // ---- codex ----
+        add(com.celestialascent.guide.Guide.CODEX.get(), "Celestial Codex");
+        add("tooltip.celestialascent.codex", "Right-click to read");
+        add("message.celestialascent.codex_given", "You received the Celestial Codex. Right-click it to see what to do next.");
+        for (var e : com.celestialascent.guide.GuideBook.strings().entrySet()) add(e.getKey(), e.getValue()[0]);
     }
 }

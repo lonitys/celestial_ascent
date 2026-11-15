@@ -1,18 +1,18 @@
 {
   "variants": {
     "facing=east": {
-      "model": "celestialascent:block/herald_altar",
+      "model": "celestialascent:block/herald_altar_base",
       "y": 90
     },
     "facing=north": {
-      "model": "celestialascent:block/herald_altar"
+      "model": "celestialascent:block/herald_altar_base"
     },
     "facing=south": {
-      "model": "celestialascent:block/herald_altar",
+      "model": "celestialascent:block/herald_altar_base",
       "y": 180
     },
     "facing=west": {
-      "model": "celestialascent:block/herald_altar",
+      "model": "celestialascent:block/herald_altar_base",
       "y": 270
     }
   }

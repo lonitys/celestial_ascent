@@ -27,6 +27,7 @@ public final class DataGen {
         CompletableFuture<HolderLookup.Provider> lookup = e.getLookupProvider();
 
         gen.addProvider(e.includeClient(), new LangGen(out));
+        gen.addProvider(e.includeClient(), new LangGenDe(out));
         gen.addProvider(e.includeClient(), new BlockStateGen(out, files)); // before item models (lenient skip list)
         gen.addProvider(e.includeClient(), new ItemModelGen(out, files));
 

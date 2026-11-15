@@ -321,6 +321,11 @@
         "type": "projecte:item",
         "emc_value": 150000000,
         "id": "celestialascent:ascension_altar"
+      },
+      {
+        "type": "projecte:item",
+        "emc_value": 512,
+        "id": "celestialascent:celestial_codex"
       }
     ]
   }

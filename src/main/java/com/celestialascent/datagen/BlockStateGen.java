@@ -39,6 +39,14 @@ public class BlockStateGen extends BlockStateProvider {
         return models().getExistingFile(modLoc("block/" + name));
     }
 
+    /** Blocks whose decorative top floats: the blockstate uses the model without it (tools/split_floating.py). */
+    private static final Set<String> FLOATING = Set.of("frost_altar", "tide_altar", "storm_altar", "magma_altar", "seraph_altar",
+            "leviathan_altar", "herald_altar", "sky_altar", "void_infuser", "ascension_altar", "relic_pedestal");
+
+    private ModelFile placed(String name) {
+        return existing(FLOATING.contains(name) ? name + "_base" : name);
+    }
+
     /** -Dcelestialascent.datagen.lenient=true skips blocks whose art is not finished yet. */
     static final boolean LENIENT = Boolean.getBoolean("celestialascent.datagen.lenient");
 
@@ -73,10 +81,10 @@ public class BlockStateGen extends BlockStateProvider {
             } else if (block == Empire.IMPERIAL_BARRIER.get()) {
                 simpleBlock(block, models().cubeAll(name, modLoc("block/" + name)).renderType("translucent"));
             } else if (block instanceof PylonBlock) {
-                ModelFile broken = existing(name), restored = existing(name + "_restored");
+                ModelFile broken = existing(name), restored = existing(name + "_restored_base");
                 getVariantBuilder(block).forAllStates(st -> ConfiguredModel.builder().modelFile(st.getValue(PylonBlock.RESTORED) ? restored : broken).build());
             } else if (block instanceof StarGatePedestalBlock) {
-                ModelFile plain = existing(name), head = existing(name + "_head");
+                ModelFile plain = existing(name), head = existing(name + "_head_base");
                 getVariantBuilder(block).forAllStates(st -> ConfiguredModel.builder()
                         .modelFile(st.getValue(StarGatePedestalBlock.HEAD) ? head : plain)
                         .rotationY(((int) st.getValue(FacingBlock.FACING).toYRot() + 180) % 360).build());
@@ -96,9 +104,9 @@ public class BlockStateGen extends BlockStateProvider {
                     return ConfiguredModel.builder().modelFile(cross).rotationX(x).rotationY(y).build();
                 }, AmethystClusterBlock.WATERLOGGED);
             } else if (block instanceof FacingBlock) {
-                horizontalBlock(block, existing(name));
+                horizontalBlock(block, placed(name));
             } else {
-                simpleBlock(block, existing(name));
+                simpleBlock(block, placed(name));
             }
         }
         simpleBlock(Titans.COOLED_MAGMA.get(), models().cubeAll("cooled_magma", mcLoc("block/magma")));

@@ -1,5 +1,13 @@
 package com.celestialascent.core.station;
 
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.level.block.Block;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.ParticleTypes;
@@ -52,8 +60,59 @@ public class StationBlockEntity extends BlockEntity {
             public void setChanged() {
                 super.setChanged();
                 StationBlockEntity.this.setChanged();
+                syncToClients(); // the renderer shows the item floating above the station
             }
         };
+    }
+
+    /** Client copy: whether the station is working (the floating item spins faster). */
+    private boolean active;
+    private boolean sentActive;
+    private boolean loading;
+
+    public boolean active() {
+        return active;
+    }
+
+    private void syncToClients() {
+        if (!loading && level != null && !level.isClientSide) level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+    }
+
+    /** Writes the slots with their slot numbers (a plain SimpleContainer tag would shift items between slots on reload). */
+    private void saveItems(CompoundTag tag, HolderLookup.Provider lookup) {
+        NonNullList<ItemStack> list = NonNullList.withSize(items.getContainerSize(), ItemStack.EMPTY);
+        for (int i = 0; i < list.size(); i++) list.set(i, items.getItem(i));
+        ContainerHelper.saveAllItems(tag, list, true, lookup);
+    }
+
+    private void loadItems(CompoundTag tag, HolderLookup.Provider lookup) {
+        loading = true;
+        try {
+            ListTag stored = tag.getList("Items", Tag.TAG_COMPOUND);
+            items.removeAllItems();
+            if (!stored.isEmpty() && !stored.getCompound(0).contains("Slot")) {
+                items.fromTag(stored, lookup); // saves from before slot numbers were written
+                return;
+            }
+            NonNullList<ItemStack> list = NonNullList.withSize(items.getContainerSize(), ItemStack.EMPTY);
+            ContainerHelper.loadAllItems(tag, list, lookup);
+            for (int i = 0; i < list.size(); i++) items.setItem(i, list.get(i));
+        } finally {
+            loading = false;
+        }
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider lookup) {
+        CompoundTag tag = new CompoundTag();
+        saveItems(tag, lookup);
+        tag.putBoolean("Active", progress > 0);
+        return tag;
+    }
+
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 
     public int outputSlot() {
@@ -74,6 +133,10 @@ public class StationBlockEntity extends BlockEntity {
                 be.progress = 0;
                 be.setChanged();
             }
+            if (be.sentActive) {
+                be.sentActive = false;
+                be.syncToClients();
+            }
             return;
         }
         be.progress++;
@@ -93,20 +156,24 @@ public class StationBlockEntity extends BlockEntity {
             }
         }
         be.setChanged();
+        if (be.sentActive != be.progress > 0) {
+            be.sentActive = be.progress > 0;
+            be.syncToClients();
+        }
     }
 
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider lookup) {
         super.saveAdditional(tag, lookup);
-        tag.put("Items", items.createTag(lookup));
+        saveItems(tag, lookup);
         tag.putInt("Progress", progress);
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider lookup) {
         super.loadAdditional(tag, lookup);
-        items.removeAllItems();
-        items.fromTag(tag.getList("Items", Tag.TAG_COMPOUND), lookup);
+        loadItems(tag, lookup);
         progress = tag.getInt("Progress");
+        active = tag.getBoolean("Active");
     }
 }

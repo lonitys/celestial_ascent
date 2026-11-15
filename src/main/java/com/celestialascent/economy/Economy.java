@@ -42,7 +42,7 @@ public final class Economy {
                             Shapes.box(0, 0.625, 0.1875, 1, 1, 0.8125))));
 
     public static final DeferredBlock<FacingBlock> RELIC_PEDESTAL = Content.block("relic_pedestal",
-            () -> new FacingBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_PURPLE).strength(4f, 1200f).sound(SoundType.AMETHYST)
+            () -> new com.celestialascent.core.DisplayFacingBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_PURPLE).strength(4f, 1200f).sound(SoundType.AMETHYST)
                     .requiresCorrectToolForDrops().noOcclusion().lightLevel(s -> 10),
                     Shapes.or(Shapes.box(0.125, 0, 0.125, 0.875, 0.1875, 0.875), Shapes.box(0.25, 0.1875, 0.25, 0.75, 0.75, 0.75),
                             Shapes.box(0.125, 0.75, 0.125, 0.875, 0.875, 0.875))));

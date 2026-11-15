@@ -1,18 +1,18 @@
 {
   "variants": {
     "facing=east": {
-      "model": "celestialascent:block/magma_altar",
+      "model": "celestialascent:block/magma_altar_base",
       "y": 90
     },
     "facing=north": {
-      "model": "celestialascent:block/magma_altar"
+      "model": "celestialascent:block/magma_altar_base"
     },
     "facing=south": {
-      "model": "celestialascent:block/magma_altar",
+      "model": "celestialascent:block/magma_altar_base",
       "y": 180
     },
     "facing=west": {
-      "model": "celestialascent:block/magma_altar",
+      "model": "celestialascent:block/magma_altar_base",
       "y": 270
     }
   }

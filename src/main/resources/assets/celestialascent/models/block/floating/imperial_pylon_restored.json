@@ -1,0 +1,400 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "celestialascent:block/imperial_pylon_base",
+    "base": "celestialascent:block/imperial_pylon_base",
+    "step": "celestialascent:block/imperial_pylon_step",
+    "claw": "celestialascent:block/imperial_pylon_claw",
+    "crystal": "celestialascent:block/imperial_pylon_crystal"
+  },
+  "ambientocclusion": false,
+  "elements": [
+    {
+      "name": "crystal",
+      "from": [
+        5.5,
+        4,
+        5.5
+      ],
+      "to": [
+        10.5,
+        14,
+        10.5
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          8,
+          8,
+          8
+        ]
+      },
+      "light_emission": 15,
+      "faces": {
+        "down": {
+          "uv": [
+            8,
+            8,
+            13,
+            13
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            5,
+            5
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "north": {
+          "uv": [
+            4,
+            6,
+            9,
+            16
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "south": {
+          "uv": [
+            7,
+            6,
+            12,
+            16
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "west": {
+          "uv": [
+            0,
+            6,
+            5,
+            16
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "east": {
+          "uv": [
+            8,
+            6,
+            13,
+            16
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        }
+      }
+    },
+    {
+      "name": "crystal_cap",
+      "from": [
+        6.4,
+        14,
+        6.4
+      ],
+      "to": [
+        9.6,
+        15.25,
+        9.6
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          8,
+          8,
+          8
+        ]
+      },
+      "light_emission": 15,
+      "faces": {
+        "down": {
+          "uv": [
+            8,
+            8,
+            11.2,
+            11.2
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            3.2,
+            3.2
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "north": {
+          "uv": [
+            4,
+            14.75,
+            7.2,
+            16
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "south": {
+          "uv": [
+            8.8,
+            14.75,
+            12,
+            16
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "west": {
+          "uv": [
+            0,
+            14.75,
+            3.2,
+            16
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "east": {
+          "uv": [
+            8,
+            14.75,
+            11.2,
+            16
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        }
+      }
+    },
+    {
+      "name": "crystal_tip",
+      "from": [
+        7.2,
+        15.25,
+        7.2
+      ],
+      "to": [
+        8.8,
+        16,
+        8.8
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          8,
+          8,
+          8
+        ]
+      },
+      "light_emission": 15,
+      "faces": {
+        "down": {
+          "uv": [
+            8,
+            8,
+            9.6,
+            9.6
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1.6,
+            1.6
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "north": {
+          "uv": [
+            4,
+            15.25,
+            5.6,
+            16
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "south": {
+          "uv": [
+            10.4,
+            15.25,
+            12,
+            16
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "west": {
+          "uv": [
+            0,
+            15.25,
+            1.6,
+            16
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "east": {
+          "uv": [
+            8,
+            15.25,
+            9.6,
+            16
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        }
+      }
+    },
+    {
+      "name": "band",
+      "from": [
+        5.2,
+        11.5,
+        5.2
+      ],
+      "to": [
+        10.8,
+        12.25,
+        10.8
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          8,
+          11.5,
+          8
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            0,
+            5.6,
+            5.6
+          ],
+          "texture": "#claw"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            5.6,
+            5.6
+          ],
+          "texture": "#claw"
+        },
+        "north": {
+          "uv": [
+            0,
+            2,
+            5.6,
+            2.75
+          ],
+          "texture": "#claw"
+        },
+        "south": {
+          "uv": [
+            0,
+            2,
+            5.6,
+            2.75
+          ],
+          "texture": "#claw"
+        },
+        "west": {
+          "uv": [
+            0,
+            2,
+            5.6,
+            2.75
+          ],
+          "texture": "#claw"
+        },
+        "east": {
+          "uv": [
+            0,
+            2,
+            5.6,
+            2.75
+          ],
+          "texture": "#claw"
+        }
+      }
+    }
+  ]
+}

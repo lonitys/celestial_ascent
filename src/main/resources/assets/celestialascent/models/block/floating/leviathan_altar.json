@@ -1,0 +1,2241 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "celestialascent:block/leviathan_altar_pillar",
+    "base": "celestialascent:block/leviathan_altar_base",
+    "pillar": "celestialascent:block/leviathan_altar_pillar",
+    "dish": "celestialascent:block/leviathan_altar_dish",
+    "inner": "celestialascent:block/leviathan_altar_inner",
+    "scales": "celestialascent:block/leviathan_altar_scales"
+  },
+  "ambientocclusion": false,
+  "elements": [
+    {
+      "name": "orb",
+      "from": [
+        7,
+        16.25,
+        7
+      ],
+      "to": [
+        9,
+        18.25,
+        9
+      ],
+      "light_emission": 15,
+      "faces": {
+        "down": {
+          "uv": [
+            2,
+            12,
+            4,
+            14
+          ],
+          "texture": "#scales",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "up": {
+          "uv": [
+            2,
+            12,
+            4,
+            14
+          ],
+          "texture": "#scales",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "north": {
+          "uv": [
+            2,
+            12,
+            4,
+            14
+          ],
+          "texture": "#scales",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "south": {
+          "uv": [
+            2,
+            12,
+            4,
+            14
+          ],
+          "texture": "#scales",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "west": {
+          "uv": [
+            2,
+            12,
+            4,
+            14
+          ],
+          "texture": "#scales",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "east": {
+          "uv": [
+            2,
+            12,
+            4,
+            14
+          ],
+          "texture": "#scales",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        }
+      }
+    },
+    {
+      "name": "orb_flare",
+      "from": [
+        7.5,
+        15.75,
+        7.5
+      ],
+      "to": [
+        8.5,
+        18.75,
+        8.5
+      ],
+      "light_emission": 15,
+      "faces": {
+        "down": {
+          "uv": [
+            6,
+            12,
+            7,
+            14
+          ],
+          "texture": "#scales",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "up": {
+          "uv": [
+            6,
+            12,
+            7,
+            14
+          ],
+          "texture": "#scales",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "north": {
+          "uv": [
+            6,
+            12,
+            7,
+            14
+          ],
+          "texture": "#scales",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "south": {
+          "uv": [
+            6,
+            12,
+            7,
+            14
+          ],
+          "texture": "#scales",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "west": {
+          "uv": [
+            6,
+            12,
+            7,
+            14
+          ],
+          "texture": "#scales",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "east": {
+          "uv": [
+            6,
+            12,
+            7,
+            14
+          ],
+          "texture": "#scales",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        }
+      }
+    },
+    {
+      "name": "coil",
+      "from": [
+        4.1811,
+        15.2,
+        8.1934
+      ],
+      "to": [
+        4.7811,
+        15.8,
+        10.0934
+      ],
+      "rotation": {
+        "angle": 22.5,
+        "axis": "y",
+        "origin": [
+          4.4811,
+          15.2,
+          9.1434
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            10,
+            0.6,
+            11.9
+          ],
+          "texture": "#scales"
+        },
+        "up": {
+          "uv": [
+            0,
+            2,
+            0.6,
+            3.9
+          ],
+          "texture": "#scales"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            0.6,
+            0.6
+          ],
+          "texture": "#scales"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            0.6,
+            0.6
+          ],
+          "texture": "#scales"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1.9,
+            0.6
+          ],
+          "texture": "#scales"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            1.9,
+            0.6
+          ],
+          "texture": "#scales"
+        }
+      }
+    },
+    {
+      "name": "coil",
+      "from": [
+        3.9853,
+        15.4211,
+        6.6227
+      ],
+      "to": [
+        4.6642,
+        16.1,
+        8.5227
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            3,
+            10,
+            3.6789,
+            11.9
+          ],
+          "texture": "#scales"
+        },
+        "up": {
+          "uv": [
+            3,
+            2,
+            3.6789,
+            3.9
+          ],
+          "texture": "#scales"
+        },
+        "north": {
+          "uv": [
+            3,
+            0,
+            3.6789,
+            0.6789
+          ],
+          "texture": "#scales"
+        },
+        "south": {
+          "uv": [
+            3,
+            0,
+            3.6789,
+            0.6789
+          ],
+          "texture": "#scales"
+        },
+        "west": {
+          "uv": [
+            3,
+            0,
+            4.9,
+            0.6789
+          ],
+          "texture": "#scales"
+        },
+        "east": {
+          "uv": [
+            3,
+            0,
+            4.9,
+            0.6789
+          ],
+          "texture": "#scales"
+        }
+      }
+    },
+    {
+      "name": "coil",
+      "from": [
+        4.4583,
+        15.6421,
+        5.1298
+      ],
+      "to": [
+        5.2162,
+        16.4,
+        7.0298
+      ],
+      "rotation": {
+        "angle": -22.5,
+        "axis": "y",
+        "origin": [
+          4.8373,
+          15.6421,
+          6.0798
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            6,
+            10,
+            6.7579,
+            11.9
+          ],
+          "texture": "#scales"
+        },
+        "up": {
+          "uv": [
+            6,
+            2,
+            6.7579,
+            3.9
+          ],
+          "texture": "#scales"
+        },
+        "north": {
+          "uv": [
+            6,
+            0,
+            6.7579,
+            0.7579
+          ],
+          "texture": "#scales"
+        },
+        "south": {
+          "uv": [
+            6,
+            0,
+            6.7579,
+            0.7579
+          ],
+          "texture": "#scales"
+        },
+        "west": {
+          "uv": [
+            6,
+            0,
+            7.9,
+            0.7579
+          ],
+          "texture": "#scales"
+        },
+        "east": {
+          "uv": [
+            6,
+            0,
+            7.9,
+            0.7579
+          ],
+          "texture": "#scales"
+        }
+      }
+    },
+    {
+      "name": "coil",
+      "from": [
+        4.9754,
+        15.8632,
+        4.5179
+      ],
+      "to": [
+        6.8754,
+        16.7,
+        5.3548
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          5.9254,
+          15.8632,
+          4.9364
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            9,
+            10,
+            10.9,
+            10.8368
+          ],
+          "texture": "#scales"
+        },
+        "up": {
+          "uv": [
+            9,
+            2,
+            10.9,
+            2.8368
+          ],
+          "texture": "#scales"
+        },
+        "north": {
+          "uv": [
+            9,
+            0,
+            10.9,
+            0.8368
+          ],
+          "texture": "#scales"
+        },
+        "south": {
+          "uv": [
+            9,
+            0,
+            10.9,
+            0.8368
+          ],
+          "texture": "#scales"
+        },
+        "west": {
+          "uv": [
+            9,
+            0,
+            9.8368,
+            0.8368
+          ],
+          "texture": "#scales"
+        },
+        "east": {
+          "uv": [
+            9,
+            0,
+            9.8368,
+            0.8368
+          ],
+          "texture": "#scales"
+        }
+      }
+    },
+    {
+      "name": "coil",
+      "from": [
+        6.441,
+        16.0842,
+        3.8926
+      ],
+      "to": [
+        8.341,
+        17,
+        4.8084
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            10,
+            1.9,
+            10.9158
+          ],
+          "texture": "#scales"
+        },
+        "up": {
+          "uv": [
+            0,
+            2,
+            1.9,
+            2.9158
+          ],
+          "texture": "#scales"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            1.9,
+            0.9158
+          ],
+          "texture": "#scales"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1.9,
+            0.9158
+          ],
+          "texture": "#scales"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            0.9158,
+            0.9158
+          ],
+          "texture": "#scales"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            0.9158,
+            0.9158
+          ],
+          "texture": "#scales"
+        }
+      }
+    },
+    {
+      "name": "coil",
+      "from": [
+        8.0175,
+        16.3053,
+        3.9314
+      ],
+      "to": [
+        9.9175,
+        17.3,
+        4.9261
+      ],
+      "rotation": {
+        "angle": -22.5,
+        "axis": "y",
+        "origin": [
+          8.9675,
+          16.3053,
+          4.4287
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            3,
+            10,
+            4.9,
+            10.9947
+          ],
+          "texture": "#scales"
+        },
+        "up": {
+          "uv": [
+            3,
+            2,
+            4.9,
+            2.9947
+          ],
+          "texture": "#scales"
+        },
+        "north": {
+          "uv": [
+            3,
+            0,
+            4.9,
+            0.9947
+          ],
+          "texture": "#scales"
+        },
+        "south": {
+          "uv": [
+            3,
+            0,
+            4.9,
+            0.9947
+          ],
+          "texture": "#scales"
+        },
+        "west": {
+          "uv": [
+            3,
+            0,
+            3.9947,
+            0.9947
+          ],
+          "texture": "#scales"
+        },
+        "east": {
+          "uv": [
+            3,
+            0,
+            3.9947,
+            0.9947
+          ],
+          "texture": "#scales"
+        }
+      }
+    },
+    {
+      "name": "coil",
+      "from": [
+        9.4179,
+        16.5263,
+        4.6201
+      ],
+      "to": [
+        11.3179,
+        17.6,
+        5.6938
+      ],
+      "rotation": {
+        "angle": -45,
+        "axis": "y",
+        "origin": [
+          10.3679,
+          16.5263,
+          5.1569
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            6,
+            10,
+            7.9,
+            11.0737
+          ],
+          "texture": "#scales"
+        },
+        "up": {
+          "uv": [
+            6,
+            2,
+            7.9,
+            3.0737
+          ],
+          "texture": "#scales"
+        },
+        "north": {
+          "uv": [
+            6,
+            0,
+            7.9,
+            1.0737
+          ],
+          "texture": "#scales"
+        },
+        "south": {
+          "uv": [
+            6,
+            0,
+            7.9,
+            1.0737
+          ],
+          "texture": "#scales"
+        },
+        "west": {
+          "uv": [
+            6,
+            0,
+            7.0737,
+            1.0737
+          ],
+          "texture": "#scales"
+        },
+        "east": {
+          "uv": [
+            6,
+            0,
+            7.0737,
+            1.0737
+          ],
+          "texture": "#scales"
+        }
+      }
+    },
+    {
+      "name": "coil",
+      "from": [
+        10.7611,
+        16.7474,
+        5.4525
+      ],
+      "to": [
+        11.9137,
+        17.9,
+        7.3525
+      ],
+      "rotation": {
+        "angle": 22.5,
+        "axis": "y",
+        "origin": [
+          11.3374,
+          16.7474,
+          6.4025
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            9,
+            10,
+            10.1526,
+            11.9
+          ],
+          "texture": "#scales"
+        },
+        "up": {
+          "uv": [
+            9,
+            2,
+            10.1526,
+            3.9
+          ],
+          "texture": "#scales"
+        },
+        "north": {
+          "uv": [
+            9,
+            0,
+            10.1526,
+            1.1526
+          ],
+          "texture": "#scales"
+        },
+        "south": {
+          "uv": [
+            9,
+            0,
+            10.1526,
+            1.1526
+          ],
+          "texture": "#scales"
+        },
+        "west": {
+          "uv": [
+            9,
+            0,
+            10.9,
+            1.1526
+          ],
+          "texture": "#scales"
+        },
+        "east": {
+          "uv": [
+            9,
+            0,
+            10.9,
+            1.1526
+          ],
+          "texture": "#scales"
+        }
+      }
+    },
+    {
+      "name": "coil",
+      "from": [
+        11.0995,
+        16.9684,
+        6.9888
+      ],
+      "to": [
+        12.2995,
+        18.1684,
+        8.8888
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            10,
+            1.2,
+            11.9
+          ],
+          "texture": "#scales"
+        },
+        "up": {
+          "uv": [
+            0,
+            2,
+            1.2,
+            3.9
+          ],
+          "texture": "#scales"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            1.2,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1.2,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1.9,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            1.9,
+            1.2
+          ],
+          "texture": "#scales"
+        }
+      }
+    },
+    {
+      "name": "coil",
+      "from": [
+        10.7884,
+        17.1895,
+        8.5363
+      ],
+      "to": [
+        11.9884,
+        18.3895,
+        10.4363
+      ],
+      "rotation": {
+        "angle": -22.5,
+        "axis": "y",
+        "origin": [
+          11.3884,
+          17.1895,
+          9.4863
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            3,
+            10,
+            4.2,
+            11.9
+          ],
+          "texture": "#scales"
+        },
+        "up": {
+          "uv": [
+            3,
+            2,
+            4.2,
+            3.9
+          ],
+          "texture": "#scales"
+        },
+        "north": {
+          "uv": [
+            3,
+            0,
+            4.2,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "south": {
+          "uv": [
+            3,
+            0,
+            4.2,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "west": {
+          "uv": [
+            3,
+            0,
+            4.9,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "east": {
+          "uv": [
+            3,
+            0,
+            4.9,
+            1.2
+          ],
+          "texture": "#scales"
+        }
+      }
+    },
+    {
+      "name": "coil",
+      "from": [
+        9.5106,
+        17.4105,
+        10.1632
+      ],
+      "to": [
+        11.4106,
+        18.6105,
+        11.3632
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          10.4606,
+          17.4105,
+          10.7632
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            6,
+            10,
+            7.9,
+            11.2
+          ],
+          "texture": "#scales"
+        },
+        "up": {
+          "uv": [
+            6,
+            2,
+            7.9,
+            3.2
+          ],
+          "texture": "#scales"
+        },
+        "north": {
+          "uv": [
+            6,
+            0,
+            7.9,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "south": {
+          "uv": [
+            6,
+            0,
+            7.9,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "west": {
+          "uv": [
+            6,
+            0,
+            7.2,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "east": {
+          "uv": [
+            6,
+            0,
+            7.2,
+            1.2
+          ],
+          "texture": "#scales"
+        }
+      }
+    },
+    {
+      "name": "coil",
+      "from": [
+        8.135,
+        17.6316,
+        10.9373
+      ],
+      "to": [
+        10.035,
+        18.8316,
+        12.1373
+      ],
+      "rotation": {
+        "angle": 22.5,
+        "axis": "y",
+        "origin": [
+          9.085,
+          17.6316,
+          11.5373
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            9,
+            10,
+            10.9,
+            11.2
+          ],
+          "texture": "#scales"
+        },
+        "up": {
+          "uv": [
+            9,
+            2,
+            10.9,
+            3.2
+          ],
+          "texture": "#scales"
+        },
+        "north": {
+          "uv": [
+            9,
+            0,
+            10.9,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "south": {
+          "uv": [
+            9,
+            0,
+            10.9,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "west": {
+          "uv": [
+            9,
+            0,
+            10.2,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "east": {
+          "uv": [
+            9,
+            0,
+            10.2,
+            1.2
+          ],
+          "texture": "#scales"
+        }
+      }
+    },
+    {
+      "name": "coil",
+      "from": [
+        6.562,
+        17.8526,
+        11.0677
+      ],
+      "to": [
+        8.462,
+        19.0526,
+        12.2677
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            10,
+            1.9,
+            11.2
+          ],
+          "texture": "#scales"
+        },
+        "up": {
+          "uv": [
+            0,
+            2,
+            1.9,
+            3.2
+          ],
+          "texture": "#scales"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            1.9,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1.9,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1.2,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            1.2,
+            1.2
+          ],
+          "texture": "#scales"
+        }
+      }
+    },
+    {
+      "name": "coil",
+      "from": [
+        5.0778,
+        18.0737,
+        10.5306
+      ],
+      "to": [
+        6.9778,
+        19.2737,
+        11.7306
+      ],
+      "rotation": {
+        "angle": -22.5,
+        "axis": "y",
+        "origin": [
+          6.0278,
+          18.0737,
+          11.1306
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            3,
+            10,
+            4.9,
+            11.2
+          ],
+          "texture": "#scales"
+        },
+        "up": {
+          "uv": [
+            3,
+            2,
+            4.9,
+            3.2
+          ],
+          "texture": "#scales"
+        },
+        "north": {
+          "uv": [
+            3,
+            0,
+            4.9,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "south": {
+          "uv": [
+            3,
+            0,
+            4.9,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "west": {
+          "uv": [
+            3,
+            0,
+            4.2,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "east": {
+          "uv": [
+            3,
+            0,
+            4.2,
+            1.2
+          ],
+          "texture": "#scales"
+        }
+      }
+    },
+    {
+      "name": "coil",
+      "from": [
+        4.3025,
+        18.2947,
+        9.0737
+      ],
+      "to": [
+        5.5025,
+        19.4947,
+        10.9737
+      ],
+      "rotation": {
+        "angle": 22.5,
+        "axis": "y",
+        "origin": [
+          4.9025,
+          18.2947,
+          10.0237
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            6,
+            10,
+            7.2,
+            11.9
+          ],
+          "texture": "#scales"
+        },
+        "up": {
+          "uv": [
+            6,
+            2,
+            7.2,
+            3.9
+          ],
+          "texture": "#scales"
+        },
+        "north": {
+          "uv": [
+            6,
+            0,
+            7.2,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "south": {
+          "uv": [
+            6,
+            0,
+            7.2,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "west": {
+          "uv": [
+            6,
+            0,
+            7.9,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "east": {
+          "uv": [
+            6,
+            0,
+            7.9,
+            1.2
+          ],
+          "texture": "#scales"
+        }
+      }
+    },
+    {
+      "name": "coil",
+      "from": [
+        3.7409,
+        18.5158,
+        7.5986
+      ],
+      "to": [
+        4.9409,
+        19.7158,
+        9.4986
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            9,
+            10,
+            10.2,
+            11.9
+          ],
+          "texture": "#scales"
+        },
+        "up": {
+          "uv": [
+            9,
+            2,
+            10.2,
+            3.9
+          ],
+          "texture": "#scales"
+        },
+        "north": {
+          "uv": [
+            9,
+            0,
+            10.2,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "south": {
+          "uv": [
+            9,
+            0,
+            10.2,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "west": {
+          "uv": [
+            9,
+            0,
+            10.9,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "east": {
+          "uv": [
+            9,
+            0,
+            10.9,
+            1.2
+          ],
+          "texture": "#scales"
+        }
+      }
+    },
+    {
+      "name": "coil",
+      "from": [
+        3.8452,
+        18.7368,
+        6.0236
+      ],
+      "to": [
+        5.0452,
+        19.9368,
+        7.9236
+      ],
+      "rotation": {
+        "angle": -22.5,
+        "axis": "y",
+        "origin": [
+          4.4452,
+          18.7368,
+          6.9736
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            10,
+            1.2,
+            11.9
+          ],
+          "texture": "#scales"
+        },
+        "up": {
+          "uv": [
+            0,
+            2,
+            1.2,
+            3.9
+          ],
+          "texture": "#scales"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            1.2,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1.2,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1.9,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            1.9,
+            1.2
+          ],
+          "texture": "#scales"
+        }
+      }
+    },
+    {
+      "name": "coil",
+      "from": [
+        4.5965,
+        18.9579,
+        4.6354
+      ],
+      "to": [
+        5.7965,
+        20.1579,
+        6.5354
+      ],
+      "rotation": {
+        "angle": -45,
+        "axis": "y",
+        "origin": [
+          5.1965,
+          18.9579,
+          5.5854
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            3,
+            10,
+            4.2,
+            11.9
+          ],
+          "texture": "#scales"
+        },
+        "up": {
+          "uv": [
+            3,
+            2,
+            4.2,
+            3.9
+          ],
+          "texture": "#scales"
+        },
+        "north": {
+          "uv": [
+            3,
+            0,
+            4.2,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "south": {
+          "uv": [
+            3,
+            0,
+            4.2,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "west": {
+          "uv": [
+            3,
+            0,
+            4.9,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "east": {
+          "uv": [
+            3,
+            0,
+            4.9,
+            1.2
+          ],
+          "texture": "#scales"
+        }
+      }
+    },
+    {
+      "name": "coil",
+      "from": [
+        5.5079,
+        19.1789,
+        4.0367
+      ],
+      "to": [
+        7.4079,
+        20.3789,
+        5.2367
+      ],
+      "rotation": {
+        "angle": 22.5,
+        "axis": "y",
+        "origin": [
+          6.4579,
+          19.1789,
+          4.6367
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            6,
+            10,
+            7.9,
+            11.2
+          ],
+          "texture": "#scales"
+        },
+        "up": {
+          "uv": [
+            6,
+            2,
+            7.9,
+            3.2
+          ],
+          "texture": "#scales"
+        },
+        "north": {
+          "uv": [
+            6,
+            0,
+            7.9,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "south": {
+          "uv": [
+            6,
+            0,
+            7.9,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "west": {
+          "uv": [
+            6,
+            0,
+            7.2,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "east": {
+          "uv": [
+            6,
+            0,
+            7.2,
+            1.2
+          ],
+          "texture": "#scales"
+        }
+      }
+    },
+    {
+      "name": "coil",
+      "from": [
+        7.05,
+        19.4,
+        3.7
+      ],
+      "to": [
+        8.95,
+        20.6,
+        4.9
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            9,
+            10,
+            10.9,
+            11.2
+          ],
+          "texture": "#scales"
+        },
+        "up": {
+          "uv": [
+            9,
+            2,
+            10.9,
+            3.2
+          ],
+          "texture": "#scales"
+        },
+        "north": {
+          "uv": [
+            9,
+            0,
+            10.9,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "south": {
+          "uv": [
+            9,
+            0,
+            10.9,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "west": {
+          "uv": [
+            9,
+            0,
+            10.2,
+            1.2
+          ],
+          "texture": "#scales"
+        },
+        "east": {
+          "uv": [
+            9,
+            0,
+            10.2,
+            1.2
+          ],
+          "texture": "#scales"
+        }
+      }
+    },
+    {
+      "name": "neck",
+      "from": [
+        7.4,
+        19.8,
+        2.7
+      ],
+      "to": [
+        8.6,
+        21.2,
+        4.1
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            3,
+            10,
+            4.2,
+            11.4
+          ],
+          "texture": "#scales"
+        },
+        "up": {
+          "uv": [
+            3,
+            2,
+            4.2,
+            3.4
+          ],
+          "texture": "#scales"
+        },
+        "north": {
+          "uv": [
+            3,
+            0,
+            4.2,
+            1.4
+          ],
+          "texture": "#scales"
+        },
+        "south": {
+          "uv": [
+            3,
+            0,
+            4.2,
+            1.4
+          ],
+          "texture": "#scales"
+        },
+        "west": {
+          "uv": [
+            5,
+            0,
+            6.4,
+            1.4
+          ],
+          "texture": "#scales"
+        },
+        "east": {
+          "uv": [
+            5,
+            0,
+            6.4,
+            1.4
+          ],
+          "texture": "#scales"
+        }
+      }
+    },
+    {
+      "name": "head",
+      "from": [
+        6.9,
+        20.8,
+        0.1
+      ],
+      "to": [
+        9.1,
+        22.4,
+        3.1
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            10,
+            2.2,
+            11.6
+          ],
+          "texture": "#scales"
+        },
+        "up": {
+          "uv": [
+            4,
+            2,
+            6.2,
+            5
+          ],
+          "texture": "#scales"
+        },
+        "north": {
+          "uv": [
+            4,
+            4,
+            6.2,
+            5.6
+          ],
+          "texture": "#scales"
+        },
+        "south": {
+          "uv": [
+            4,
+            4,
+            6.2,
+            5.6
+          ],
+          "texture": "#scales"
+        },
+        "west": {
+          "uv": [
+            2,
+            4,
+            5,
+            5.6
+          ],
+          "texture": "#scales"
+        },
+        "east": {
+          "uv": [
+            2,
+            4,
+            5,
+            5.6
+          ],
+          "texture": "#scales"
+        }
+      }
+    },
+    {
+      "name": "jaw",
+      "from": [
+        7.2,
+        20.35,
+        0.4
+      ],
+      "to": [
+        8.8,
+        20.8,
+        2.8
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            10,
+            1.6,
+            12.4
+          ],
+          "texture": "#scales"
+        },
+        "up": {
+          "uv": [
+            0,
+            15,
+            1.6,
+            16
+          ],
+          "texture": "#scales"
+        },
+        "north": {
+          "uv": [
+            8,
+            4,
+            9.6,
+            4.45
+          ],
+          "texture": "#scales"
+        },
+        "south": {
+          "uv": [
+            8,
+            4,
+            9.6,
+            4.45
+          ],
+          "texture": "#scales"
+        },
+        "west": {
+          "uv": [
+            8,
+            4,
+            10.4,
+            4.45
+          ],
+          "texture": "#scales"
+        },
+        "east": {
+          "uv": [
+            8,
+            4,
+            10.4,
+            4.45
+          ],
+          "texture": "#scales"
+        }
+      }
+    },
+    {
+      "name": "eye",
+      "from": [
+        6.8,
+        21.6,
+        0.9
+      ],
+      "to": [
+        6.9,
+        22.1,
+        1.8
+      ],
+      "light_emission": 15,
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            14,
+            0.9,
+            14.5
+          ],
+          "texture": "#scales",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "up": {
+          "uv": [
+            0,
+            14,
+            0.9,
+            14.5
+          ],
+          "texture": "#scales",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "north": {
+          "uv": [
+            0,
+            14,
+            0.9,
+            14.5
+          ],
+          "texture": "#scales",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "south": {
+          "uv": [
+            0,
+            14,
+            0.9,
+            14.5
+          ],
+          "texture": "#scales",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "west": {
+          "uv": [
+            0,
+            14,
+            0.9,
+            14.5
+          ],
+          "texture": "#scales",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "east": {
+          "uv": [
+            0,
+            14,
+            0.9,
+            14.5
+          ],
+          "texture": "#scales",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        }
+      }
+    },
+    {
+      "name": "eye",
+      "from": [
+        9.1,
+        21.6,
+        0.9
+      ],
+      "to": [
+        9.2,
+        22.1,
+        1.8
+      ],
+      "light_emission": 15,
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            14,
+            0.9,
+            14.5
+          ],
+          "texture": "#scales",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "up": {
+          "uv": [
+            0,
+            14,
+            0.9,
+            14.5
+          ],
+          "texture": "#scales",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "north": {
+          "uv": [
+            0,
+            14,
+            0.9,
+            14.5
+          ],
+          "texture": "#scales",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "south": {
+          "uv": [
+            0,
+            14,
+            0.9,
+            14.5
+          ],
+          "texture": "#scales",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "west": {
+          "uv": [
+            0,
+            14,
+            0.9,
+            14.5
+          ],
+          "texture": "#scales",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "east": {
+          "uv": [
+            0,
+            14,
+            0.9,
+            14.5
+          ],
+          "texture": "#scales",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        }
+      }
+    },
+    {
+      "name": "fin",
+      "from": [
+        7.88,
+        22.4,
+        1.9
+      ],
+      "to": [
+        8.12,
+        23.2,
+        2.8
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            8,
+            0,
+            9,
+            1
+          ],
+          "texture": "#scales"
+        },
+        "up": {
+          "uv": [
+            8,
+            0,
+            9,
+            1
+          ],
+          "texture": "#scales"
+        },
+        "north": {
+          "uv": [
+            8,
+            0,
+            9,
+            1
+          ],
+          "texture": "#scales"
+        },
+        "south": {
+          "uv": [
+            8,
+            0,
+            9,
+            1
+          ],
+          "texture": "#scales"
+        },
+        "west": {
+          "uv": [
+            8,
+            0,
+            9,
+            1
+          ],
+          "texture": "#scales"
+        },
+        "east": {
+          "uv": [
+            8,
+            0,
+            9,
+            1
+          ],
+          "texture": "#scales"
+        }
+      }
+    },
+    {
+      "name": "fin",
+      "from": [
+        7.88,
+        22.4,
+        2.9
+      ],
+      "to": [
+        8.12,
+        23.5,
+        3.8
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            8,
+            0,
+            9,
+            1
+          ],
+          "texture": "#scales"
+        },
+        "up": {
+          "uv": [
+            8,
+            0,
+            9,
+            1
+          ],
+          "texture": "#scales"
+        },
+        "north": {
+          "uv": [
+            8,
+            0,
+            9,
+            1
+          ],
+          "texture": "#scales"
+        },
+        "south": {
+          "uv": [
+            8,
+            0,
+            9,
+            1
+          ],
+          "texture": "#scales"
+        },
+        "west": {
+          "uv": [
+            8,
+            0,
+            9,
+            1
+          ],
+          "texture": "#scales"
+        },
+        "east": {
+          "uv": [
+            8,
+            0,
+            9,
+            1
+          ],
+          "texture": "#scales"
+        }
+      }
+    }
+  ]
+}

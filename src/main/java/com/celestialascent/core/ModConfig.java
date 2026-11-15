@@ -13,6 +13,7 @@ public final class ModConfig {
     public static final ModConfigSpec.DoubleValue ABYSS_CRUMBLE_SPEED;
     public static final ModConfigSpec.IntValue EMERALD_TO_COPPER;
     public static final ModConfigSpec.BooleanValue PROJECTE_REPAIR;
+    public static final ModConfigSpec.BooleanValue GIVE_CODEX;
 
     static {
         ModConfigSpec.Builder b = new ModConfigSpec.Builder();
@@ -30,6 +31,9 @@ public final class ModConfig {
         b.pop();
         b.push("projecte");
         PROJECTE_REPAIR = b.comment("When ProjectE is installed, mod armor repairs itself using the wearer's EMC").define("emcRepair", true);
+        b.pop();
+        b.push("codex");
+        GIVE_CODEX = b.comment("Give every player a Celestial Codex (the in-game guide) the first time they join").define("giveOnFirstJoin", true);
         b.pop();
         SPEC = b.build();
     }

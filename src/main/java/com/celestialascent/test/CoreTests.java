@@ -128,4 +128,19 @@ public final class CoreTests {
                 .getModifier(ResourceLocation.fromNamespaceAndPath(CelestialAscent.MODID, "constellation_frost")) != null, "constellation bonus applied");
         h.succeed();
     }
+
+    @GameTest(template = FLOOR)
+    public static void stationKeepsSlotsOnReload(GameTestHelper h) {
+        BlockPos rel = new BlockPos(2, 1, 2);
+        h.setBlock(rel, com.celestialascent.titans.Titans.TITAN_FORGE.get());
+        var be = (com.celestialascent.core.station.StationBlockEntity) h.getLevel().getBlockEntity(h.absolutePos(rel));
+        var lookup = h.getLevel().registryAccess();
+        be.items.setItem(2, new ItemStack(com.celestialascent.titans.Titans.TITAN_SHARD.get(), 3)); // a material, no base item
+        var tag = be.saveWithoutMetadata(lookup);
+        be.items.removeAllItems();
+        be.loadWithComponents(tag, lookup);
+        h.assertTrue(be.items.getItem(0).isEmpty(), "base slot stays empty after reload");
+        eq(h, 3, be.items.getItem(2).getCount(), "shards stay in their slot");
+        h.succeed();
+    }
 }

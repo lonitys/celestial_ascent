@@ -1,0 +1,802 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "celestialascent:block/ascension_altar_body",
+    "marble": "celestialascent:block/ascension_altar_marble",
+    "body": "celestialascent:block/ascension_altar_body",
+    "top": "celestialascent:block/ascension_altar_top",
+    "halo": "celestialascent:block/ascension_altar_halo",
+    "gold": "celestialascent:block/ascension_altar_gold"
+  },
+  "ambientocclusion": false,
+  "elements": [
+    {
+      "name": "halo",
+      "from": [
+        6.2396,
+        19,
+        3.25
+      ],
+      "to": [
+        9.7604,
+        19.75,
+        4.25
+      ],
+      "light_emission": 15,
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            6,
+            3.5,
+            7
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "up": {
+          "uv": [
+            0,
+            6,
+            3.5,
+            7
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "north": {
+          "uv": [
+            0,
+            6,
+            3.5,
+            6.75
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "south": {
+          "uv": [
+            0,
+            6,
+            3.5,
+            6.75
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "west": {
+          "uv": [
+            0,
+            6,
+            3.5,
+            6.75
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "east": {
+          "uv": [
+            0,
+            6,
+            3.5,
+            6.75
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        }
+      }
+    },
+    {
+      "name": "halo",
+      "from": [
+        6.2396,
+        19,
+        11.75
+      ],
+      "to": [
+        9.7604,
+        19.75,
+        12.75
+      ],
+      "light_emission": 15,
+      "faces": {
+        "down": {
+          "uv": [
+            8,
+            6,
+            11.5,
+            7
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "up": {
+          "uv": [
+            8,
+            6,
+            11.5,
+            7
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "north": {
+          "uv": [
+            8,
+            6,
+            11.5,
+            6.75
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "south": {
+          "uv": [
+            8,
+            6,
+            11.5,
+            6.75
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "west": {
+          "uv": [
+            8,
+            6,
+            11.5,
+            6.75
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "east": {
+          "uv": [
+            8,
+            6,
+            11.5,
+            6.75
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        }
+      }
+    },
+    {
+      "name": "halo",
+      "from": [
+        3.25,
+        19,
+        6.2396
+      ],
+      "to": [
+        4.25,
+        19.75,
+        9.7604
+      ],
+      "light_emission": 15,
+      "faces": {
+        "down": {
+          "uv": [
+            12,
+            6,
+            15.5,
+            7
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "up": {
+          "uv": [
+            12,
+            6,
+            15.5,
+            7
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "north": {
+          "uv": [
+            12,
+            6,
+            15.5,
+            6.75
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "south": {
+          "uv": [
+            12,
+            6,
+            15.5,
+            6.75
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "west": {
+          "uv": [
+            12,
+            6,
+            15.5,
+            6.75
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "east": {
+          "uv": [
+            12,
+            6,
+            15.5,
+            6.75
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        }
+      }
+    },
+    {
+      "name": "halo",
+      "from": [
+        11.75,
+        19,
+        6.2396
+      ],
+      "to": [
+        12.75,
+        19.75,
+        9.7604
+      ],
+      "light_emission": 15,
+      "faces": {
+        "down": {
+          "uv": [
+            4,
+            6,
+            7.5,
+            7
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "up": {
+          "uv": [
+            4,
+            6,
+            7.5,
+            7
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "north": {
+          "uv": [
+            4,
+            6,
+            7.5,
+            6.75
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "south": {
+          "uv": [
+            4,
+            6,
+            7.5,
+            6.75
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "west": {
+          "uv": [
+            4,
+            6,
+            7.5,
+            6.75
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "east": {
+          "uv": [
+            4,
+            6,
+            7.5,
+            6.75
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        }
+      }
+    },
+    {
+      "name": "halo",
+      "from": [
+        3.2344,
+        19,
+        4.4948
+      ],
+      "to": [
+        6.7552,
+        19.75,
+        5.4948
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          4.9948,
+          19.4,
+          4.9948
+        ]
+      },
+      "light_emission": 15,
+      "faces": {
+        "down": {
+          "uv": [
+            12,
+            6,
+            15.5,
+            7
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "up": {
+          "uv": [
+            12,
+            6,
+            15.5,
+            7
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "north": {
+          "uv": [
+            12,
+            6,
+            15.5,
+            6.75
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "south": {
+          "uv": [
+            12,
+            6,
+            15.5,
+            6.75
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "west": {
+          "uv": [
+            12,
+            6,
+            15.5,
+            6.75
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "east": {
+          "uv": [
+            12,
+            6,
+            15.5,
+            6.75
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        }
+      }
+    },
+    {
+      "name": "halo",
+      "from": [
+        9.2448,
+        19,
+        4.4948
+      ],
+      "to": [
+        12.7656,
+        19.75,
+        5.4948
+      ],
+      "rotation": {
+        "angle": -45,
+        "axis": "y",
+        "origin": [
+          11.0052,
+          19.4,
+          4.9948
+        ]
+      },
+      "light_emission": 15,
+      "faces": {
+        "down": {
+          "uv": [
+            2,
+            6,
+            5.5,
+            7
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "up": {
+          "uv": [
+            2,
+            6,
+            5.5,
+            7
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "north": {
+          "uv": [
+            2,
+            6,
+            5.5,
+            6.75
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "south": {
+          "uv": [
+            2,
+            6,
+            5.5,
+            6.75
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "west": {
+          "uv": [
+            2,
+            6,
+            5.5,
+            6.75
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "east": {
+          "uv": [
+            2,
+            6,
+            5.5,
+            6.75
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        }
+      }
+    },
+    {
+      "name": "halo",
+      "from": [
+        3.2344,
+        19,
+        10.5052
+      ],
+      "to": [
+        6.7552,
+        19.75,
+        11.5052
+      ],
+      "rotation": {
+        "angle": -45,
+        "axis": "y",
+        "origin": [
+          4.9948,
+          19.4,
+          11.0052
+        ]
+      },
+      "light_emission": 15,
+      "faces": {
+        "down": {
+          "uv": [
+            10,
+            6,
+            13.5,
+            7
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "up": {
+          "uv": [
+            10,
+            6,
+            13.5,
+            7
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "north": {
+          "uv": [
+            10,
+            6,
+            13.5,
+            6.75
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "south": {
+          "uv": [
+            10,
+            6,
+            13.5,
+            6.75
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "west": {
+          "uv": [
+            10,
+            6,
+            13.5,
+            6.75
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "east": {
+          "uv": [
+            10,
+            6,
+            13.5,
+            6.75
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        }
+      }
+    },
+    {
+      "name": "halo",
+      "from": [
+        9.2448,
+        19,
+        10.5052
+      ],
+      "to": [
+        12.7656,
+        19.75,
+        11.5052
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          11.0052,
+          19.4,
+          11.0052
+        ]
+      },
+      "light_emission": 15,
+      "faces": {
+        "down": {
+          "uv": [
+            6,
+            6,
+            9.5,
+            7
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "up": {
+          "uv": [
+            6,
+            6,
+            9.5,
+            7
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "north": {
+          "uv": [
+            6,
+            6,
+            9.5,
+            6.75
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "south": {
+          "uv": [
+            6,
+            6,
+            9.5,
+            6.75
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "west": {
+          "uv": [
+            6,
+            6,
+            9.5,
+            6.75
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "east": {
+          "uv": [
+            6,
+            6,
+            9.5,
+            6.75
+          ],
+          "texture": "#halo",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        }
+      }
+    }
+  ]
+}

@@ -29,7 +29,7 @@ import net.minecraft.world.phys.shapes.Shapes;
  * Star Gate pedestal. Place a Dragon Head on it, then present the Imperial Seal: the 3x3 gate floor
  * five blocks in front of the pedestal (one block lower) becomes a Star Portal.
  */
-public class StarGatePedestalBlock extends FacingBlock {
+public class StarGatePedestalBlock extends FacingBlock implements net.minecraft.world.level.block.EntityBlock {
     public static final BooleanProperty HEAD = BooleanProperty.create("head");
 
     public StarGatePedestalBlock(Properties props) {
@@ -81,5 +81,10 @@ public class StarGatePedestalBlock extends FacingBlock {
         Component msg = Component.translatable("message.celestialascent.gate_open").withColor(0xFFFFFF);
         for (Player p : sl.getEntitiesOfClass(Player.class, new AABB(pos).inflate(48))) p.sendSystemMessage(msg);
         return ItemInteractionResult.CONSUME;
+    }
+
+    @Override
+    public net.minecraft.world.level.block.entity.BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new com.celestialascent.core.DisplayBlockEntity(pos, state); // draws the floating dragon head
     }
 }

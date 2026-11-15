@@ -101,6 +101,10 @@ public class RecipeGen extends RecipeProvider {
                 .define('P', ItemTags.PLANKS).define('B', Items.BOOK)
                 .unlockedBy("has_book", has(Items.BOOK)).save(out);
 
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, com.celestialascent.guide.Guide.CODEX.get())
+                .requires(Items.BOOK).requires(Items.AMETHYST_SHARD)
+                .unlockedBy("has_book", has(Items.BOOK)).save(out);
+
         sigil(out, Element.FROST, Items.BLUE_ICE, Items.DIAMOND);
         sigil(out, Element.TIDE, Items.PRISMARINE_SHARD, Items.NAUTILUS_SHELL);
         sigil(out, Element.STORM, Items.LIGHTNING_ROD, Items.AMETHYST_SHARD);

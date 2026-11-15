@@ -1,0 +1,169 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "celestialascent:block/relic_pedestal_slab",
+    "slab": "celestialascent:block/relic_pedestal_slab",
+    "top": "celestialascent:block/relic_pedestal_top",
+    "column": "celestialascent:block/relic_pedestal_column",
+    "crystal": "celestialascent:block/relic_pedestal_crystal"
+  },
+  "ambientocclusion": false,
+  "elements": [
+    {
+      "name": "crystal_spire",
+      "from": [
+        7,
+        15,
+        7
+      ],
+      "to": [
+        9,
+        20,
+        9
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          8,
+          17,
+          8
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            12,
+            14,
+            14,
+            16
+          ],
+          "texture": "#crystal"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            2,
+            2
+          ],
+          "texture": "#crystal"
+        },
+        "north": {
+          "uv": [
+            4,
+            0,
+            6,
+            16
+          ],
+          "texture": "#crystal"
+        },
+        "south": {
+          "uv": [
+            12,
+            0,
+            14,
+            16
+          ],
+          "texture": "#crystal"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            2,
+            16
+          ],
+          "texture": "#crystal"
+        },
+        "east": {
+          "uv": [
+            8,
+            0,
+            10,
+            16
+          ],
+          "texture": "#crystal"
+        }
+      }
+    },
+    {
+      "name": "crystal_shard",
+      "from": [
+        8.6,
+        15.2,
+        7.3
+      ],
+      "to": [
+        10,
+        18.4,
+        8.7
+      ],
+      "rotation": {
+        "angle": -22.5,
+        "axis": "z",
+        "origin": [
+          9.3,
+          15.2,
+          8
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            12,
+            14,
+            13.4,
+            15.4
+          ],
+          "texture": "#crystal"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1.4,
+            1.4
+          ],
+          "texture": "#crystal"
+        },
+        "north": {
+          "uv": [
+            4,
+            3,
+            5.4,
+            13
+          ],
+          "texture": "#crystal"
+        },
+        "south": {
+          "uv": [
+            12,
+            3,
+            13.4,
+            13
+          ],
+          "texture": "#crystal"
+        },
+        "west": {
+          "uv": [
+            0,
+            3,
+            1.4,
+            13
+          ],
+          "texture": "#crystal"
+        },
+        "east": {
+          "uv": [
+            8,
+            3,
+            9.4,
+            13
+          ],
+          "texture": "#crystal"
+        }
+      }
+    }
+  ]
+}

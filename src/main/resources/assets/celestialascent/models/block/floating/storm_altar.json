@@ -1,0 +1,521 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "celestialascent:block/storm_altar_pillar",
+    "base": "celestialascent:block/storm_altar_base",
+    "pillar": "celestialascent:block/storm_altar_pillar",
+    "dish": "celestialascent:block/storm_altar_dish",
+    "inner": "celestialascent:block/storm_altar_inner",
+    "crystal": "celestialascent:block/storm_altar_crystal",
+    "copper": "celestialascent:block/storm_altar_copper"
+  },
+  "ambientocclusion": false,
+  "elements": [
+    {
+      "name": "spark_spire",
+      "from": [
+        6.75,
+        16,
+        6.75
+      ],
+      "to": [
+        9.25,
+        22.5,
+        9.25
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          8,
+          19,
+          8
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            12,
+            13,
+            14.5,
+            15.5
+          ],
+          "texture": "#crystal"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            2.5,
+            2.5
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "north": {
+          "uv": [
+            4,
+            0,
+            6.5,
+            16
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "south": {
+          "uv": [
+            12,
+            0,
+            14.5,
+            16
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            2.5,
+            16
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "east": {
+          "uv": [
+            8,
+            0,
+            10.5,
+            16
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        }
+      }
+    },
+    {
+      "name": "spark",
+      "from": [
+        4.3,
+        19,
+        7.5
+      ],
+      "to": [
+        5.3,
+        20,
+        8.5
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "z",
+        "origin": [
+          4.8,
+          19.5,
+          8
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            1,
+            1,
+            2,
+            2
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "up": {
+          "uv": [
+            1,
+            1,
+            2,
+            2
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "north": {
+          "uv": [
+            1,
+            1,
+            2,
+            2
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "south": {
+          "uv": [
+            1,
+            1,
+            2,
+            2
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "west": {
+          "uv": [
+            1,
+            1,
+            2,
+            2
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "east": {
+          "uv": [
+            1,
+            1,
+            2,
+            2
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        }
+      }
+    },
+    {
+      "name": "spark",
+      "from": [
+        10.7,
+        17,
+        7
+      ],
+      "to": [
+        11.7,
+        18,
+        8
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "z",
+        "origin": [
+          11.2,
+          17.5,
+          7.5
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            1,
+            1,
+            2,
+            2
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "up": {
+          "uv": [
+            1,
+            1,
+            2,
+            2
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "north": {
+          "uv": [
+            1,
+            1,
+            2,
+            2
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "south": {
+          "uv": [
+            1,
+            1,
+            2,
+            2
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "west": {
+          "uv": [
+            1,
+            1,
+            2,
+            2
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "east": {
+          "uv": [
+            1,
+            1,
+            2,
+            2
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        }
+      }
+    },
+    {
+      "name": "spark",
+      "from": [
+        8,
+        21.5,
+        4.3
+      ],
+      "to": [
+        9,
+        22.5,
+        5.3
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "z",
+        "origin": [
+          8.5,
+          22,
+          4.8
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            1,
+            1,
+            2,
+            2
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "up": {
+          "uv": [
+            1,
+            1,
+            2,
+            2
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "north": {
+          "uv": [
+            1,
+            1,
+            2,
+            2
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "south": {
+          "uv": [
+            1,
+            1,
+            2,
+            2
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "west": {
+          "uv": [
+            1,
+            1,
+            2,
+            2
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "east": {
+          "uv": [
+            1,
+            1,
+            2,
+            2
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        }
+      }
+    },
+    {
+      "name": "spark",
+      "from": [
+        7,
+        17.5,
+        10.9
+      ],
+      "to": [
+        8,
+        18.5,
+        11.9
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "z",
+        "origin": [
+          7.5,
+          18,
+          11.4
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            1,
+            1,
+            2,
+            2
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "up": {
+          "uv": [
+            1,
+            1,
+            2,
+            2
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "north": {
+          "uv": [
+            1,
+            1,
+            2,
+            2
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "south": {
+          "uv": [
+            1,
+            1,
+            2,
+            2
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "west": {
+          "uv": [
+            1,
+            1,
+            2,
+            2
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "east": {
+          "uv": [
+            1,
+            1,
+            2,
+            2
+          ],
+          "texture": "#crystal",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        }
+      }
+    }
+  ]
+}

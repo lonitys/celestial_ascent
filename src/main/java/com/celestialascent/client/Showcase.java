@@ -128,6 +128,24 @@ public final class Showcase {
         }, "blocks", 0, 20, CameraType.FIRST_PERSON));
         step(30, "blocks_2", 0, 20, "tp @s 8 202.2 1 0 20");
         step(30, "blocks_3", 0, 25, "tp @s 0 202.6 4 0 25");
+        // Floating tops: every animated block in a row, a restored pylon, the gate pedestal with its head, a station with an item
+        STEPS.add(new Step(60, p -> {
+            cmd(p, CLEAR);
+            cmd(p, "fill -12 199 0 12 199 12 minecraft:smooth_stone");
+            cmd(p, "fill -12 200 0 12 210 12 minecraft:air");
+            String[] row = {"frost_altar", "tide_altar", "storm_altar", "magma_altar", "seraph_altar", "leviathan_altar", "herald_altar"};
+            for (int i = 0; i < row.length; i++) cmd(p, "setblock " + (-9 + i * 3) + " 200 8 celestialascent:" + row[i] + "[facing=south]");
+            String[] row2 = {"relic_pedestal[facing=south]", "imperial_pylon[restored=true]", "star_gate_pedestal[facing=south,head=true]",
+                    "sky_altar[facing=south]", "void_infuser[facing=south]", "ascension_altar[facing=south]"};
+            for (int i = 0; i < row2.length; i++) cmd(p, "setblock " + (-8 + i * 3) + " 200 4 celestialascent:" + row2[i]);
+            if (p.serverLevel().getBlockEntity(new BlockPos(1, 200, 4)) instanceof com.celestialascent.core.station.StationBlockEntity st) {
+                st.items.setItem(0, new net.minecraft.world.item.ItemStack(com.celestialascent.empire.Empire.CHESTPLATE.get()));
+            }
+            cmd(p, "time set 6000");
+            cmd(p, "tp @s 0 203 -4 0 22");
+        }, "floating", 0, 22, CameraType.FIRST_PERSON));
+        step(13, "floating_later", 0, 22, "tp @s 0 203 -4 0 22");
+        step(30, "floating_close", 0, 25, "tp @s -3 201.8 1.5 0 25");
         // GUIs
         String[][] guis = {{"bank_counter", "gui_bank"}, {"shop_stall", "gui_shop"}, {"titan_forge", "gui_titan_forge"},
                 {"quest_board", "gui_quest_board"}, {"imperial_forge", "gui_imperial_forge"}, {"sky_altar", "gui_sky_altar"},
@@ -145,6 +163,14 @@ public final class Showcase {
             }, g[1], 0, 30, CameraType.FIRST_PERSON));
         }
         STEPS.add(new Step(10, ServerPlayer::closeContainer, null, 0, 0, CameraType.FIRST_PERSON));
+        // The codex: front page at two stages of progress, then one spread per chapter section
+        codex("codex_front", List.of("celestialascent:frost_titan", "celestialascent:tide_titan"), null, null);
+        codex("codex_front_late", Constellations.ALL.stream().map(c -> c.boss().toString()).toList(), null, null);
+        String[][] spreads = {{"intro", null}, {"economy", null}, {"titans", "titans"}, {"titans", "titan_armor"}, {"dragon", null},
+                {"empire", "empire"}, {"empire", "imperial_armor"}, {"stargate", null}, {"stars", "celestials"}, {"stars", "stellar_armor"},
+                {"abyss", "abyss"}, {"abyss", "void_armor"}, {"ascendant", null}, {"constellations", null}, {"projecte", null}};
+        for (String[] sp : spreads) codex("codex_" + sp[0] + (sp[1] == null ? "" : "_" + sp[1]), null, sp[0], sp[1]);
+        STEPS.add(new Step(10, p -> Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(null)), null, 0, 0, CameraType.FIRST_PERSON));
         // Constellations
         STEPS.add(new Step(80, p -> {
             for (var c : Constellations.ALL) Progress.recordKill(p, c.boss());
@@ -172,6 +198,18 @@ public final class Showcase {
         step(300, "magma_shrine_view", 0, 15, "execute in minecraft:the_nether run tp @s -336 40 176 0 15");
         step(300, "ruined_capital", 0, 35, "execute in minecraft:the_end run tp @s -1316 85 60 0 35");
         step(300, "star_gate", 0, 35, "execute in minecraft:the_end run tp @s -1052 75 -725 0 35");
+    }
+
+    /** Opens the codex on the client; {@code kills} (if given) replaces the player's progress first. */
+    private static void codex(String shot, List<String> kills, String chapter, String anchor) {
+        STEPS.add(new Step(25, p -> {
+            // No closeContainer() here: its packet can arrive after the screen opens and close it again.
+            if (kills != null) {
+                p.setData(Progress.TYPE, new Progress(kills.stream().map(net.minecraft.resources.ResourceLocation::parse).toList()));
+                Progress.sync(p);
+            }
+            Minecraft.getInstance().execute(() -> GuideScreen.open(chapter, anchor));
+        }, shot, 0, 30, CameraType.FIRST_PERSON));
     }
 
     @SubscribeEvent
