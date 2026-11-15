@@ -58,6 +58,23 @@ public class EntityLootGen extends EntityLootSubProvider {
                 .withPool(looted(com.celestialascent.empire.Empire.IMPERIAL_PLATING, 4, 8))
                 .withPool(fixed(Economy.coin(CoinTier.ENDER), 1, 2))
                 .withPool(fixed(Economy.coin(CoinTier.TITAN), 3, 6)));
+        for (var type : java.util.List.of(com.celestialascent.stars.Stars.SERAPH.get(), com.celestialascent.stars.Stars.LEVIATHAN.get(), com.celestialascent.stars.Stars.HERALD.get())) {
+            add(type, LootTable.lootTable()
+                    .withPool(fixed(com.celestialascent.stars.Stars.DORMANT_STAR_CORE, 1, 1))
+                    .withPool(looted(com.celestialascent.stars.Stars.STARDUST, 8, 16))
+                    .withPool(fixed(Economy.coin(CoinTier.STAR), 1, 1))
+                    .withPool(fixed(Economy.coin(CoinTier.ENDER), 2, 4)));
+        }
+        add(com.celestialascent.abyss.Abyss.VOID_SOVEREIGN.get(), LootTable.lootTable()
+                .withPool(fixed(com.celestialascent.abyss.Abyss.VOID_HEART, 1, 1))
+                .withPool(looted(com.celestialascent.abyss.Abyss.VOID_ESSENCE, 12, 24))
+                .withPool(fixed(Economy.coin(CoinTier.VOID), 1, 2))
+                .withPool(fixed(Economy.coin(CoinTier.STAR), 3, 6)));
+        add(com.celestialascent.abyss.Abyss.VOID_WRAITH.get(), LootTable.lootTable()
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1))
+                        .add(LootItem.lootTableItem(com.celestialascent.abyss.Abyss.VOID_ESSENCE)
+                                .when(net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition.randomChance(0.2f))
+                                .apply(EnchantedCountIncreaseFunction.lootingMultiplier(registries, UniformGenerator.between(0, 1))))));
     }
 
     @Override

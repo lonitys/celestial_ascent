@@ -120,7 +120,7 @@ def frost():
         if b.get(x, fy + 1, z) is None or b.palette[b.get(x, fy + 1, z)]['Name'] == 'minecraft:air':
             for y in range(fy + 1, fy + 1 + rnd.randint(1, 3)):
                 b.set(x, y, z, 'ice')
-    dais(b, fy, 'deepslate_tile_stairs' if False else 'polished_deepslate', 'blue_ice', 'frost_altar')
+    dais(b, fy, 'polished_deepslate', 'blue_ice', 'frost_altar')
     for (x, z) in ((C - 2, C - 2), (C + 2, C - 2), (C - 2, C + 2), (C + 2, C + 2)):
         b.set(x, fy + 3, z, 'soul_lantern')
     return b, fy
@@ -152,7 +152,7 @@ def tide():
     pil = pillars(b, fy, 8, 12, lambda i, r: 4 + r.randint(0, 4),
                   lambda i, y: 'prismarine' if y % 4 else 'dark_prismarine', 'sea_lantern', 'prismarine_bricks', rnd)
     for (px, top, pz, h) in pil:
-        b.set(px, top + 1, pz, 'conduit') if rnd.random() < 0.25 else b.set(px, top + 1, pz, 'lantern')
+        b.set(px, top + 1, pz, 'lantern')
     dais(b, fy, 'dark_prismarine', 'prismarine_bricks', 'tide_altar')
     for (x, z) in ((C - 3, C), (C + 3, C), (C, C - 3), (C, C + 3)):
         b.set(x, fy + 2, z, 'sea_lantern')

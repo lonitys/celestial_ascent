@@ -89,7 +89,9 @@ public final class ArmorSets {
             syncBonuses(p, set);
             if (set == null) WORN.remove(p.getUUID());
             else WORN.put(p.getUUID(), set);
-            if (set == null) {
+            // Losing creative flight mid-air: stop flying (the attribute alone does not do this).
+            if (!p.isCreative() && !p.isSpectator() && !p.mayFly() && p.getAbilities().flying) {
+                p.getAbilities().flying = false;
                 p.onUpdateAbilities();
             }
         }

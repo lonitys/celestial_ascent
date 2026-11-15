@@ -57,6 +57,46 @@ public class RecipeGen extends RecipeProvider {
                 .define('F', Items.BLAST_FURNACE).define('O', Items.OBSIDIAN)
                 .unlockedBy("has_shard", has(Titans.TITAN_SHARD)).save(out);
 
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, com.celestialascent.stars.Stars.STAR_COMPASS.get())
+                .pattern("EHE").pattern("ECE").pattern(" E ")
+                .define('E', Items.ENDER_EYE).define('H', com.celestialascent.empire.Empire.DRAGON_HEART).define('C', Items.COMPASS)
+                .unlockedBy("has_heart", has(com.celestialascent.empire.Empire.DRAGON_HEART)).save(out);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, com.celestialascent.empire.Empire.IMPERIAL_FORGE.get())
+                .pattern("PGP").pattern("GFG").pattern("OOO")
+                .define('P', com.celestialascent.empire.Empire.IMPERIAL_PLATING).define('G', com.celestialascent.empire.Empire.ENDER_GEAR)
+                .define('F', Titans.TITAN_FORGE.get()).define('O', Items.OBSIDIAN)
+                .unlockedBy("has_plating", has(com.celestialascent.empire.Empire.IMPERIAL_PLATING)).save(out);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, com.celestialascent.stars.Stars.SKY_ALTAR.get())
+                .pattern("ASA").pattern("SBS").pattern("OOO")
+                .define('A', Items.AMETHYST_BLOCK).define('S', com.celestialascent.stars.Stars.STARDUST).define('B', Items.BEACON).define('O', Items.OBSIDIAN)
+                .unlockedBy("has_stardust", has(com.celestialascent.stars.Stars.STARDUST)).save(out);
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, com.celestialascent.stars.Stars.STARSTONE_BRICKS.get(), 4)
+                .pattern("SS").pattern("SS").define('S', com.celestialascent.stars.Stars.STARSTONE.get())
+                .unlockedBy("has_starstone", has(com.celestialascent.stars.Stars.STARSTONE.get())).save(out);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, com.celestialascent.abyss.Abyss.VOID_INFUSER.get())
+                .pattern("VEV").pattern("ECE").pattern("OOO")
+                .define('V', com.celestialascent.abyss.Abyss.VOID_ESSENCE).define('E', Items.ECHO_SHARD).define('C', Items.SCULK_CATALYST)
+                .define('O', Items.CRYING_OBSIDIAN)
+                .unlockedBy("has_essence", has(com.celestialascent.abyss.Abyss.VOID_ESSENCE)).save(out);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, com.celestialascent.abyss.Abyss.PRIMORDIAL_CORE.get(), 2)
+                .pattern("FVT").pattern("VCV").pattern("SVM")
+                .define('F', Titans.CORES.get(Element.FROST)).define('T', Titans.CORES.get(Element.TIDE))
+                .define('S', Titans.CORES.get(Element.STORM)).define('M', Titans.CORES.get(Element.MAGMA))
+                .define('V', com.celestialascent.abyss.Abyss.VOID_ESSENCE).define('C', com.celestialascent.empire.Empire.COLOSSUS_CORE)
+                .unlockedBy("has_essence", has(com.celestialascent.abyss.Abyss.VOID_ESSENCE)).save(out);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, com.celestialascent.abyss.Abyss.ABYSSAL_BEACON.get())
+                .pattern("VSV").pattern("SNS").pattern("VSV")
+                .define('V', com.celestialascent.abyss.Abyss.VOID_ESSENCE).define('S', com.celestialascent.stars.Stars.STARDUST).define('N', Items.NETHER_STAR)
+                .unlockedBy("has_essence", has(com.celestialascent.abyss.Abyss.VOID_ESSENCE)).save(out);
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, com.celestialascent.abyss.Abyss.ASCENSION_PEARL.get(), 2)
+                .requires(Items.ENDER_PEARL).requires(com.celestialascent.abyss.Abyss.VOID_ESSENCE).requires(com.celestialascent.stars.Stars.STARDUST)
+                .unlockedBy("has_essence", has(com.celestialascent.abyss.Abyss.VOID_ESSENCE)).save(out);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, com.celestialascent.abyss.Abyss.ASCENSION_ALTAR.get())
+                .pattern("OSO").pattern("NIN").pattern("OSO")
+                .define('O', Items.CRYING_OBSIDIAN).define('S', com.celestialascent.stars.Stars.STAR_CORE).define('N', Items.NETHERITE_BLOCK)
+                .define('I', com.celestialascent.empire.Empire.IMPERIAL_SEAL)
+                .unlockedBy("has_heart", has(com.celestialascent.abyss.Abyss.VOID_HEART)).save(out);
+
         sigil(out, Element.FROST, Items.BLUE_ICE, Items.DIAMOND);
         sigil(out, Element.TIDE, Items.PRISMARINE_SHARD, Items.NAUTILUS_SHELL);
         sigil(out, Element.STORM, Items.LIGHTNING_ROD, Items.AMETHYST_SHARD);

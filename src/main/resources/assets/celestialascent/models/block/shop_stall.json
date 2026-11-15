@@ -1,0 +1,221 @@
+{
+  "parent": "block/block",
+  "textures": {
+    "particle": "celestialascent:block/shop_stall_front",
+    "top": "celestialascent:block/shop_stall_top",
+    "front": "celestialascent:block/shop_stall_front",
+    "side": "celestialascent:block/shop_stall_side",
+    "back": "celestialascent:block/shop_stall_back",
+    "board": "celestialascent:block/shop_stall_board",
+    "awning": "celestialascent:block/shop_stall_awning"
+  },
+  "elements": [
+    {
+      "name": "counter",
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        12,
+        16
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            4,
+            16,
+            8
+          ],
+          "texture": "#board"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#top"
+        },
+        "north": {
+          "uv": [
+            0,
+            4,
+            16,
+            16
+          ],
+          "texture": "#front"
+        },
+        "south": {
+          "uv": [
+            0,
+            4,
+            16,
+            16
+          ],
+          "texture": "#back"
+        },
+        "west": {
+          "uv": [
+            0,
+            4,
+            16,
+            16
+          ],
+          "texture": "#side"
+        },
+        "east": {
+          "uv": [
+            0,
+            4,
+            16,
+            16
+          ],
+          "texture": "#side"
+        }
+      }
+    },
+    {
+      "name": "back_board",
+      "from": [
+        0,
+        12,
+        12
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "up": {
+          "uv": [
+            0,
+            4,
+            16,
+            8
+          ],
+          "texture": "#board"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ],
+          "texture": "#board"
+        },
+        "south": {
+          "uv": [
+            0,
+            4,
+            16,
+            8
+          ],
+          "texture": "#board"
+        },
+        "west": {
+          "uv": [
+            0,
+            8,
+            4,
+            12
+          ],
+          "texture": "#board"
+        },
+        "east": {
+          "uv": [
+            12,
+            8,
+            16,
+            12
+          ],
+          "texture": "#board"
+        }
+      }
+    },
+    {
+      "name": "awning",
+      "from": [
+        0,
+        16,
+        10.5
+      ],
+      "to": [
+        16,
+        17,
+        16
+      ],
+      "rotation": {
+        "angle": -22.5,
+        "axis": "x",
+        "origin": [
+          8,
+          16,
+          16
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            8,
+            16,
+            13.5
+          ],
+          "texture": "#awning"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            5.5
+          ],
+          "texture": "#awning"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            1
+          ],
+          "texture": "#awning"
+        },
+        "south": {
+          "uv": [
+            0,
+            8,
+            16,
+            9
+          ],
+          "texture": "#awning"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            5.5,
+            1
+          ],
+          "texture": "#awning"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            5.5,
+            1
+          ],
+          "texture": "#awning"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,357 @@
+{
+  "parent": "block/block",
+  "textures": {
+    "particle": "celestialascent:block/relic_pedestal_slab",
+    "slab": "celestialascent:block/relic_pedestal_slab",
+    "top": "celestialascent:block/relic_pedestal_top",
+    "column": "celestialascent:block/relic_pedestal_column",
+    "crystal": "celestialascent:block/relic_pedestal_crystal"
+  },
+  "elements": [
+    {
+      "name": "base",
+      "from": [
+        2,
+        0,
+        2
+      ],
+      "to": [
+        14,
+        3,
+        14
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            2,
+            2,
+            14,
+            14
+          ],
+          "texture": "#slab"
+        },
+        "up": {
+          "uv": [
+            2,
+            4,
+            14,
+            12
+          ],
+          "texture": "#slab"
+        },
+        "north": {
+          "uv": [
+            2,
+            13,
+            14,
+            16
+          ],
+          "texture": "#slab"
+        },
+        "south": {
+          "uv": [
+            2,
+            13,
+            14,
+            16
+          ],
+          "texture": "#slab"
+        },
+        "west": {
+          "uv": [
+            2,
+            13,
+            14,
+            16
+          ],
+          "texture": "#slab"
+        },
+        "east": {
+          "uv": [
+            2,
+            13,
+            14,
+            16
+          ],
+          "texture": "#slab"
+        }
+      }
+    },
+    {
+      "name": "column",
+      "from": [
+        4,
+        3,
+        4
+      ],
+      "to": [
+        12,
+        12,
+        12
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            4,
+            12,
+            13
+          ],
+          "texture": "#column"
+        },
+        "south": {
+          "uv": [
+            4,
+            4,
+            12,
+            13
+          ],
+          "texture": "#column"
+        },
+        "west": {
+          "uv": [
+            4,
+            4,
+            12,
+            13
+          ],
+          "texture": "#column"
+        },
+        "east": {
+          "uv": [
+            4,
+            4,
+            12,
+            13
+          ],
+          "texture": "#column"
+        }
+      }
+    },
+    {
+      "name": "top",
+      "from": [
+        2,
+        12,
+        2
+      ],
+      "to": [
+        14,
+        14,
+        14
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            2,
+            4,
+            14,
+            12
+          ],
+          "texture": "#slab"
+        },
+        "up": {
+          "uv": [
+            2,
+            2,
+            14,
+            14
+          ],
+          "texture": "#top"
+        },
+        "north": {
+          "uv": [
+            2,
+            2,
+            14,
+            4
+          ],
+          "texture": "#slab"
+        },
+        "south": {
+          "uv": [
+            2,
+            2,
+            14,
+            4
+          ],
+          "texture": "#slab"
+        },
+        "west": {
+          "uv": [
+            2,
+            2,
+            14,
+            4
+          ],
+          "texture": "#slab"
+        },
+        "east": {
+          "uv": [
+            2,
+            2,
+            14,
+            4
+          ],
+          "texture": "#slab"
+        }
+      }
+    },
+    {
+      "name": "crystal_spire",
+      "from": [
+        7,
+        15,
+        7
+      ],
+      "to": [
+        9,
+        20,
+        9
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          8,
+          17,
+          8
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            12,
+            14,
+            14,
+            16
+          ],
+          "texture": "#crystal"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            2,
+            2
+          ],
+          "texture": "#crystal"
+        },
+        "north": {
+          "uv": [
+            4,
+            0,
+            6,
+            16
+          ],
+          "texture": "#crystal"
+        },
+        "south": {
+          "uv": [
+            12,
+            0,
+            14,
+            16
+          ],
+          "texture": "#crystal"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            2,
+            16
+          ],
+          "texture": "#crystal"
+        },
+        "east": {
+          "uv": [
+            8,
+            0,
+            10,
+            16
+          ],
+          "texture": "#crystal"
+        }
+      }
+    },
+    {
+      "name": "crystal_shard",
+      "from": [
+        8.6,
+        15.2,
+        7.3
+      ],
+      "to": [
+        10,
+        18.4,
+        8.7
+      ],
+      "rotation": {
+        "angle": -22.5,
+        "axis": "z",
+        "origin": [
+          9.3,
+          15.2,
+          8
+        ]
+      },
+      "faces": {
+        "down": {
+          "uv": [
+            12,
+            14,
+            13.4,
+            15.4
+          ],
+          "texture": "#crystal"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1.4,
+            1.4
+          ],
+          "texture": "#crystal"
+        },
+        "north": {
+          "uv": [
+            4,
+            3,
+            5.4,
+            13
+          ],
+          "texture": "#crystal"
+        },
+        "south": {
+          "uv": [
+            12,
+            3,
+            13.4,
+            13
+          ],
+          "texture": "#crystal"
+        },
+        "west": {
+          "uv": [
+            0,
+            3,
+            1.4,
+            13
+          ],
+          "texture": "#crystal"
+        },
+        "east": {
+          "uv": [
+            8,
+            3,
+            9.4,
+            13
+          ],
+          "texture": "#crystal"
+        }
+      }
+    }
+  ]
+}

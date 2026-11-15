@@ -258,6 +258,11 @@ def _u32(a):
 
 
 def hash3(ix, iy, iz, seed=0):
+    with np.errstate(over="ignore"):
+        return _hash3(np.atleast_1d(ix), np.atleast_1d(iy), np.atleast_1d(iz), seed)
+
+
+def _hash3(ix, iy, iz, seed=0):
     h = _u32(ix) * np.uint32(0x8DA6B343) ^ _u32(iy) * np.uint32(0xD8163841) ^ _u32(iz) * np.uint32(0xCB1AB31F)
     h = h ^ np.uint32((seed * 0x9E3779B1) & 0xFFFFFFFF)
     h ^= h >> np.uint32(15)

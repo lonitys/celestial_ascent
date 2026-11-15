@@ -1,0 +1,11 @@
+{
+  "type": "celestialascent:abyss",
+  "generator": {
+    "type": "minecraft:noise",
+    "settings": "celestialascent:abyss",
+    "biome_source": {
+      "type": "minecraft:fixed",
+      "biome": "celestialascent:abyss"
+    }
+  }
+}

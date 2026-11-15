@@ -1,0 +1,11 @@
+{
+  "type": "celestialascent:fallen_stars",
+  "generator": {
+    "type": "minecraft:noise",
+    "settings": "celestialascent:fallen_stars",
+    "biome_source": {
+      "type": "minecraft:fixed",
+      "biome": "celestialascent:fallen_stars"
+    }
+  }
+}

@@ -20,6 +20,8 @@ public final class CelestialAscent {
         com.celestialascent.economy.Economy.init();
         com.celestialascent.titans.Titans.init();
         com.celestialascent.empire.Empire.init();
+        com.celestialascent.stars.Stars.init();
+        com.celestialascent.abyss.Abyss.init();
         CAReg.register(modBus);
     }
 }
