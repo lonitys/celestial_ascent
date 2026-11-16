@@ -21,6 +21,7 @@ public final class DebugCommands {
 
     @SubscribeEvent
     public static void register(RegisterCommandsEvent e) {
+        if (net.neoforged.fml.loading.FMLEnvironment.production) return; // worldgen checks for development only
         e.getDispatcher().register(Commands.literal("celestialascent").requires(s -> s.hasPermission(2))
                 .then(Commands.literal("gen").then(Commands.argument("structure", net.minecraft.commands.arguments.ResourceLocationArgument.id()).executes(ctx -> {
                     var src = ctx.getSource();

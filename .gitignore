@@ -42,3 +42,4 @@ run-data/
 tools/art/__pycache__/
 *.pyc
 dist/
+release/curseforge/*.jar

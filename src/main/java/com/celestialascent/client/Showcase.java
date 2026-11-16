@@ -93,7 +93,7 @@ public final class Showcase {
         step(40, null, 0, 0, "time set 6000", "weather clear", "gamerule doDaylightCycle false",
                 "gamerule doMobSpawning false", "gamerule doWeatherCycle false", "gamerule sendCommandFeedback false",
                 "gamerule doEntityDrops false", "gamerule doMobLoot false",
-                "fill -24 200 -12 24 230 24 minecraft:air", stage, "tp @s 0 200 -8 0 0");
+                "fill -24 200 -12 24 212 24 minecraft:air", stage, "tp @s 0 200 -8 0 0");
         // Titans
         step(80, "titans", 0, 8, CLEAR, boss("frost_titan", -9, 200, 8), boss("tide_titan", -3, 200, 8),
                 boss("storm_titan", 3, 200, 8), boss("magma_titan", 9, 200, 8), "tp @s 0 202 -10 0 8");
@@ -115,9 +115,47 @@ public final class Showcase {
                     stagedStand(2.2, set[0], set[1], 3), "tp @s 0 201.3 -8.6 0 8");
             step(25, "armor_stages_" + set[0] + "_back", 180, 8, "tp @s 0 201.3 -1.4 180 8");
         }
+        // Gallery for the CurseForge page: clean platform, night (glow shows), no chat
+        step(60, "gallery_setup", 0, 0, "kill @e[type=!minecraft:player]", "fill -24 200 -12 24 212 24 minecraft:air",
+                "fill -24 199 -12 24 199 24 minecraft:polished_deepslate", "time set 18000", "tp @s 0 202 -8 0 0");
+        Object[][] trios = {{"astral_seraph", 6, 11, 202}, {"void_sovereign", 6, 12, 200}, {"frost_titan", 5, 10, 200}, {"sun_herald", 5, 10, 200},
+                {"ender_colossus", 6, 13, 200}};
+        for (Object[] t : trios) {
+            String id = (String) t[0];
+            int gap = (Integer) t[1], dist = (Integer) t[2], y = (Integer) t[3];
+            step(60, "gallery_" + id, 0, 4, CLEAR,
+                    "summon celestialascent:" + id + " " + gap + " " + y + " 4 {NoAI:1b,Rotation:[180f,0f],PersistenceRequired:1b,Phase:0}",
+                    "summon celestialascent:" + id + " 0 " + y + " 4 {NoAI:1b,Rotation:[180f,0f],PersistenceRequired:1b,Phase:1}",
+                    "summon celestialascent:" + id + " " + (-gap) + " " + y + " 4 {NoAI:1b,Rotation:[180f,0f],PersistenceRequired:1b,Phase:2}",
+                    "tp @s 0 " + (y + 2.5) + " " + (4 - dist) + " 0 4");
+        }
+        step(50, "gallery_armor_ascendant", 180, 6, CLEAR, stagedStand(-2.2, "ascendant", null, 1), stagedStand(0, "ascendant", null, 2),
+                stagedStand(2.2, "ascendant", null, 3), "tp @s 0 201.5 2.4 180 7");
+        step(30, "gallery_armor_titan", 0, 6, CLEAR, stagedStand(-2.2, "titan", "frost", 1), stagedStand(0, "titan", "frost", 2),
+                stagedStand(2.2, "titan", "frost", 3), "tp @s 0 201.5 -12.4 0 7");
+        STEPS.add(new Step(60, p -> {
+            cmd(p, CLEAR);
+            String[] row = {"frost_altar", "tide_altar", "storm_altar", "magma_altar", "seraph_altar", "leviathan_altar", "herald_altar"};
+            for (int i = 0; i < row.length; i++) cmd(p, "setblock " + (-9 + i * 3) + " 200 8 celestialascent:" + row[i] + "[facing=south]");
+            String[] row2 = {"relic_pedestal[facing=south]", "imperial_pylon[restored=true]", "star_gate_pedestal[facing=south,head=true]",
+                    "sky_altar[facing=south]", "void_infuser[facing=south]", "ascension_altar[facing=south]"};
+            for (int i = 0; i < row2.length; i++) cmd(p, "setblock " + (-8 + i * 3) + " 200 4 celestialascent:" + row2[i]);
+            if (p.serverLevel().getBlockEntity(new BlockPos(1, 200, 4)) instanceof com.celestialascent.core.station.StationBlockEntity st) {
+                st.items.setItem(0, new net.minecraft.world.item.ItemStack(com.celestialascent.abyss.Abyss.ASC_CHESTPLATE.get()));
+            }
+            cmd(p, "tp @s 0 203 -3 0 24");
+        }, "gallery_altars", 0, 24, CameraType.FIRST_PERSON));
+        step(90, "gallery_cleanup", 0, 0, "kill @e[type=!minecraft:player]", "fill -24 200 -12 24 212 24 minecraft:air",
+                "fill -24 199 -12 24 199 24 minecraft:smooth_quartz", "time set 6000");
+        STEPS.add(new Step(60, p -> {
+            cmd(p, "summon celestialascent:magma_titan 0 200 9 {Rotation:[180f,0f],PersistenceRequired:1b}");
+            cmd(p, "tp @s 0 202 -4 0 4");
+        }, "hud_gallery_bar", 0, 4, CameraType.FIRST_PERSON));
+        step(14, "hud_gallery_banner", 0, 4, "data merge entity @e[type=celestialascent:magma_titan,limit=1] {Health:340f}");
+        step(10, "gallery_end", 0, 0, "kill @e[type=!minecraft:player]");
         // HUD: the custom boss bar and the stage banner (a real stage change: the titan loses health)
         // Earlier shots leave bosses whose bars would fill the screen (named so it only runs with the HUD shots).
-        step(90, "hud_clear", 0, 0, "kill @e[type=!minecraft:player]", "fill -24 200 -12 24 230 24 minecraft:air");
+        step(90, "hud_clear", 0, 0, "kill @e[type=!minecraft:player]", "fill -24 200 -12 24 212 24 minecraft:air");
         STEPS.add(new Step(50, p -> {
             cmd(p, "summon celestialascent:frost_titan 0 200 10 {Rotation:[180f,0f],PersistenceRequired:1b}");
             cmd(p, "tp @s 0 202 -3 0 5");
@@ -160,7 +198,7 @@ public final class Showcase {
         // Every block on a shelf
         STEPS.add(new Step(60, p -> {
             cmd(p, CLEAR);
-            cmd(p, "fill -24 200 -12 24 230 24 minecraft:air");
+            cmd(p, "fill -24 200 -12 24 212 24 minecraft:air");
             int i = 0;
             for (var b : Content.BLOCKS) {
                 var id = BuiltInRegistries.BLOCK.getKey(b.get());
@@ -300,6 +338,8 @@ public final class Showcase {
         }
         Step step = s;
         mc.options.hideGui = step.shot() == null || !step.shot().startsWith("hud_"); // HUD shots keep the HUD
+        mc.options.chatVisibility().set(net.minecraft.world.entity.player.ChatVisiblity.HIDDEN); // no chat in screenshots
+        mc.options.fov().set(step.shot() != null && step.shot().startsWith("gallery_") ? 45 : 70); // gallery: tighter framing
         mc.options.setCameraType(step.camera());
         timer = step.ticks();
         MinecraftServer server = mc.getSingleplayerServer();

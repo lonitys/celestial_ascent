@@ -2,14 +2,14 @@
 
 An endgame ladder past netherite and the Ender Dragon: four Elemental Titans, the Lost Ender Empire, the Fallen Stars, the Abyss, and the Ascendant armor, which outclasses everything, including creative flight. Also adds an economy (Aster coins, banks, player shops, quest boards, growing villages, trade cities). ProjectE support is optional.
 
-**Minecraft 1.21.1 · NeoForge 21.1.219+ · requires GeckoLib 4.9+ · ProjectE optional**
+**Minecraft 1.21.1 · NeoForge 21.1.219+ · requires GeckoLib 4.9.3+ · ProjectE optional**
 
 ## Install
 
 1. Install NeoForge 21.1.219 or newer for Minecraft 1.21.1.
 2. Put these in `.minecraft/mods`:
    - `celestialascent-<version>.jar` (from `build/libs/` after `./gradlew build`)
-   - GeckoLib for NeoForge 1.21.1 (4.9 or newer)
+   - GeckoLib for NeoForge 1.21.1 (4.9.3 or newer)
    - optional: ProjectE for 1.21.1, which gives every Celestial item an EMC value and adds EMC armor repair
 
 ## The ladder

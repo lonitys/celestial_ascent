@@ -1,0 +1,85 @@
+# Gallery captions (title | description), in upload order
+
+01_astral_seraph.png
+  Title: Astral Seraph - three stages
+  Description: Every boss evolves twice. The Astral Seraph grows a second pair of wings, then a crown of wings and a crystal halo.
+
+02_void_sovereign.png
+  Title: Void Sovereign - three stages
+  Description: The final boss: a void crown in stage II, spectral arms and a ring of void shards in stage III.
+
+03_frost_titan.png
+  Title: Frost Titan - three stages
+  Description: An ice crown and icicle pauldrons, then glacier spires, a glowing core and ice claws.
+
+04_sun_herald.png
+  Title: Sun Herald - three stages
+  Description: A ring of fire, then wings of light and a sun crown.
+
+05_ender_colossus.png
+  Title: Ender Colossus - three stages
+  Description: Purpur crystals and new ender eyes, then a floating obsidian crown and end crystals.
+
+06_banner.png
+  Title: Boss bar and stage banner
+  Description: Each boss has its own boss bar with stage gems and thresholds. A banner announces every new stage.
+
+07_armor_ascendant.png
+  Title: Ascendant armor evolution
+  Description: Armor grows with you: fight to fill its resonance, then evolve it at its station. Stage III Ascendant armor gets wings of light.
+
+08_armor_titan.png
+  Title: Titan armor evolution
+  Description: Horns, then a crown, an elemental core and crystal spikes.
+
+09_altars.png
+  Title: Altars and stations
+  Description: Altar tops float and turn; stations show the item they are working on.
+
+10_codex_front.png
+  Title: The Celestial Codex
+  Description: An in-game guide that always shows your next step, with live recipes. Fully translated into German.
+
+11_codex_titans_titan_armor.png
+  Title: Codex recipes
+  Description: Crafting and station recipes inside the codex.
+
+12_trade_city.png
+  Title: Trade city
+  Description: Walled towns with a bank, a market of player shops and a relic pavilion.
+
+13_frost_shrine_view.png
+  Title: Frost shrine
+  Description: Four elemental shrines across the Overworld and the Nether hold the Titans.
+
+14_tide_shrine.png
+  Title: Tide shrine
+  Description: The Tide Titan waits in the oceans.
+
+15_storm_shrine_view.png
+  Title: Storm shrine
+  Description: The Storm Titan rules the peaks.
+
+16_magma_shrine_view.png
+  Title: Magma shrine
+  Description: The Magma Titan burns in the Nether.
+
+17_ruined_capital.png
+  Title: Ruined Capital
+  Description: The Lost Ender Empire on the outer End islands: restore its pylons and wake the Ender Colossus.
+
+18_star_gate.png
+  Title: Star Gate
+  Description: Open it with a Dragon Head and the Imperial Seal to reach the Fallen Stars.
+
+19_fallen_stars.png
+  Title: The Fallen Stars
+  Description: A dimension of floating starstone islands under a sky full of nebulae.
+
+20_abyss.png
+  Title: The Abyss
+  Description: Fall through the bottom of the stars into a dimension where the ground crumbles beneath you.
+
+21_constellations_1.png
+  Title: Constellations
+  Description: Every boss you defeat adds its constellation to your night sky and a permanent bonus.

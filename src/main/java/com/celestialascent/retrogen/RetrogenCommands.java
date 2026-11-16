@@ -15,6 +15,7 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
@@ -32,8 +33,7 @@ public final class RetrogenCommands {
 
     @SubscribeEvent
     public static void register(RegisterCommandsEvent e) {
-        e.getDispatcher().register(Commands.literal("celestialascent").requires(s -> s.hasPermission(2))
-                .then(Commands.literal("retrogen")
+        var retrogen = Commands.literal("retrogen")
                         .then(Commands.literal("status").executes(ctx -> status(ctx.getSource())))
                         .then(Commands.literal("scan").then(Commands.argument("radius", IntegerArgumentType.integer(1, 256)).executes(ctx -> {
                             var src = ctx.getSource();
@@ -41,8 +41,11 @@ public final class RetrogenCommands {
                             src.sendSuccess(() -> Component.literal("retrogen: queued " + n + " cells"), false);
                             return n;
                         })))
-                        .then(Commands.literal("run").executes(ctx -> run(ctx.getSource())))
-                        .then(Commands.literal("pregen").then(Commands.argument("radius", IntegerArgumentType.integer(1, 64)).executes(ctx -> {
+                        .then(Commands.literal("run").executes(ctx -> run(ctx.getSource())));
+        // pregen and hut only exist to test the retrogen; release builds leave them out.
+        if (!FMLEnvironment.production) {
+            retrogen = retrogen
+                    .then(Commands.literal("pregen").then(Commands.argument("radius", IntegerArgumentType.integer(1, 64)).executes(ctx -> {
                             var src = ctx.getSource();
                             int r = IntegerArgumentType.getInteger(ctx, "radius");
                             ChunkPos c = new ChunkPos(BlockPos.containing(src.getPosition()));
@@ -56,8 +59,10 @@ public final class RetrogenCommands {
                             src.sendSuccess(() -> Component.literal("retrogen: generated " + total + " chunks"), false);
                             return n;
                         })))
-                        .then(Commands.literal("hut").then(Commands.argument("set", ResourceLocationArgument.id()).executes(ctx -> hut(ctx.getSource(),
-                                ResourceLocationArgument.getId(ctx, "set")))))));
+                    .then(Commands.literal("hut").then(Commands.argument("set", ResourceLocationArgument.id()).executes(ctx -> hut(ctx.getSource(),
+                                ResourceLocationArgument.getId(ctx, "set")))));
+        }
+        e.getDispatcher().register(Commands.literal("celestialascent").requires(s -> s.hasPermission(2)).then(retrogen));
     }
 
     private static int status(CommandSourceStack src) {
