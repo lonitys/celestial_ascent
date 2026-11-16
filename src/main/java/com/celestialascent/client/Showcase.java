@@ -245,6 +245,8 @@ public final class Showcase {
             }, g[1], 0, 30, CameraType.FIRST_PERSON));
         }
         STEPS.add(new Step(10, ServerPlayer::closeContainer, null, 0, 0, CameraType.FIRST_PERSON));
+        // JEI pages (only in runs with JEI; the JEI classes are only touched from jeiSteps)
+        if (net.neoforged.fml.ModList.get().isLoaded("jei")) jeiSteps();
         // The codex: front page at two stages of progress, then one spread per chapter section
         codex("codex_front", List.of("celestialascent:frost_titan", "celestialascent:tide_titan"), null, null);
         codex("codex_front_late", Constellations.ALL.stream().map(c -> c.boss().toString()).toList(), null, null);
@@ -280,6 +282,64 @@ public final class Showcase {
         step(300, "magma_shrine_view", 0, 15, "execute in minecraft:the_nether run tp @s -336 40 176 0 15");
         step(300, "ruined_capital", 0, 35, "execute in minecraft:the_end run tp @s -1316 85 60 0 35");
         step(300, "star_gate", 0, 35, "execute in minecraft:the_end run tp @s -1052 75 -725 0 35");
+    }
+
+    /** Runs on the client thread. */
+    private static void client(Runnable r) {
+        Minecraft.getInstance().execute(r);
+    }
+
+    /** JEI recipe pages, opened like pressing R or U, plus the + button on a station. Only called with JEI loaded. */
+    private static void jeiSteps() {
+        STEPS.add(new Step(40, p -> client(() -> com.celestialascent.compat.jei.JeiShowcase.showStationRecipes(com.celestialascent.titans.Titans.FORGE,
+                new net.minecraft.world.item.ItemStack(com.celestialascent.titans.Titans.HELMET.get()))), "jei_titan_forge", 0, 30, CameraType.FIRST_PERSON));
+        // R on a drop shows its boss (the frost core like a player would press it, the others on the summoning tab)
+        STEPS.add(new Step(40, p -> client(() -> com.celestialascent.compat.jei.JeiShowcase.showRecipes(new net.minecraft.world.item.ItemStack(
+                com.celestialascent.titans.Titans.CORES.get(com.celestialascent.titans.Element.FROST).get()))), "jei_summon_frost", 0, 30, CameraType.FIRST_PERSON));
+        STEPS.add(new Step(40, p -> client(() -> com.celestialascent.compat.jei.JeiShowcase.showSummonsOf(new net.minecraft.world.item.ItemStack(
+                com.celestialascent.stars.Stars.STARDUST.get()))), "jei_summon_stardust", 0, 30, CameraType.FIRST_PERSON));
+        // Every boss, two per page (ladder order: four titans, dragon, sentinel, colossus, seraph, leviathan, herald, sovereign)
+        for (int i = 0; i < 11; i += 2) {
+            int first = i;
+            STEPS.add(new Step(40, p -> client(() -> com.celestialascent.compat.jei.JeiShowcase.showSummons(first, first + 1)),
+                    "jei_summon_" + (i / 2 + 1), 0, 30, CameraType.FIRST_PERSON));
+        }
+        STEPS.add(new Step(40, p -> client(() -> com.celestialascent.compat.jei.JeiShowcase.showUses(new net.minecraft.world.item.ItemStack(
+                com.celestialascent.titans.Titans.CORES.get(com.celestialascent.titans.Element.STORM).get()))), "jei_uses_storm_core", 0, 30, CameraType.FIRST_PERSON));
+        STEPS.add(new Step(40, p -> client(() -> com.celestialascent.compat.jei.JeiShowcase.showStation(com.celestialascent.stars.Stars.SKY_ALTAR_TYPE)),
+                "jei_sky_altar", 0, 30, CameraType.FIRST_PERSON));
+        // An upgrade and an evolution (night sky and resonance in the footer)
+        STEPS.add(new Step(40, p -> client(() -> com.celestialascent.compat.jei.JeiShowcase.showStationRecipes(com.celestialascent.stars.Stars.SKY_ALTAR_TYPE,
+                new net.minecraft.world.item.ItemStack(com.celestialascent.stars.Stars.CHESTPLATE.get()))), "jei_sky_altar_evolution", 0, 30, CameraType.FIRST_PERSON));
+        STEPS.add(new Step(40, p -> client(() -> com.celestialascent.compat.jei.JeiShowcase.showStation(com.celestialascent.abyss.Abyss.ASCENSION)),
+                "jei_ascension_altar", 0, 30, CameraType.FIRST_PERSON));
+        STEPS.add(new Step(40, p -> client(() -> com.celestialascent.compat.jei.JeiShowcase.showTrades("titansmith")),
+                "jei_trades_titansmith", 0, 30, CameraType.FIRST_PERSON));
+        STEPS.add(new Step(40, p -> client(() -> com.celestialascent.compat.jei.JeiShowcase.showInfo(new net.minecraft.world.item.ItemStack(
+                com.celestialascent.economy.Economy.coin(com.celestialascent.economy.CoinTier.GOLD)))), "jei_info_coin", 0, 30, CameraType.FIRST_PERSON));
+        STEPS.add(new Step(10, p -> client(() -> Minecraft.getInstance().setScreen(null)), null, 0, 0, CameraType.FIRST_PERSON));
+        // The + button: open a Titan Forge with the materials in the inventory, then let JEI move them in.
+        STEPS.add(new Step(30, p -> {
+            cmd(p, "clear @s");
+            cmd(p, "give @s minecraft:netherite_helmet");
+            cmd(p, "give @s celestialascent:frost_core 2");
+            cmd(p, "give @s celestialascent:titan_shard 9");
+            BlockPos at = new BlockPos(0, 200, 2);
+            p.serverLevel().setBlockAndUpdate(at, com.celestialascent.titans.Titans.TITAN_FORGE.get().defaultBlockState());
+            if (p.serverLevel().getBlockEntity(at) instanceof com.celestialascent.core.station.StationBlockEntity st) st.items.clearContent();
+            cmd(p, "tp @s 0 200 0 0 30");
+            p.serverLevel().getBlockState(at).useWithoutItem(p.serverLevel(), p, new BlockHitResult(Vec3.atCenterOf(at), Direction.NORTH, at, false));
+        }, "jei_transfer_before", 0, 30, CameraType.FIRST_PERSON));
+        STEPS.add(new Step(30, p -> client(() -> {
+            boolean ok = com.celestialascent.compat.jei.JeiShowcase.transfer(com.celestialascent.titans.Titans.FORGE,
+                    ex -> ex.base().is(net.minecraft.world.item.Items.NETHERITE_HELMET)
+                            && ex.mats().getFirst().is(com.celestialascent.titans.Titans.CORES.get(com.celestialascent.titans.Element.FROST).get()));
+            com.mojang.logging.LogUtils.getLogger().info("Showcase: JEI transfer into the Titan Forge {}", ok ? "succeeded" : "FAILED");
+        }), "jei_transfer", 0, 30, CameraType.FIRST_PERSON));
+        STEPS.add(new Step(10, p -> {
+            p.closeContainer();
+            cmd(p, "clear @s");
+        }, null, 0, 0, CameraType.FIRST_PERSON));
     }
 
     /** Opens the codex on the client; {@code kills} (if given) replaces the player's progress first. */
