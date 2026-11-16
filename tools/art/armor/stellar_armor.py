@@ -122,7 +122,137 @@ def build_model():
     sym(RB, LB, (-3.0, 2.4, -4.2), (1, 1, 1), "gem", rot=[0, 0, 45], pivot=[-2.5, 2.9, -3.7])
     for k, (y, L, ang) in enumerate(((4.0, 4, 26), (3.0, 3, 8))):
         sym(RB, LB, (-5.5, y, -0.3), (1, 1, L), "blade", rot=[ang, -16, 0], pivot=[-5.0, y + 0.5, -0.3], blade=3)
+    build_stage_parts(m)
     return m
+
+
+# =============================================================================== stage parts
+# Evolving armor: bones named "stage2_*" are shown when the piece is stage 2 or 3, "stage3_*" only at
+# stage 3 (the renderer toggles them by that prefix). They are created after every base bone, so base
+# cubes keep their cube index (texel hashes), and StagedPainter keeps them out of the base AO: with the
+# stage bones hidden every piece renders exactly as it did before.
+
+STAGE_PREFIXES = ("stage2_", "stage3_")
+
+
+def stage_level(name):
+    return 3 if name.startswith("stage3_") else 2 if name.startswith("stage2_") else 1
+
+
+def stage_bone(m, name, parent, pivot):
+    assert name.startswith(STAGE_PREFIXES), name
+    return m.bone(name, parent, [round(float(x), 4) for x in pivot])
+
+
+def stage_pair(m, name, limb, pivot_r):
+    """Mirrored stage bones <name>R / <name>L under armorRight<limb> / armorLeft<limb>."""
+    x, y, z = pivot_r
+    return (stage_bone(m, name + "R", "armorRight" + limb, (x, y, z)),
+            stage_bone(m, name + "L", "armorLeft" + limb, (-x, y, z)))
+
+
+class StagedPainter(al.Painter):
+    """AO that follows stage visibility: a cube only receives occlusion from cubes that are visible
+    whenever it is (base <- base, stage 2 <- base + stage 2, stage 3 <- everything)."""
+
+    def _ao(self, pw, nw, cm, face, ci, boxes):
+        lvl = stage_level(boxes[ci][0].bone.name)
+        far = (np.full(3, 1e9), np.full(3, -1e9))       # empty bounds: skipped by the AO loop
+        boxes = [b if b[0] is None or stage_level(b[0].bone.name) <= lvl else b[:5] + far for b in boxes]
+        return super()._ao(pw, nw, cm, face, ci, boxes)
+
+
+def check_stage_bones(m):
+    names = list(m.bones)
+    first = next((i for i, n in enumerate(names) if stage_level(n) > 1), len(names))
+    assert all(stage_level(n) > 1 for n in names[first:]), "stage bones must come after every base bone"
+    for b in m.bones.values():
+        if b.parent and stage_level(b.parent) > 1:
+            assert stage_level(b.name) == stage_level(b.parent), f"{b.name} needs its parent's stage prefix"
+
+
+def paint_staged(m, shaders, ao=0.85):
+    check_stage_bones(m)
+    return StagedPainter(m, shaders, ao_strength=ao, occluders=ak.BODY_BOXES).paint()
+
+
+def sym_rows(br, bl, x0, rows, mats, width=1, rot=None, pivot=None, **params):
+    """Mirrored pixel-stepped fin in the YZ plane: rows = [(y, z0, z1), ...] of 1 px tall bars spanning
+    x0..x0+width on the right bone (mirrored onto the left one). mats: one per row, or a single name."""
+    for k, (y, z0, z1) in enumerate(rows):
+        mat = mats[k] if isinstance(mats, (list, tuple)) else mats
+        sym(br, bl, (x0, y, z0), (width, 1, z1 - z0), mat, rot=rot, pivot=pivot, **params)
+
+
+def sym_octagram(br, bl, center, size, axis="x", mat="wgold", gem=True, **params):
+    """Mirrored 8-point star plate: a square and a 45-degree square, the turned one set 0.2 px deeper,
+    with a gem in the middle. axis = plate normal ('x': on a side face, 'z': on a front face)."""
+    c = np.asarray(center, dtype=float)
+    out = np.array([-1.0, 0, 0]) if axis == "x" else np.array([0, 0, -1.0])   # outward normal (right side / front)
+    if axis == "x":
+        sz, rot = (1, size, size), [45, 0, 0]
+    else:
+        sz, rot = (size, size, 1), [0, 0, 45]
+    sym_boxc(br, bl, c.tolist(), sz, mat, **params)
+    sym_boxc(br, bl, (c - out * 0.2).tolist(), sz, mat, rot=rot, **params)
+    if gem:
+        gsz = (1, 2, 2) if axis == "x" else (2, 2, 1)
+        sym_boxc(br, bl, (c + out * 0.7).tolist(), gsz, "gem", rot=rot)
+
+
+def build_stage_parts(m):
+    # ------------------------------------------------------------------ helmet
+    # stage 2: star-point diadem - glowing white-gold rays fanning up from the brow trim
+    dr = stage_bone(m, "stage2_diadem", "armorHead", (0, 30.3, -5.4))
+    for side in (-1, 1):
+        for (x, d, L) in ((1.9, (0.2, 1.0, -0.15), 4), (3.7, (0.55, 1.0, -0.1), 4), (5.3, (1.0, 0.75, 0.0), 3)):
+            dr.spike((x * side, 30.2, -5.3), (d[0] * side, d[1], d[2]), L, 2, "ray", segs=[0.5, 0.6], taper=0.5)
+    # stage 3: constellation halo standing behind the head: dotted white-gold ring with six star sprites
+    hb = stage_bone(m, "stage3_halo", "armorHead", (0, 31.5, 6.3))
+    R = 5.2
+    for k in range(12):
+        a = k * 30.0 + 15.0
+        cx, cy = R * math.sin(math.radians(a)), 31.5 + R * math.cos(math.radians(a))
+        cube(hb, (cx - 1.0, cy - 0.5, 5.8), (2, 1, 1), "ring", rot=[0, 0, a], pivot=[cx, cy, 6.3])
+    for k in range(6):                                            # flat star sprites in the halo plane
+        a = math.radians(k * 60.0)
+        cx, cy = round(R * math.sin(a), 3), round(31.5 + R * math.cos(a), 3)
+        cube(hb, (cx - 2, cy - 2, 6.95), (4, 4, 0), "sprite", plane="north", tier=1)
+
+    # ------------------------------------------------------------------ chestplate
+    # stage 2: white-gold 8-point star plates on the pauldrons
+    pr, pl = stage_pair(m, "stage2_shoulderStar", "Arm", (-10.0, 23.0, 0))
+    sym_octagram(pr, pl, (-10.8, 23.0, 0.0), 4, "x")
+    # stage 3: a second, lower pair of star wings
+    for side, nm in ((-1, "R"), (1, "L")):
+        wb = stage_bone(m, f"stage3_wingLower{nm}", "armorBody", (1.5 * side, 18.0, 4.4))
+        wb.rotation = [0.0, -30.0 * side, 0.0]
+        x0 = 1.5 if side > 0 else -10.5
+        cube(wb, (x0, 10.0, 4.4), (9, 9, 0), "wingplane", side=side, root_y=18.0,
+             blades=((-10, 7.0, 1.6), (-36, 8.4, 1.8), (-62, 6.4, 1.5)))
+
+    # ------------------------------------------------------------------ leggings
+    # stage 2: glowing star cross over the knee with a bigger star gem
+    kr, kl = stage_pair(m, "stage2_kneeStar", "Leg", (-2.0, 5.3, -3.8))
+    sym_boxc(kr, kl, (-2.0, 5.3, -4.15), (1, 5, 1), "ray")
+    sym_boxc(kr, kl, (-2.0, 5.3, -4.15), (5, 1, 1), "ray", inflate=0.05)
+    sym_boxc(kr, kl, (-2.0, 5.3, -4.75), (2, 2, 1), "gem", rot=[0, 0, 45])
+    # stage 3: star-wing blades at the outer hips (below the hands)
+    hr, hl = stage_pair(m, "stage3_hipBlade", "Leg", (-5.4, 7.6, -0.3))
+    for (y, L, ang) in ((7.1, 4, 22), (6.1, 3, 4)):
+        sym(hr, hl, (-5.9, y, -0.3), (1, 1, L), "blade", rot=[ang, -16, 0], pivot=[-5.4, y + 0.5, -0.3], blade=3)
+
+    # ------------------------------------------------------------------ boots
+    # stage 2: a third heel blade and a small star plate on the shin
+    br, bl = stage_pair(m, "stage2_bootStar", "Boot", (-2.4, 2.8, -3.8))
+    sym(br, bl, (-5.5, 2.0, -0.3), (1, 1, 4), "blade", rot=[-14, -16, 0], pivot=[-5.0, 2.5, -0.3], blade=3)
+    sym_octagram(br, bl, (-2.4, 2.8, -4.3), 2, "z", gem=False)
+    sym_boxc(br, bl, (-2.4, 2.8, -4.95), (1, 1, 1), "gem", rot=[0, 0, 45], inflate=0.1)
+    # stage 3: star spurs - white-gold neck carrying a glowing 3D star
+    sr, sl = stage_pair(m, "stage3_starSpur", "Boot", (-2.4, 1.6, 3.2))
+    sym(sr, sl, (-2.9, 1.1, 3.1), (1, 1, 2), "wgold")
+    star_point(sr, (-2.4, 1.6, 6.2), 1.5)
+    star_point(sl, (2.4, 1.6, 6.2), 1.5)
 
 
 # =============================================================================== shaders
@@ -346,13 +476,13 @@ def make_shaders():
             return rgb, alpha, glow
         x, y = ctx.p[:, 0], ctx.p[:, 1]
         u = np.abs(x) - 1.5                      # distance out from the root
-        w_ = y - 22.0                            # height relative to the root
+        w_ = y - ctx.params.get("root_y", 22.0)  # height relative to the root
         best_d = np.full(ctx.N, 9.0)
         best_t = np.zeros(ctx.N)
         inside = np.zeros(ctx.N, dtype=bool)
         edge = np.zeros(ctx.N, dtype=bool)
         spine = np.zeros(ctx.N, dtype=bool)
-        for ang, L, W in ((72, 8.8, 1.8), (42, 10.2, 2.2), (12, 7.4, 1.8)):
+        for ang, L, W in ctx.params.get("blades", ((72, 8.8, 1.8), (42, 10.2, 2.2), (12, 7.4, 1.8))):
             a = math.radians(ang)
             dx, dy = math.cos(a), math.sin(a)
             tt = u * dx + w_ * dy                # along the blade
@@ -409,6 +539,9 @@ def build_clips():
     c.f("crownStar", "rotation", lambda t: [0, 360.0 * t / T, 0])
     c.f("wingR", "rotation", lambda t: [0, 9.0 * (0.5 + 0.5 * math.sin(w * 2 * t)), 2.5 * math.sin(w * 2 * t + 0.5)])
     c.f("wingL", "rotation", lambda t: [0, -9.0 * (0.5 + 0.5 * math.sin(w * 2 * t)), -2.5 * math.sin(w * 2 * t + 0.5)])
+    c.f("stage3_wingLowerR", "rotation", lambda t: [0, 7.0 * (0.5 + 0.5 * math.sin(w * 2 * t - 0.8)), 0])
+    c.f("stage3_wingLowerL", "rotation", lambda t: [0, -7.0 * (0.5 + 0.5 * math.sin(w * 2 * t - 0.8)), 0])
+    c.f("stage3_halo", "rotation", lambda t: [0, 0, 60.0 * t / T])         # 6-fold halo: seamless loop
     return [c]
 
 
@@ -421,7 +554,7 @@ def build(preview=False):
     geo = ak.export_geo(m, paths["geo"])
     print(f"{NAME}: {m.cube_count()} cubes, uv {W}x{H}, png {W * 2}x{H * 2}")
     anims = al.export_anims(build_clips(), paths["anim"])
-    rgba, glow = ak.paint(m, make_shaders())
+    rgba, glow = paint_staged(m, make_shaders())
     ak.save_textures(NAME, "", rgba, glow)
     if preview:
         import geo_preview as gp
@@ -432,6 +565,8 @@ def build(preview=False):
         an = anims["animations"]["idle"]
         ak.sheet_anim("stellar idle", g, rgba, glow, an, [0, 1.0, 2.0, 3.0], view=("3/4 back", 210, -14)).save(
             os.path.join(ak.PREVIEW, "stellar_idle.png"))
+        import stage_preview
+        stage_preview.stage_sheet("stellar")
     return m, geo, (rgba, glow), anims
 
 

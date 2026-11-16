@@ -26,6 +26,7 @@ EYE = M.pal("#0a3328", "#11503c", "#1a7254", "#26946c", "#3ab685", "#5fd4a0", "#
 CAPE = M.pal("#14072a", "#1f0b3c", "#2c1052", "#3b166a", "#4c1d84", "#5f259e", "#7430b8", "#8b40cf",
              "#a45ae2", "#bf7ff0", "#dcaafb", "#f3dcff")
 LINING = M.pal("#0e0618", "#160a24", "#200f31", "#2b1540", "#371b50")
+ECORE = M.pal("#5a1678", "#7f1f9e", "#a62cc0", "#c94adb", "#e478ee", "#f6aefa", "#ffe0ff")
 
 
 # =============================================================================== geometry
@@ -105,7 +106,138 @@ def build_model():
     sym(RB, LB, (-3.0, 2.7, -4.15), (1, 2, 1), "eye")
     for k, (y, L, rx) in enumerate(((4.2, 4, 30), (3.3, 3, 44))):
         sym(RB, LB, (-5.6, y, -0.5), (1, 1, L), "gold", rot=[rx, -18, 0], pivot=[-5.1, y + 0.5, 0])  # heel wings
+    build_stage_parts(m)
     return m
+
+
+# =============================================================================== stage parts
+# Evolving armor: bones named "stage2_*" are shown when the piece is stage 2 or 3, "stage3_*" only at
+# stage 3 (the renderer toggles them by that prefix). They are created after every base bone, so base
+# cubes keep their cube index (texel hashes), and StagedPainter keeps them out of the base AO: with the
+# stage bones hidden every piece renders exactly as it did before.
+
+STAGE_PREFIXES = ("stage2_", "stage3_")
+
+
+def stage_level(name):
+    return 3 if name.startswith("stage3_") else 2 if name.startswith("stage2_") else 1
+
+
+def stage_bone(m, name, parent, pivot):
+    assert name.startswith(STAGE_PREFIXES), name
+    return m.bone(name, parent, [round(float(x), 4) for x in pivot])
+
+
+def stage_pair(m, name, limb, pivot_r):
+    """Mirrored stage bones <name>R / <name>L under armorRight<limb> / armorLeft<limb>."""
+    x, y, z = pivot_r
+    return (stage_bone(m, name + "R", "armorRight" + limb, (x, y, z)),
+            stage_bone(m, name + "L", "armorLeft" + limb, (-x, y, z)))
+
+
+class StagedPainter(al.Painter):
+    """AO that follows stage visibility: a cube only receives occlusion from cubes that are visible
+    whenever it is (base <- base, stage 2 <- base + stage 2, stage 3 <- everything)."""
+
+    def _ao(self, pw, nw, cm, face, ci, boxes):
+        lvl = stage_level(boxes[ci][0].bone.name)
+        far = (np.full(3, 1e9), np.full(3, -1e9))       # empty bounds: skipped by the AO loop
+        boxes = [b if b[0] is None or stage_level(b[0].bone.name) <= lvl else b[:5] + far for b in boxes]
+        return super()._ao(pw, nw, cm, face, ci, boxes)
+
+
+def check_stage_bones(m):
+    names = list(m.bones)
+    first = next((i for i, n in enumerate(names) if stage_level(n) > 1), len(names))
+    assert all(stage_level(n) > 1 for n in names[first:]), "stage bones must come after every base bone"
+    for b in m.bones.values():
+        if b.parent and stage_level(b.parent) > 1:
+            assert stage_level(b.name) == stage_level(b.parent), f"{b.name} needs its parent's stage prefix"
+
+
+def paint_staged(m, shaders, ao=0.85):
+    check_stage_bones(m)
+    return StagedPainter(m, shaders, ao_strength=ao, occluders=ak.BODY_BOXES).paint()
+
+
+def sym_rows(br, bl, x0, rows, mats, width=1, rot=None, pivot=None, **params):
+    """Mirrored pixel-stepped fin in the YZ plane: rows = [(y, z0, z1), ...] of 1 px tall bars spanning
+    x0..x0+width on the right bone (mirrored onto the left one). mats: one per row, or a single name."""
+    for k, (y, z0, z1) in enumerate(rows):
+        mat = mats[k] if isinstance(mats, (list, tuple)) else mats
+        sym(br, bl, (x0, y, z0), (width, 1, z1 - z0), mat, rot=rot, pivot=pivot, **params)
+
+
+def ender_crystal(bone, center, core=2, cage=3, **params):
+    """Small End crystal standing on a corner: glowing core inside a glass cage (edges only)."""
+    R = al.axis_angle([0, 0, 1], 54.7356) @ al.axis_angle([0, 1, 0], 45)
+    e = al.euler(R)
+    boxc(bone, center, (core, core, core), "ecore", rot=e, **params)
+    boxc(bone, center, (cage, cage, cage), "ecage", rot=e, **params)
+
+
+def build_stage_parts(m):
+    # ------------------------------------------------------------------ helmet
+    # stage 2: fanned violet energy wing-fins at the temples + a short trailing plume behind the crest
+    fr, fl = stage_bone(m, "stage2_helmFinR", "armorHead", (-5.9, 28.6, 0.4)),         stage_bone(m, "stage2_helmFinL", "armorHead", (5.9, 28.6, 0.4))
+    for (y, L, rx, h) in ((28.6, 7, 10, 1), (29.3, 7, 28, 1), (30.0, 6, 48, 1)):
+        sym(fr, fl, (-6.5, y - h / 2, 0.0), (1, h, L), "plume", rot=[rx, -16, 0], pivot=[-6.0, y, 0.4], tier=1,
+            y0=y - 4.0)
+    sym(fr, fl, (-6.6, 27.6, -0.6), (1, 2, 2), "gold")                                     # wing root boss
+    tail = stage_bone(m, "stage2_plumeTail", "armorHead", (0, 35.4, 5.4))
+    cube(tail, (-1, 34.4, 5.0), (2, 2, 3), "plume", rot=[-30, 0, 0], pivot=[0, 35.4, 5.0], tier=1, y0=31.0)
+    cube(tail, (-1, 32.9, 7.0), (2, 1, 3), "plume", rot=[-52, 0, 0], pivot=[0, 33.4, 7.0], tier=2, y0=29.5)
+
+    # stage 3: the crown closes - crown fans with ender eyes on both temples
+    cr = stage_bone(m, "stage3_crown", "armorHead", (0, 32.8, 0))
+    for side in (-1, 1):
+        cube(cr, (5.3 * side - 3, 32.8, -1.5), (6, 4, 1), "crown", rot=[0, 90, 0], pivot=[5.3 * side, 34.8, -1.0])
+        boxc(cr, (5.95 * side, 35.0, -1.0), (1, 2, 2), "eye")
+
+    # ------------------------------------------------------------------ chestplate
+    # stage 2: gold-edged purpur fins flaring up and out from the pauldron rims
+    sr, sl = stage_pair(m, "stage2_shoulderFin", "Arm", (-10.0, 24.6, 0))
+    sym(sr, sl, (-14.0, 24.2, -3.0), (4, 1, 6), "purpur", rot=[0, 0, 24], pivot=[-10.0, 24.6, 0],
+        fin=True)
+    sym(sr, sl, (-13.0, 25.4, -2.0), (3, 1, 4), "purpur", rot=[0, 0, 48], pivot=[-10.0, 25.6, 0],
+        fin=True)
+    sym(sr, sl, (-10.8, 23.8, -1.0), (1, 2, 2), "eye")                                    # fin root eye
+
+    # stage 3: floating End crystals over the shoulders (body bone: they hover, the arms swing below)
+    for side in (-1, 1):
+        s = "R" if side < 0 else "L"
+        c = (10.4 * side, 31.6, 0.8)
+        ender_crystal(stage_bone(m, f"stage3_enderCrystal{s}", "armorBody", c), c, side=side)
+    # stage 3: short rigid purpur mantle over the top of the cape
+    mt = stage_bone(m, "stage3_mantle", "armorBody", (0, 24.4, 5.6))
+    cube(mt, (-5, 24.4, 5.6), (10, 1, 1), "gold", band=True)                                # yoke
+    cube(mt, (-5, 20.4, 5.6), (10, 4, 1), "purpur", rot=[10, 0, 0], pivot=[0, 24.4, 5.6],
+         trim=("left", "right", "bottom"), plate="mantle")
+    cube(mt, (-1, 21.3, 6.3), (2, 2, 1), "eye", rot=[10, 0, 0], pivot=[0, 24.4, 5.6])
+
+    # ------------------------------------------------------------------ leggings
+    # stage 2: violet wing-fins at the outer hips (kept below the hands)
+    hr, hl = stage_pair(m, "stage2_hipFin", "Leg", (-5.9, 7.6, -0.4))
+    for (y, L, rx) in ((7.6, 5, 12), (7.0, 5, 30), (6.4, 4, 50)):
+        sym(hr, hl, (-6.4, y - 0.5, -0.4), (1, 1, L), "plume", rot=[rx, -14, 0], pivot=[-5.9, y, -0.4], tier=1,
+            y0=y - 4.0)
+    sym(hr, hl, (-6.5, 6.4, -1.4), (1, 2, 2), "gold")
+    # stage 3: gold-framed ender eyes set into the front tassets
+    er, el = stage_pair(m, "stage3_tassetEye", "Leg", (-2.4, 8.0, -4.2))
+    sym(er, el, (-4.4, 5.5, -4.25), (4, 4, 1), "gold", rot=[-8, 0, 45], pivot=[-2.4, 7.5, -3.75])
+    sym(er, el, (-3.4, 6.5, -4.75), (2, 2, 1), "eye", rot=[-8, 0, 0], pivot=[-2.4, 7.5, -3.75])
+
+    # ------------------------------------------------------------------ boots
+    # stage 2: the heel wings grow two violet energy feathers
+    wr, wl = stage_pair(m, "stage2_heelWing", "Boot", (-5.1, 4.0, 0))
+    for (y, L, rx) in ((5.0, 5, 16), (2.4, 3, 60)):
+        sym(wr, wl, (-5.6, y, -0.5), (1, 1, L), "plume", rot=[rx, -18, 0], pivot=[-5.1, y + 0.5, 0], tier=1, y0=2.0)
+    # stage 3: gold sabaton crest with an ender eye along the instep, gold + violet heel blades
+    cr3, cl3 = stage_pair(m, "stage3_sabatonCrest", "Boot", (-2.4, 1.2, -3.0))
+    sym_rows(cr3, cl3, -2.9, [(1.4, -5.0, -1.0), (2.4, -4.0, -1.0), (3.4, -3.0, -1.0)], "gold")
+    sym(cr3, cl3, (-3.1, 1.6, -4.2), (1, 1, 1), "eye", inflate=0.12)
+    sym(cr3, cl3, (-2.9, 1.0, 3.0), (1, 1, 4), "gold", rot=[22, 0, 0], pivot=[-2.4, 1.5, 3.0], feather=True)
+    sym(cr3, cl3, (-2.9, 0.2, 3.0), (1, 1, 3), "plume", rot=[6, 0, 0], pivot=[-2.4, 0.7, 3.0], tier=1, y0=-2.0)
 
 
 # =============================================================================== shaders
@@ -160,6 +292,28 @@ def make_shaders():
         if plate == "tasset" and ctx.face in ("north", "west", "east"):
             mid = (np.abs(ctx.s - 0.5) * ctx.tw < 0.6) & (ctx.j > 2) & (ctx.j < ctx.th - 3)
             rgb[mid] = PURPUR[9]
+        if prm.get("fin"):
+            # flared shoulder fin: gold outer tip and rim, glowing ender filament along the top
+            gv, grgb = M.gold(ctx, GOLD, engrave=False)
+            reach = max(abs(ctx.lo[0]), abs(ctx.hi[0]))
+            tipm = np.abs(x) > reach - 0.8
+            rgb[tipm] = grgb[tipm]
+            if ctx.face == "up":
+                zc = (ctx.lo[2] + ctx.hi[2]) / 2
+                fil = (np.abs(ctx.p[:, 2] - zc) < 0.26) & ~tipm
+                rgb[fil] = CAPE[9]
+                glow |= fil
+                rim = (M.emin(ctx) < 1) & ~fil
+                rgb[rim] = grgb[rim]
+        if plate == "mantle" and ctx.face == "south":
+            # gold chevron pointing down at the cape sigil + glowing ender filament
+            ax = np.abs(x)
+            chev = (np.abs(y - (20.9 + ax * 0.45)) < 0.26) & (ax > 1.4) & (ax < 4.2)
+            gv, grgb = M.gold(ctx, GOLD, engrave=False)
+            rgb[chev] = grgb[chev]
+            fil = (np.abs(y - (21.7 + ax * 0.45)) < 0.24) & (ax > 1.6) & (ax < 4.0)
+            rgb[fil] = CAPE[9]
+            glow |= fil
         return rgb, 255, glow
 
     def gold(ctx):
@@ -222,7 +376,7 @@ def make_shaders():
         tier = ctx.params.get("tier", 0)
         x, y, z = ctx.p[:, 0], ctx.p[:, 1], ctx.p[:, 2]
         streak = fbm(np.c_[z * 0.12, y * 2.4, x * 2.4], 1.0, 2, seed=8 + tier)
-        v = 0.28 + (y - 33.4) * 0.05 + (streak - 0.5) * 0.5 + (z + 5) * 0.012
+        v = 0.28 + (y - ctx.params.get("y0", 33.4)) * 0.05 + (streak - 0.5) * 0.5 + (z + 5) * 0.012
         rgb = M.ramp(CAPE, v, ctx, 0.6)
         dl, dr, dt, db = M.edist(ctx)
         glow = np.zeros(ctx.N, dtype=bool)
@@ -342,8 +496,30 @@ def make_shaders():
             rgb[ctx.j == 0] = GOLD[8]
         return rgb, 255, np.zeros(ctx.N, dtype=bool)
 
+    def ecore(ctx):
+        """End-crystal core: hot violet-pink cube, white heart."""
+        dx = (ctx.s - 0.5) * 2
+        dy = (ctx.t - 0.5) * 2
+        r = np.maximum(np.abs(dx), np.abs(dy))
+        v = 1.0 - r * 0.5 + (M.texel_hash(ctx, 3) - 0.5) * 0.12
+        rgb = M.ramp(ECORE, v, ctx, 0.3)
+        rgb[r < 0.3] = (255, 240, 255)
+        return rgb, 255, np.ones(ctx.N, dtype=bool)
+
+    def ecage(ctx):
+        """End-crystal glass cage: only the face borders are solid, lit corners."""
+        dl, dr, dt, db = M.edist(ctx)
+        m = np.minimum(np.minimum(dl, dr), np.minimum(dt, db))
+        edge = m < 1
+        rgb = np.tile(np.array([226, 196, 255], dtype=float), (ctx.N, 1))
+        corner = (np.minimum(dl, dr) == 0) & (np.minimum(dt, db) == 0)
+        rgb[corner] = (255, 250, 255)
+        mid = edge & ((dl == ctx.tw // 2) | (dt == ctx.th // 2))
+        rgb[mid] = (186, 140, 240)
+        return rgb, np.where(edge, 255, 0), edge
+
     return {"purpur": purpur, "gold": gold, "eye": eye, "helm": helm, "plume": plume, "cape": cape, "dark": dark,
-            "crown": crown, "feather": feather}
+            "crown": crown, "feather": feather, "ecore": ecore, "ecage": ecage}
 
 
 # =============================================================================== animation
@@ -355,6 +531,10 @@ def build_clips():
     c.f("cape", "rotation", lambda t: [3.0 + 3.0 * math.sin(w * t), 1.2 * math.sin(w * t + 1.0), 1.0 * math.sin(w * t + 0.4)])
     c.f("capeLower", "rotation", lambda t: [2.5 + 4.0 * math.sin(w * t - 1.1), 0, 1.6 * math.sin(w * t - 0.6)])
     c.f("crest", "rotation", lambda t: [0, 0, 1.5 * math.sin(w * t + 2.0)])
+    for side, s in ((-1, "R"), (1, "L")):                                # hovering End crystals spin and bob
+        c.f(f"stage3_enderCrystal{s}", "rotation", lambda t, sd=side: [0, sd * 360.0 * t / T, 0])
+        c.f(f"stage3_enderCrystal{s}", "position", lambda t, sd=side: [0, 0.3 * math.sin(w * t + (sd + 1) * 1.4), 0])
+    c.f("stage2_plumeTail", "rotation", lambda t: [2.0 * math.sin(w * t + 1.2), 0, 1.5 * math.sin(w * t + 2.0)])
     return [c]
 
 
@@ -367,7 +547,7 @@ def build(preview=False):
     geo = ak.export_geo(m, paths["geo"])
     print(f"{NAME}: {m.cube_count()} cubes, uv {W}x{H}, png {W * 2}x{H * 2}")
     anims = al.export_anims(build_clips(), paths["anim"])
-    rgba, glow = ak.paint(m, make_shaders())
+    rgba, glow = paint_staged(m, make_shaders())
     ak.save_textures(NAME, "", rgba, glow)
     if preview:
         import geo_preview as gp
@@ -378,6 +558,8 @@ def build(preview=False):
         an = anims["animations"]["idle"]
         ak.sheet_anim("imperial idle", g, rgba, glow, an, [0, 0.8, 1.6, 2.4], view=("side", 100, -6)).save(
             os.path.join(ak.PREVIEW, "imperial_idle.png"))
+        import stage_preview
+        stage_preview.stage_sheet("imperial")
     return m, geo, (rgba, glow), anims
 
 

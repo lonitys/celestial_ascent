@@ -25,6 +25,7 @@ public final class CelestialAscent {
         com.celestialascent.guide.Guide.init();
         com.celestialascent.core.DisplayBlockEntity.TYPE.getClass();
         com.celestialascent.retrogen.Retrogen.MOVED.getClass();
+        com.celestialascent.armor.ArmorStages.STAGE.getClass();
         CAReg.register(modBus);
     }
 }

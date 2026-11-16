@@ -140,7 +140,73 @@ def build_model():
         a = math.radians(tilt[k])
         top, z = top - h * math.cos(a), z + h * math.sin(a)
         parent = nm
+    build_stages(m)
     return m
+
+
+# =============================================================================== evolution stages
+# BossRenderer shows bones named stage2_* from stage 2 on and stage3_* only in stage 3 (hiding a
+# bone hides its children) and scales them in from 0 at their pivot, so every pivot sits where the
+# part attaches. Stage bones come after all base bones (base cube indices, which seed the tile and
+# rune patterns, stay the same) and never occlude the base model in the baked AO, so the base
+# texture is unchanged with them hidden. Budget: validate.py allows at most 140 cubes.
+
+
+def stage_bone(m, name, parent, pivot):
+    assert name.startswith(("stage2_", "stage3_")), name
+    return m.bone(name, parent, pivot)
+
+
+def shard(bone, base, d, length, width, mat, spin=45.0, **params):
+    """One tapered crystal: a single box along d whose tip is cut to a point in the texture."""
+    base = np.asarray(base, dtype=float)
+    w = int(round(width))
+    return bone.cube(base + np.array([-w / 2, 0, -w / 2]), (w, int(round(length)), w), mat, 0.0, base,
+                     tl.euler(tl.orient(d, spin)), **params)
+
+
+def pauldron_top(s, u):
+    """Point on the sloped top face of the main pauldron plate, u units outward from its centre
+    (plate: centre (23s, 75.5), 5 thick, rolled 20 deg outward-down)."""
+    a = math.radians(20)
+    c = np.array([23 * s + 2.5 * math.sin(a) * s, 75.5 + 2.5 * math.cos(a), 0.0])
+    return c + u * np.array([math.cos(a) * s, -math.sin(a), 0.0])
+
+
+def build_stages(m):
+    # ---- stage 2: purpur crystals burst from the shoulders and the upper back, two more ender eyes
+    for s, nm in sides():
+        b = pauldron_top(s, 4.2) + np.array([0, -0.6, 4.5])
+        cs = stage_bone(m, f"stage2_{nm}_shards", f"{nm}_pauldron", b)
+        cs.spike(b, (0.55 * s, 1.0, 0.5), 19, 5, "crystal", segs=[0.6, 0.46], taper=0.6, overlap=1.0, tip=0.55)
+        shard(cs, pauldron_top(s, 1.5) + np.array([0, -0.6, 8.0]), (0.25 * s, 1.0, 0.85), 10, 3, "crystal", tip=0.5)
+    bs = stage_bone(m, "stage2_back_shards", "torso", (0, 74.5, 9.5))
+    bs.spike((0, 74.0, 9.5), (0, 1.0, 0.36), 24, 6, "crystal", segs=[0.58, 0.48], taper=0.67, overlap=1.0, tip=0.5)
+    for s in (-1, 1):
+        shard(bs, (4.6 * s, 73.5, 10.0), (0.36 * s, 1.0, 0.32), 14, 4, "crystal", tip=0.45)
+    for s, nm in sides():
+        P = np.array([10.2 * s, 66.0, -11.4])                       # pectoral plate centre
+        eye_c = P + gp.rot_b([-8, -8 * s, 0]) @ np.array([1.3 * s, 0.5, -1.5])   # on the plate's front face
+        eye = stage_bone(m, f"stage2_{nm}_chest_eye", "torso", eye_c)
+        eye.box(P + np.array([1.3 * s, 0.5, -1.95]), (8, 6, 1), "chest_eye", rot=[-8, -8 * s, 0], pivot=P)
+
+    # ---- stage 3: a crown of floating obsidian spikes, end crystals set into the shoulders
+    cr = stage_bone(m, "stage3_spike_crown", "crown", (0, 92, -1.5))
+    for th, L in ((180, 19), (115, 16), (-115, 16), (55, 13), (-55, 13)):
+        t = math.radians(th)
+        out = np.array([math.sin(t), 0.0, -math.cos(t)])
+        base = np.array([0, 97.0, -1.5]) + 13.5 * out
+        shard(cr, base, out * 0.36 + np.array([0, 1.0, 0]), L, 3, "obsidian_spike", tip=0.5)
+    for s, nm in sides():
+        c = pauldron_top(s, 5.6) + np.array([0, 4.4, -5.0])
+        ec = stage_bone(m, f"stage3_{nm}_end_crystal", f"{nm}_pauldron", c - np.array([0, 4.4, 0]))
+        Ro = tl.axis_angle([0, 0, 1], 35.26 * s) @ tl.axis_angle([1, 0, 0], 45)   # stands on a corner
+        ec.box(c, (6, 6, 6), "end_frame", rot=Ro)
+        ec.box(c, (4, 4, 4), "end_core", rot=tl.axis_angle([0, 1, 0], 45) @ tl.axis_angle([1, 0, 0], 30))
+    for b in m.bones.values():
+        if b.name.startswith(("stage2_", "stage3_")):
+            for c in b.cubes:
+                c.params["no_ao"] = True        # never darkens the base model (it must look unchanged)
 
 # =============================================================================== shaders
 
@@ -374,6 +440,135 @@ def shade_cape(ctx):
     return rgb, np.where(shape, 255, 0), glow & shape & ~collar
 
 
+# ------------------------------------------------------------------------------- stage parts
+
+FACE_SHADE = {"north": 0.06, "west": 0.1, "east": -0.04, "south": -0.08, "up": 0.12, "down": -0.14}
+
+
+def spike_prog(ctx):
+    """0 at the base .. 1 at the tip of a crystal (stacked spike segments or a single box)."""
+    pr = ctx.params
+    if "spike_base" in pr:
+        return np.clip((ctx.p[:, 1] - pr["spike_base"][1]) / pr["spike_len"], 0, 1)
+    return np.clip((ctx.p[:, 1] - ctx.lo[1]) / max(1e-6, ctx.hi[1] - ctx.lo[1]), 0, 1)
+
+
+def taper_alpha(ctx, frac):
+    """Chisel point cut into the texture: over the top `frac` of the box the north and east faces
+    narrow to the edge they share and the south/west faces and the cap are cleared. All four faces
+    meeting in one apex on that edge reads as a single crystal point from every side (a symmetric
+    taper on each face would show a forked double tip from the diagonals). With the default 45 deg
+    spin that edge faces the front. Returns (shape mask, 0..1 distance from the cut edge)."""
+    full = np.ones(ctx.N, dtype=bool)
+    if frac <= 0:
+        return full, np.ones(ctx.N)
+    if ctx.face == "up":
+        return ~full, np.zeros(ctx.N)
+    if ctx.face == "down":
+        return full, np.ones(ctx.N)
+    w = np.clip(ctx.t / frac, 0, 1) ** 0.85          # face width left at this height (1 = full)
+    if ctx.face == "north":                          # apex at its +X end (s = 1)
+        x = 1 - ctx.s
+    elif ctx.face == "east":                         # apex at its -Z end (s = 0)
+        x = ctx.s
+    else:
+        return ctx.t >= frac, np.ones(ctx.N)
+    return x <= w + 0.5 / ctx.tw, np.clip(w - x, 0, 1)
+
+
+def _tip_frac(ctx):
+    pr = ctx.params
+    if "nseg" in pr:                                  # stacked spike: only the last segment tapers
+        return pr.get("tip", 0.5) if pr["seg"] == pr["nseg"] - 1 else 0.0
+    return pr.get("tip", 0.0)
+
+
+def shade_crystal(ctx):
+    """Purpur crystal shard: pale lilac facets that brighten towards the point, bright lit edges, a
+    glowing violet heart running up the middle and a glowing tip."""
+    prog = spike_prog(ctx)
+    shape, ed = taper_alpha(ctx, _tip_frac(ctx))
+    x = np.abs(ctx.s - 0.5) * 2
+    v = 0.42 + 0.34 * prog + FACE_SHADE.get(ctx.face, 0.0) + 0.18 * fx.spec(ctx, 4) - ctx.ao * 0.4
+    v = v + 0.08 * np.sin(ctx.p[:, 1] * 0.9 + ctx.index) * (1 - prog)          # growth bands
+    rgb = fx.dramp(em.PURPUR, v, ctx, 0.7)
+    glow = np.zeros(ctx.N, dtype=bool)
+    if ctx.face not in ("up", "down"):
+        edge = (ed < 0.16) | (x > 0.84)
+        rgb[edge] = fx.sramp(em.PURPUR, np.clip(v[edge] + 0.3, 0, 1))
+        heart = (x < 0.2 + 0.1 * (1 - prog)) & (prog > 0.12)
+        rgb[heart] = fx.sramp(em.ENDER, 0.52 + 0.3 * prog[heart])
+        tip = prog > 0.86
+        rgb[tip] = fx.sramp(em.ENDER, 0.7 + 0.25 * (prog[tip] - 0.86) / 0.14)
+        glow = heart | tip
+    elif ctx.face == "down":
+        rgb[:] = em.PURPUR[1]
+    return rgb, np.where(shape, 255, 0), glow & shape
+
+
+def shade_obsidian_spike(ctx):
+    """Floating obsidian spike: glossy black glass with a violet vein up its spine and a hot tip."""
+    prog = spike_prog(ctx)
+    shape, ed = taper_alpha(ctx, _tip_frac(ctx))
+    rgb, glow = em.obsidian(ctx, glints=True, seed=7)
+    if ctx.face not in ("up", "down"):
+        x = np.abs(ctx.s - 0.5) * 2
+        rim = ed < 0.18
+        rgb[rim] = em.OBSID[6]
+        wig = 0.12 * np.sin(ctx.t * 9 + ctx.index)
+        vein = (np.abs((ctx.s - 0.5) * 2 - wig) < 0.17) & (prog > 0.05)
+        rgb[vein] = fx.sramp(em.ENDER, 0.45 + 0.4 * prog[vein])
+        tip = prog > 0.8
+        rgb[tip] = fx.sramp(em.ENDER, 0.62 + 0.35 * (prog[tip] - 0.8) / 0.2)
+        glow = glow | vein | tip
+    return rgb, np.where(shape, 255, 0), glow & shape
+
+
+def shade_end_frame(ctx):
+    """End-crystal glass cage: a pale glowing frame with an inner hairline, glass otherwise clear."""
+    d = fx.edge_dist(ctx)
+    frame = d <= 1
+    inner = d == 3
+    glint = (np.abs(ctx.i - ctx.j) <= 0) & (d >= 3) & (d <= 4)
+    m = frame | inner | glint
+    rgb = np.zeros((ctx.N, 3)) + em.ENDER[7]
+    rgb[d == 1] = em.ENDER[6]
+    rgb[inner | glint] = em.ENDER[5]
+    return rgb, np.where(m, 255, 0), m
+
+
+def shade_end_core(ctx):
+    """End-crystal heart: magenta-violet facets crossed by dark seams, fully glowing."""
+    x, y = fx.plane_xy(ctx)
+    v = 0.78 - 0.32 * np.maximum(np.abs(x), np.abs(y)) + 0.1 * ((x < 0) & (y > 0)) + FACE_SHADE.get(ctx.face, 0) * 0.5
+    rgb = fx.mix(fx.sramp(em.MAGENTA, v), fx.sramp(em.ENDER, v + 0.05), 0.45)
+    seam = (np.abs(np.abs(x) - np.abs(y)) < 0.13) & (np.maximum(np.abs(x), np.abs(y)) > 0.25)
+    rgb[seam] = em.ENDER[1]
+    glow = ~seam
+    return rgb, 255, glow
+
+
+def shade_chest_eye(ctx):
+    """A newly opened ender eye on the pectoral: gold-lidded almond, violet sclera, teal iris with a
+    slit pupil (front face); the edges are obsidian."""
+    rgb, glow = em.obsidian(ctx, glints=False)
+    if ctx.face != "north":
+        return rgb, 255, glow
+    x, y = fx.plane_xy(ctx)
+    lid = np.abs(y) < 0.98 * (1 - x * x) ** 0.8
+    eye = np.abs(y) < 0.72 * (1 - (x / 0.9) ** 2).clip(0) ** 0.8
+    rgb[lid & ~eye] = fx.sramp(em.GOLD, 0.62 + 0.25 * y[lid & ~eye])
+    rgb[eye] = fx.sramp(em.ENDER, 0.38 + 0.25 * (1 - np.abs(x[eye])))
+    ix, iy = x * 1.45, y
+    r = np.sqrt(ix * ix + iy * iy)
+    iris = eye & (r < 0.62)
+    rgb[iris] = fx.sramp(em.TEAL, 0.92 - r[iris] * 0.6)
+    pupil = iris & (np.abs(ix) < 0.13 * (1 - (iy / 0.6) ** 2).clip(0) + 0.02) & (np.abs(iy) < 0.58)
+    rgb[pupil] = np.array([10, 30, 24])
+    glow = glow | (eye & ~pupil)
+    return rgb, 255, glow
+
+
 SHADERS = {
     "purpur_c": _wrap(lambda c: em.purpur(c, cracked=True)),
     "purpur_ct": _wrap(lambda c: em.purpur(c, cracked=True, trim="gold")),
@@ -396,6 +591,12 @@ SHADERS = {
     "crown": shade_crown,
     "cape": shade_cape,
     "rod": _wrap(lambda c: em.end_rod(c, c.params.get("tip", 0.0))),
+    # evolution stage parts
+    "crystal": shade_crystal,
+    "obsidian_spike": shade_obsidian_spike,
+    "end_frame": shade_end_frame,
+    "end_core": shade_end_core,
+    "chest_eye": shade_chest_eye,
 }
 
 # =============================================================================== animations

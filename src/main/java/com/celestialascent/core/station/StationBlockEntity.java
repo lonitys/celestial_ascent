@@ -145,6 +145,8 @@ public class StationBlockEntity extends BlockEntity {
         }
         if (be.progress >= be.type.processTicks) {
             ItemStack result = r.result().apply(be.items.getItem(0).copy());
+            boolean evolved = com.celestialascent.armor.ArmorStages.stage(result) > com.celestialascent.armor.ArmorStages.stage(be.items.getItem(0))
+                    && result.is(be.items.getItem(0).getItem());
             be.items.getItem(0).shrink(1);
             for (int i = 0; i < r.mats().size(); i++) be.items.getItem(i + 1).shrink(r.mats().get(i).count());
             be.items.setItem(be.outputSlot(), result);
@@ -153,6 +155,14 @@ public class StationBlockEntity extends BlockEntity {
             level.playSound(null, pos, SoundEvents.BEACON_POWER_SELECT, SoundSource.BLOCKS, 0.6f, 1.4f);
             if (level instanceof ServerLevel sl) {
                 sl.sendParticles(ParticleTypes.END_ROD, pos.getX() + 0.5, pos.getY() + 1.1, pos.getZ() + 0.5, 30, 0.3, 0.4, 0.3, 0.08);
+                if (evolved) {
+                    sl.sendParticles(ParticleTypes.TOTEM_OF_UNDYING, pos.getX() + 0.5, pos.getY() + 1.4, pos.getZ() + 0.5, 60, 0.4, 0.6, 0.4, 0.4);
+                    level.playSound(null, pos, SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.BLOCKS, 1f, 1f);
+                    int newStage = com.celestialascent.armor.ArmorStages.stage(result);
+                    var msg = net.minecraft.network.chat.Component.translatable("message.celestialascent.evolved", result.getHoverName(), newStage == 2 ? "II" : "III")
+                            .withStyle(net.minecraft.ChatFormatting.LIGHT_PURPLE);
+                    for (var p : sl.getEntitiesOfClass(net.minecraft.server.level.ServerPlayer.class, new net.minecraft.world.phys.AABB(pos).inflate(8))) p.sendSystemMessage(msg);
+                }
             }
         }
         be.setChanged();

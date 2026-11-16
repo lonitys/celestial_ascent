@@ -34,6 +34,17 @@ public class BossRenderer<T extends CelestialBoss> extends GeoEntityRenderer<T> 
         return stageTextures[Math.min(2, Math.max(0, animatable.phase()))];
     }
 
+    /** Evolution parts (stage2_/stage3_ bones) appear with the stage and grow out when it begins. */
+    @Override
+    public void preRender(PoseStack poseStack, T animatable, BakedGeoModel model, net.minecraft.client.renderer.MultiBufferSource bufferSource,
+                          com.mojang.blaze3d.vertex.VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, int colour) {
+        super.preRender(poseStack, animatable, model, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, colour);
+        int stage = animatable.phase() + 1;
+        float t = animatable.stageGrowth(partialTick);
+        float grow2 = animatable.stageBefore() < 1 ? t : 1, grow3 = animatable.stageBefore() < 2 ? t : 1;
+        StageBones.apply(model, stage, grow2, grow3);
+    }
+
     /** Bosses grow a little with every stage. */
     @Override
     public void scaleModelForRender(float widthScale, float heightScale, PoseStack poseStack, T animatable, BakedGeoModel model,

@@ -17,5 +17,7 @@ public final class Net {
         PayloadRegistrar r = e.registrar("1");
         r.playToClient(ProgressSync.TYPE, ProgressSync.STREAM_CODEC, ProgressSync::handle);
         r.playToServer(AbilityKey.TYPE, AbilityKey.STREAM_CODEC, AbilityKey::handle);
+        r.playToClient(com.celestialascent.boss.BossStagePayload.TYPE, com.celestialascent.boss.BossStagePayload.STREAM_CODEC,
+                com.celestialascent.boss.BossStagePayload::handle);
     }
 }

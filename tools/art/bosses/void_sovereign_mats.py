@@ -476,6 +476,220 @@ def shade_halo(ctx):
     return rgb, np.where(on, 255, 0), on
 
 
+# ============================================================================ evolution stage parts
+
+
+def _lp(ctx, axis):
+    """0..1 position of each texel along a cube-local axis (pre-rotation)."""
+    return np.clip((ctx.p[:, axis] - ctx.lo[axis]) / max(ctx.hi[axis] - ctx.lo[axis], 1e-6), 0, 1)
+
+
+def _blade_colour(ctx, prog, across, seed=0):
+    """Dark void glass for spikes: facet lit on one side, lighter violet towards the tip, a glowing
+    magenta core along the axis and cold lavender blade edges. across = -1..1 across the blade."""
+    v = crystal_v(ctx, seed, freq=0.24, stretch=0.35, base=0.24, striate=0.12, rim=0.0)
+    v += 0.22 * prog ** 1.6 + np.where(across < 0, 0.07, -0.05)
+    rgb = crystal_rgb(ctx, v, seed)
+    tint = (prog ** 2 * 0.35)[:, None]
+    rgb = rgb * (1 - tint) + sramp(VIO, 0.2 + 0.45 * v) * tint
+    along = np.sin(np.pi * np.clip(prog * 1.06, 0, 1)) ** 0.6
+    k = np.clip(1 - np.abs(across) / 0.34, 0, 1) * along
+    rgb = mix(rgb, sramp(MG, 0.12 + 0.2 * k), np.clip(k * 1.6, 0, 1) * 0.5)
+    core = k > 0.42
+    rgb[core] = sramp(MG, 0.45 + 0.45 * k[core])
+    rgb[k > 0.9] = MG[7]
+    edge = np.abs(across) > 0.8
+    rgb[edge] = sramp(VC, 0.72 + 0.18 * prog[edge])
+    return rgb, core
+
+
+def shade_taper(ctx):
+    """Stage 2 shoulder blade: a thin box whose broad faces (north/south) are cut to a faceted crystal
+    spike narrowing to the tip (t = 0 is the tip end); the narrow sides and the tip cap are open."""
+    if ctx.face in ("up", "east", "west"):
+        return np.zeros((ctx.N, 3)), 0, False
+    if ctx.face == "down":
+        rgb, _ = crystal(ctx, seed=12)
+        return rgb, 255, False
+    prog = 1 - ctx.t
+    x = (ctx.s - 0.5) * 2
+    half = (ctx.t ** 0.6) * (1 - 0.14 * (np.abs(np.sin(ctx.t * 8.0 + 0.6)) > 0.9))
+    inside = np.abs(x) <= half + 0.02
+    rgb, core = _blade_colour(ctx, prog, x / np.maximum(half, 1e-3), seed=12)
+    lit = ((half - np.abs(x)) * ctx.tw / 2 < 0.55) & (prog > 0.05)   # glowing lavender blade edges (1 texel)
+    rgb[lit] = sramp(VIO, 0.62 + 0.3 * prog[lit])
+    return rgb, np.where(inside, 255, 0), (core | lit) & inside
+
+
+# crown spikes per face: (centre 0..1 across the face measured on x (front/back) or z (sides) so the
+# crown is mirror-symmetric, half width, height above the band) in model units
+CROWN_SPIKES = {
+    "north": [(0.09, 1.3, 4.0), (0.3, 1.7, 6.6), (0.5, 2.1, 9.6), (0.7, 1.7, 6.6), (0.91, 1.3, 4.0)],
+    "south": [(0.2, 1.7, 5.6), (0.5, 2.0, 8.0), (0.8, 1.7, 5.6)],
+    "side": [(0.17, 1.4, 4.6), (0.5, 1.9, 7.6), (0.83, 1.4, 4.2)],
+}
+CROWN_BAND = 2.4
+
+
+def shade_void_crown(ctx):
+    """Stage 2 void crown: a hollow box on the skull. The lower 2.4 units of each side face are a dark
+    crystal band with a glowing violet rim line and a magenta void gem in front; above it the faces are
+    cut into tall jagged spikes of dark glass with magenta cores and glowing lavender edges (lavender so
+    they separate from the magenta fan crown behind). Top and bottom faces are open."""
+    if ctx.face in ("up", "down"):
+        return np.zeros((ctx.N, 3)), 0, False
+    H = ctx.th / 2.0
+    yb = (1 - ctx.t) * H                                  # units above the band's bottom edge
+    if ctx.face in ("north", "south"):
+        f, W = _lp(ctx, 0), ctx.hi[0] - ctx.lo[0]
+    else:
+        f, W = _lp(ctx, 2), ctx.hi[2] - ctx.lo[2]
+    xs = f * W
+    spikes = CROWN_SPIKES.get(ctx.face, CROWN_SPIKES["side"])
+    band = yb < CROWN_BAND
+    inside = band.copy()
+    prog = np.zeros(ctx.N)
+    across = np.ones(ctx.N)
+    edge_d = np.full(ctx.N, 99.0)
+    for cf, hw, hgt in spikes:
+        h = (yb - CROWN_BAND) / hgt
+        half = hw * np.clip(1 - h, 0, 1) ** 0.85 * (1 - 0.12 * (np.abs(np.sin(h * 7.0 + cf * 11)) > 0.85))
+        dx = xs - cf * W
+        on = (yb >= CROWN_BAND - 0.01) & (h <= 1) & (np.abs(dx) <= half)
+        inside |= on
+        prog = np.where(on, np.clip(h, 0, 1), prog)
+        across = np.where(on, dx / np.maximum(half, 1e-3), across)
+        edge_d = np.where(on, np.minimum(edge_d, half - np.abs(dx)), edge_d)
+    rgb, core = _blade_colour(ctx, prog, across, seed=14)
+    lit = ~band & (edge_d < 0.5) & (prog > 0.06)
+    rgb[lit] = sramp(VIO, 0.62 + 0.3 * prog[lit])
+    glow = (core | lit) & ~band
+    bv = crystal_v(ctx, 14, base=0.22, rim=0.0)
+    brgb = crystal_rgb(ctx, bv, 14)
+    rgb[band] = brgb[band]
+    rim = band & (yb > CROWN_BAND - 0.55)
+    low = band & (yb < 0.5)
+    rgb[rim] = sramp(VIO, np.full(int(rim.sum()), 0.66))
+    rgb[low] = rgb[low] * 0.7
+    glow |= rim
+    if ctx.face == "north":
+        gx, gy = (f - 0.5) * W, yb - 1.1
+        gem = np.abs(gx) / 1.4 + np.abs(gy) / 1.0 < 1.0
+        rgb[gem] = sramp(MG, 0.55 + 0.4 * (1 - np.abs(gx[gem]) / 1.4))
+        glow |= gem
+    return rgb, np.where(inside, 255, 0), glow & inside
+
+
+def shade_spectral(ctx):
+    """Stage 3 spectral arms: violet ghost-light. A dim emissive body of drifting smoke with a brighter
+    core streak down each face and magenta veins; the edges and the root (where the arm leaves the back)
+    dissolve in an ordered stipple, so the arms read soft and half-transparent rather than solid."""
+    prm = ctx.params
+    u = _lp(ctx, 1)                                       # 0 at the root end of this box
+    pw = ctx.pw
+    smoke = fbm(pw * np.array([0.9, 0.5, 0.9]), 0.22, 3, 301)
+    wisp = fbm(pw * np.array([1.4, 0.35, 1.4]), 0.3, 2, 303)
+    side = ctx.face not in ("up", "down")
+    x = np.abs(ctx.s - 0.5) * 2 if side else np.maximum(np.abs(ctx.s - 0.5), np.abs(ctx.t - 0.5)) * 2
+    v = 0.1 + 0.34 * smoke ** 1.4 + 0.3 * np.clip(1 - x / 0.55, 0, 1) ** 1.5
+    if prm.get("part") == "fore":
+        v = v + 0.06 + 0.1 * u
+    rgb = sramp(VIO, v + dither(ctx, 0.04))
+    f1, f2, _ = worley(pw * np.array([1.0, 0.45, 1.0]), 0.2, 307)
+    vein = (tex_dist(ctx, f2 - f1) < 0.8) & (smoke > 0.45)
+    rgb[vein] = sramp(MG, np.full(int(vein.sum()), 0.62))
+    bay = BAYER[ctx.j % 4, ctx.i % 4]
+    d = edge_dist(ctx)
+    stip = 0.25 * smoothstep(0.5, 0.68, wisp) + np.where(d == 0, 0.5, np.where(d == 1, 0.25, 0.0))
+    if prm.get("part") == "upper":
+        stip = stip + 0.8 * (1 - smoothstep(0.0, 0.45, u))
+    cut = bay < stip
+    if ctx.face == "down" and prm.get("part") == "upper":
+        cut[:] = True
+    return rgb, np.where(cut, 0, 255), ~cut
+
+
+BAYER = np.array([[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]], dtype=float) / 16.0 + 1 / 32.0
+
+
+def shade_spectral_claw(ctx):
+    """Open spectral claw hanging from the wrist: a small palm and five hooked talons with white-hot
+    magenta tips (all emissive)."""
+    W, H = ctx.tw / 2.0, ctx.th / 2.0
+    side = ctx.params.get("side", 1)
+    x = (ctx.s - 0.5) * W * side                          # mirrored so the thumb is on the inside
+    y = ctx.t * H                                         # 0 at the wrist
+    palm = (x / 2.8) ** 2 + ((y - 1.8) / 2.4) ** 2 < 1.0
+    inside = palm.copy()
+    tipm = np.zeros(ctx.N, dtype=bool)
+    prog = np.zeros(ctx.N)
+    talons = [(-1.9, -4.2, 9.6), (-0.6, -1.6, 10.6), (0.6, 1.2, 10.8), (1.8, 3.8, 9.8), (2.4, 4.6, 5.8)]
+    for x0, x1, y1 in talons:
+        y0 = 2.6
+        f = np.clip((y - y0) / (y1 - y0), 0, 1)
+        cx = x0 + (x1 - x0) * f ** 0.8 - 0.6 * f ** 3 * np.sign(x1)     # tips hook back inward
+        half = 0.75 * (1 - f) ** 0.8 + 0.12
+        on = (y >= y0 - 0.6) & (y <= y1) & (np.abs(x - cx) <= half)
+        inside |= on
+        prog = np.where(on, f, prog)
+        tipm |= on & (f > 0.78)
+    v = 0.34 + 0.3 * prog + 0.1 * (fbm(ctx.p, 0.5, 2, 311) - 0.5)
+    rgb = sramp(VIO, v + dither(ctx, 0.04))
+    rgb[tipm] = sramp(MG, 0.6 + 0.35 * prog[tipm])
+    return rgb, np.where(inside, 255, 0), inside
+
+
+def _ring_shards():
+    out = []
+    for k in range(12):
+        j = hash3(np.array([k]), np.array([3]), np.array([7]), 401)[0]
+        jl = hash3(np.array([k]), np.array([5]), np.array([1]), 403)[0]
+        ang = np.radians(k * 30.0 + (j - 0.5) * 12.0)
+        L = (11.5 if k % 2 == 0 else 7.0) + jl * 3.0
+        hw = (2.8 if k % 2 == 0 else 2.0) + 0.5 * j
+        out.append((ang, L, hw))
+    return out
+
+
+RING_SHARDS = _ring_shards()
+
+
+def shade_shard_ring(ctx):
+    """Stage 3 wheel of void shards floating behind the back: twelve jagged shards (alternating long
+    and short, slightly irregular) pointing outward from a broken glowing violet ring."""
+    W = ctx.tw / 2.0
+    x = (ctx.s - 0.5) * W
+    y = (0.5 - ctx.t) * W
+    r = np.sqrt(x * x + y * y)
+    a = np.arctan2(y, x)
+    r0 = 19.5
+    inside = np.zeros(ctx.N, dtype=bool)
+    prog = np.zeros(ctx.N)
+    across = np.ones(ctx.N)
+    for ang, L, hw in RING_SHARDS:
+        da = np.angle(np.exp(1j * (a - ang)))
+        along = r * np.cos(da)
+        perp = r * np.sin(da)
+        u = (along - r0) / L
+        prof = np.where(u < 0.25, 0.55 + 0.45 * u / 0.25, 1 - (u - 0.25) / 0.75)
+        half = hw * np.clip(prof, 0, 1)
+        on = (u >= -0.05) & (u <= 1) & (np.abs(perp) <= half) & (np.abs(da) < 1.0)
+        inside |= on
+        prog = np.where(on, np.clip(u, 0, 1), prog)
+        across = np.where(on, perp / np.maximum(half, 1e-3), across)
+    rgb, core = _blade_colour(ctx, prog, across, seed=16)
+    gap = np.zeros(ctx.N, dtype=bool)
+    for ang, L, hw in RING_SHARDS:
+        da = np.angle(np.exp(1j * (a - ang - np.radians(15))))
+        gap |= np.abs(da) < np.radians(3.5)
+    ring = (np.abs(r - 18.8) < 0.9) & ~gap & ~inside
+    thin = (np.abs(r - 16.4) < 0.35) & ~gap & ~inside
+    rgb[ring] = sramp(VIO, 0.55 + 0.3 * (np.abs(r[ring] - 18.8) < 0.4))
+    rgb[thin] = sramp(VIO, np.full(int(thin.sum()), 0.42))
+    shape = inside | ring | thin
+    return rgb, np.where(shape, 255, 0), (core & inside) | ring | thin
+
+
 SHADERS = {
     "crystal": _w(lambda c: crystal(c)),
     "crystal_cracked": _w(lambda c: crystal(c, seed=1, cracks=0.55)),
@@ -497,4 +711,10 @@ SHADERS = {
     "cloak": shade_cloak,
     "halo": shade_halo,
     "tabard": lambda c: shade_tabard(c),
+    # evolution stages
+    "void_crown": shade_void_crown,
+    "void_spike": shade_taper,
+    "spectral": shade_spectral,
+    "spectral_claw": shade_spectral_claw,
+    "shard_ring": shade_shard_ring,
 }

@@ -113,7 +113,66 @@ def build_model():
         foot.boxb(5.5 * s, 0, -1.5, 8, 3, 11, "obsidian")                           # foot
         foot.boxb(5.5 * s, 0, -7.0, 8, 2, 2, "gold")                                # toe cap
         foot.boxb(5.5 * s, 0, 4.6, 6, 2, 2, "obsidian")                             # heel spur
+    build_stages(m)
     return m
+
+
+# =============================================================================== evolution stages
+# BossRenderer shows bones named stage2_* from stage 2 on and stage3_* only in stage 3 (hiding a
+# bone hides its children) and scales them in from 0 at their pivot, so every pivot sits where the
+# part attaches. Stage bones are added after all base bones (base cube indices, which seed some
+# patterns, stay the same) and never occlude the base model in the baked AO, so with them hidden the
+# texture of the base model is unchanged.
+RING_C = np.array([0.0, 38.0, 15.0])   # rune ring centre (behind the back hump, clear of the mast tips)
+RING_R = 17.0
+
+
+def stage_bone(m, name, parent, pivot):
+    assert name.startswith(("stage2_", "stage3_")), name
+    return m.bone(name, parent, pivot)
+
+
+def build_stages(m):
+    # ---- stage 2: shoulder cannons on the hovering pauldrons, vented vambraces, reactor vents
+    for s, nm in sides():
+        # a point on the outer half of the pauldron's sloped top plate (plate: centre (15s, 44),
+        # 4 thick, rolled 20 deg outward-down); the cannon is built in the plate's frame
+        a = math.radians(20)
+        top = np.array([15 * s + 2 * math.sin(a) * s, 44 + 2 * math.cos(a), 0.0])
+        T = top + 3.9 * np.array([math.cos(a) * s, -math.sin(a), 0.0])
+        rz = [0, 0, 20 * s]
+        cn = stage_bone(m, f"stage2_{nm}_cannon", f"{nm}_pauldron", T)
+        L = lambda x, y, z: T + np.array([x * s, y, z])
+        cn.box(L(0, 2.5, 1.5), (7, 5, 9), "cannon_housing", rot=rz, pivot=T)          # turret housing
+        cn.box(L(0, 3.0, -6.5), (4, 4, 10), "barrel", rot=rz, pivot=T)                # barrel
+        cn.box(L(0, 3.0, -3.5), (5, 5, 2), "gold_band", rot=rz, pivot=T)              # barrel collar
+        cn.box(L(0, 3.0, -12.0), (6, 6, 2), "muzzle", rot=rz, pivot=T)                # muzzle brake
+        cn.box(L(0, 5.6, 3.0), (5, 2, 5), "cannon_vent", rot=rz, pivot=T)             # top heat sink
+        # vented armour plate bolted onto the front of the gauntlet
+        vb = stage_bone(m, f"stage2_{nm}_vambrace", f"{nm}_forearm", (14 * s, 20.5, -4.5))
+        vb.box((14 * s, 20.5, -5.5), (7, 8, 2), "vent_plate")
+    # reactor exhaust stacks on the lower back, flanking the spine under the back hump
+    for s, nm in sides():
+        rx = stage_bone(m, f"stage2_{nm}_reactor", "torso", (8.0 * s, 29.5, 5.5))
+        rx.box((8.0 * s, 29.5, 8.0), (5, 8, 6), "reactor_vent")
+
+    # ---- stage 3: a floating ring of rune tablets behind the back, an antenna crest on the head
+    ring = stage_bone(m, "stage3_rune_ring", "torso", RING_C)
+    for k in range(8):
+        th = math.radians(90 + 45 * k)
+        c = RING_C + RING_R * np.array([math.cos(th), math.sin(th), 0.0])
+        ring.box(c, (5, 8, 2), "rune_tablet", rot=[0, 0, -45 * k], glyph=k)
+    ring.plane(RING_C + np.array([0, 0, 0.6]), 40, 40, "rune_ring", r=RING_R)
+    ant = stage_bone(m, "stage3_antenna", "head", (0, 48.4, -1.0))
+    ant.boxb(0, 48.0, -1.0, 4, 2, 4, "gold")                                        # antenna collar
+    ant.boxb(0, 49.5, -1.0, 2, 13, 2, "rod", tip=0.16)                              # central mast
+    for s in (-1, 1):
+        rod(ant, (1.4 * s, 48.6, -1.0), (0.55 * s, 1.0, 0.12), 9, 1, "rod", tip=0.25)  # side whiskers
+    ant.box((0, 53.5, 1.4), (1, 7, 4), "gold_fin", rot=[-18, 0, 0], pivot=(0, 50.0, -0.2))   # rear blade
+    for b in m.bones.values():
+        if b.name.startswith(("stage2_", "stage3_")):
+            for c in b.cubes:
+                c.params["no_ao"] = True        # never darkens the base model (it must look unchanged)
 
 
 # =============================================================================== shaders
@@ -219,6 +278,161 @@ def shade_rod(ctx):
     return rgb, 255, glow
 
 
+# ------------------------------------------------------------------------------- stage parts
+
+def _along_z(ctx):
+    """0..1 coordinate along the cube's Z axis for side/top faces (front = 0)."""
+    if ctx.face in ("up", "down"):
+        return 1 - ctx.t
+    if ctx.face == "east":
+        return ctx.s
+    if ctx.face == "west":
+        return 1 - ctx.s
+    return np.full(ctx.N, 0.0 if ctx.face == "north" else 1.0)
+
+
+def shade_cannon_housing(ctx):
+    """Turret housing: gold-trimmed purpur with glowing louvre slits along both flanks."""
+    rgb, glow = em.purpur(ctx, trim="gold")
+    if ctx.face in ("east", "west"):
+        d = fx.edge_dist(ctx)
+        slot = (np.mod(ctx.i, 3) == 1) & (d >= 2) & (ctx.s > 0.18) & (ctx.s < 0.82)
+        rgb[slot] = fx.sramp(em.ENDER, 0.45 + 0.35 * (1 - np.abs(ctx.t[slot] - 0.5) * 2))
+        lip = (np.mod(ctx.i, 3) == 2) & (d >= 2) & (ctx.s > 0.18) & (ctx.s < 0.82)
+        rgb[lip] = rgb[lip] * 0.6
+        glow = glow | slot
+    return rgb, 255, glow
+
+
+def shade_barrel(ctx):
+    """Obsidian barrel with dark cooling grooves and a glowing energy rail along its top."""
+    rgb, glow = em.obsidian(ctx, glints=False)
+    if ctx.face in ("north", "south"):
+        x, y = fx.plane_xy(ctx)
+        core = np.maximum(np.abs(x), np.abs(y)) < 0.45
+        rgb[core] = em.ENDER[6]
+        return rgb, 255, glow | core
+    z = _along_z(ctx) * 20.0                          # texels along the 10-unit barrel
+    groove = np.mod(z, 6.0) < 1.0
+    rgb[groove] = em.OBSID[0]
+    if ctx.face == "up":
+        rail = (np.abs(ctx.s - 0.5) < 0.2) & ~groove
+        rgb[rail] = fx.sramp(em.ENDER, 0.62 + 0.25 * np.sin(z[rail] * 0.9))
+        glow = glow | rail
+    return rgb, 255, glow
+
+
+def shade_muzzle(ctx):
+    """Gold muzzle brake: a white-hot violet bore on the front, side ports glowing faintly."""
+    rgb, glow = em.gold(ctx, filig=False)
+    if ctx.face == "north":
+        x, y = fx.plane_xy(ctx)
+        r = np.maximum(np.abs(x), np.abs(y))
+        bore = r < 0.46
+        rim = (r >= 0.46) & (r < 0.64)
+        rgb[rim] = em.OBSID[1]
+        rgb[bore] = fx.sramp(em.ENDER, 1.0 - r[bore] * 0.9)
+        glow = glow | bore
+    elif ctx.face in ("east", "west", "up", "down"):
+        port = (fx.edge_dist(ctx) >= 1) & (np.abs(ctx.s - 0.5) < 0.24 if ctx.face in ("up", "down") else np.abs(ctx.t - 0.5) < 0.24)
+        port &= fx.edge_dist(ctx) >= 1
+        rgb[port] = em.ENDER[4]
+        glow = glow | port
+    return rgb, 255, glow
+
+
+def shade_cannon_vent(ctx):
+    """Heat sink on the turret: dark fins with violet light between them."""
+    rgb, glow = em.gold(ctx, filig=False)
+    if ctx.face == "up":
+        fin = np.mod(ctx.i, 3) == 0
+        gap = np.mod(ctx.i, 3) == 1
+        rgb[fin] = em.GOLD[3]
+        rgb[gap] = em.ENDER[5]
+        glow = glow | gap
+    elif ctx.face in ("east", "west", "north", "south"):
+        gap = (np.mod(ctx.i, 3) == 1) & (ctx.j >= 1)
+        rgb[gap] = em.ENDER[4]
+        glow = glow | gap
+    return rgb, 255, glow
+
+
+def shade_vent_plate(ctx):
+    """Bolted purpur armour plate with three glowing vent slots and gold rivets (front face)."""
+    rgb, glow = em.purpur(ctx, tile=8, trim="gold")
+    if ctx.face == "north":
+        d = fx.edge_dist(ctx)
+        slot = (np.mod(ctx.j - 4, 4) == 0) & (ctx.j >= 4) & (ctx.j <= 12) & (d >= 3)
+        lip = (np.mod(ctx.j - 5, 4) == 0) & (ctx.j >= 5) & (ctx.j <= 13) & (d >= 3)
+        rgb[slot] = fx.sramp(em.ENDER, 0.5 + 0.35 * (1 - np.abs(ctx.s[slot] - 0.5) * 2.2))
+        rgb[lip] = em.PURPUR[1]
+        glow = glow | slot
+    return rgb, 255, glow
+
+
+def shade_reactor_vent(ctx):
+    """Obsidian exhaust stack: gold top rim, a glowing grille on the back, a glowing exhaust port."""
+    rgb, glow = em.obsidian(ctx)
+    if ctx.face == "up":
+        x, y = fx.plane_xy(ctx)
+        r = np.maximum(np.abs(x), np.abs(y))
+        port = r < 0.55
+        rgb[r >= 0.7] = em.GOLD[6]
+        rgb[port] = fx.sramp(em.ENDER, 0.95 - r[port])
+        return rgb, 255, glow | port
+    rim = ctx.j <= 1
+    rgb[rim] = fx.sramp(em.GOLD, 0.75 - 0.15 * ctx.j[rim])
+    if ctx.face == "south":
+        d = fx.edge_dist(ctx)
+        grille = (np.mod(ctx.j, 3) == 0) & (d >= 2) & (ctx.j > 2)
+        rgb[grille] = fx.sramp(em.ENDER, 0.5 + 0.3 * (1 - np.abs(ctx.s[grille] - 0.5) * 2))
+        glow = glow | grille
+    return rgb, 255, glow
+
+
+def shade_rune_tablet(ctx):
+    """Floating rune tablet: obsidian slab in a gold frame, two glowing glyphs on each broad face."""
+    rgb, glow = em.obsidian(ctx, glints=True, seed=3)
+    d = fx.edge_dist(ctx)
+    if ctx.face in ("north", "south"):
+        rgb[d == 0] = em.GOLD[6]
+        rgb[d == 1] = em.GOLD[3]
+        k = ctx.params.get("glyph", 0)
+        m, _ = fx.runes(ctx.i.astype(float) - 1.0, ctx.j.astype(float) - 0.0, cell=8.0, seed=40 + 7 * k + (ctx.face == "south"),
+                        density=0.5, stroke=0.6, gap=0.22)
+        m &= (d >= 2)
+        rgb[m] = em.ENDER[5]
+        glow = glow | m
+    else:
+        rgb[:] = fx.sramp(em.GOLD, 0.55 + 0.25 * (ctx.face == "up") + fx.dither(ctx, 0.05))
+    return rgb, 255, glow
+
+
+def shade_rune_ring(ctx):
+    """The ring that binds the tablets: two glowing circles with a band of runes between them and an
+    inner circle with ticks (plane, transparent elsewhere)."""
+    x, y = fx.plane_xy(ctx)
+    R = ctx.tw / 4.0                                   # plane half-size in model units
+    X, Y = x * R, y * R
+    r = np.sqrt(X * X + Y * Y) + 1e-6
+    a = np.arctan2(Y, X)
+    rr = ctx.params.get("r", 17.0)
+    outer = np.abs(r - (rr + 1.4)) < 0.32
+    inner = np.abs(r - (rr - 1.4)) < 0.28
+    gx = (a / TAU + 0.5) * 2 * math.pi * rr / 1.2     # ~1.2 units per glyph texel unit
+    gy = (r - (rr - 1.0)) / 2.0 * 4.0
+    rm, _ = fx.runes(gx, gy, cell=4.0, seed=61, density=0.45, stroke=0.42, gap=0.18)
+    band = rm & (gy > 0.1) & (gy < 3.9)
+    tick_ring = np.abs(r - (rr - 5.5)) < 0.22
+    ticks = (r > rr - 5.5) & (r < rr - 3.6) & (np.abs(np.mod(a * 16 / TAU, 1) - 0.5) < 0.05 * 18 / np.maximum(r, 1))
+    m = outer | inner | band | tick_ring | ticks
+    rgb = np.zeros((ctx.N, 3)) + em.ENDER[5]
+    rgb[outer] = em.ENDER[6]
+    rgb[band] = em.ENDER[4]
+    rgb[tick_ring | ticks] = em.ENDER[4]
+    return rgb, np.where(m, 255, 0), m
+
+
 SHADERS = {
     "purpur": _wrap(lambda c: em.purpur(c)),
     "purpur_trim": _wrap(lambda c: em.purpur(c, trim="gold")),
@@ -237,6 +451,15 @@ SHADERS = {
     "orb": shade_orb,
     "lens_ring": shade_lens_ring,
     "rune_circle": shade_rune_circle,
+    # evolution stage parts
+    "cannon_housing": shade_cannon_housing,
+    "barrel": shade_barrel,
+    "muzzle": shade_muzzle,
+    "cannon_vent": shade_cannon_vent,
+    "vent_plate": shade_vent_plate,
+    "reactor_vent": shade_reactor_vent,
+    "rune_tablet": shade_rune_tablet,
+    "rune_ring": shade_rune_ring,
 }
 
 # =============================================================================== animations

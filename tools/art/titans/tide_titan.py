@@ -116,7 +116,78 @@ def build_model():
         foot.box((6 * s, 0.5, -9.0), (10, 1, 3), "fin", inflate=-0.05, shape="web", axis="y")
         for x in (3.0, 6.0, 9.0):
             foot.box((x * s, 1.0, -8.6), (2, 2, 2), "claw")
+    build_stages(m)
     return m
+
+# =============================================================================== boss stages
+# Bones named stage2_* are shown from boss stage 2 on, stage3_* only in stage 3; the renderer hides them
+# by name prefix and scales them in from 0 about their pivot. They are created after every base bone so
+# the base cubes keep their order, and _install_stage_ao keeps them out of the base cubes' baked AO, so
+# with all stage bones hidden the model looks exactly as before.
+
+STAGE_PREFIXES = ("stage2_", "stage3_")
+
+
+def is_stage_bone(bone):
+    while bone is not None:
+        if bone.name.startswith(STAGE_PREFIXES):
+            return True
+        bone = bone.model.bones.get(bone.parent) if bone.parent else None
+    return False
+
+
+def _install_stage_ao():
+    """Stage parts are hidden in stage 1, so they must not darken the always-visible cubes. Wraps the
+    shared painter's AO (a no-op for models without stage bones; installed once per process)."""
+    if getattr(tl.Painter, "_stage_ao", False):
+        return
+    base_ao = tl.Painter._ao
+    far = np.full(3, np.inf)
+
+    def _ao(self, pw, nw, cm, face, ci, boxes):
+        if not is_stage_bone(boxes[ci][0].bone):
+            boxes = [b if not is_stage_bone(b[0].bone) else b[:5] + (far, far) for b in boxes]
+        return base_ao(self, pw, nw, cm, face, ci, boxes)
+
+    tl.Painter._ao = _ao
+    tl.Painter._stage_ao = True
+
+
+_install_stage_ao()
+
+
+def build_stages(m):
+    # ---- stage 2 "Rising Tide": a coral-and-shell crown, barnacle shoulder plates with glowing gills
+    crown = m.bone("stage2_crown", "head", (0, 61.5, -6.5))
+    crown.box((0, 61.2, -6.5), (13, 2, 14), "gold", inflate=0.15, bracer=True)          # gold circlet
+    crown.spike((-4.2, 61.6, -10.8), (-0.35, 1.0, -0.25), 13, 4, "coral_pink", segs=[0.6, 0.4])
+    crown.spike((4.2, 61.6, -10.8), (0.35, 1.0, -0.25), 13, 4, "coral_orange", segs=[0.6, 0.4])
+    crown.spike((-5.6, 61.6, -3.0), (-0.65, 1.0, 0.3), 11, 3, "coral_orange", segs=[0.6, 0.4])
+    crown.spike((5.6, 61.6, -3.0), (0.65, 1.0, 0.3), 11, 3, "coral_pink", segs=[0.6, 0.4])
+    crown.spike((-6.6, 66.6, -11.8), (-1.0, 0.8, -0.2), 5, 2, "coral_pink", segs=[1.0])  # side branches
+    crown.spike((6.6, 66.6, -11.8), (1.0, 0.8, -0.2), 5, 2, "coral_orange", segs=[1.0])
+    crown.box((0, 63.8, -13.4), (7, 5, 1), "shell", rot=[-12, 0, 0])                     # scallop tiara
+    crown.box((0, 63.5, -14.1), (2, 2, 1), "pearl", inflate=0.15)
+    for s, nm in ((-1, "right"), (1, "left")):
+        # a flared slab of barnacle crust under the shell pauldron, widening the shoulders
+        sh = m.bone(f"stage2_{nm}_shoulder", f"{nm}_arm", (21.0 * s, 46.0, 0))
+        sh.box((22.4 * s, 40.8, 0), (3, 13, 14), "barn_plate", rot=[0, 0, -24 * s])
+        sh.box((25.0 * s, 42.2, -3.4), (3, 3, 3), "barnacle", rot=[0, 0, -24 * s])
+        sh.box((26.3 * s, 37.6, 2.8), (2, 3, 2), "barnacle", rot=[0, 0, -24 * s])
+        sh.box((24.0 * s, 45.4, 3.6), (2, 2, 2), "barnacle", rot=[0, 0, -24 * s])
+    # ---- stage 3 "Tsunami": a glowing fin crest down the spine and a halo of water orbs
+    fin = m.bone("stage3_fin_crest", "chest", (0, 44, 8))
+    fin.box((0, 53.5, 14.0), (1, 22, 14), "stage_fin", rot=[-14, 0, 0], inflate=-0.2, shape="dorsal")
+    nfin = m.bone("stage3_neck_fin", "neck", (0, 51, 2))
+    nfin.box((0, 51.5, 5.0), (1, 9, 7), "stage_fin", rot=[-22, 0, 0], inflate=-0.2, shape="dorsal")
+    tfin = m.bone("stage3_tail_fin", "tail", (0, 24, 9))
+    tfin.box((0, 25.2, 11.5), (1, 6, 10), "stage_fin", rot=[28, 0, 0], inflate=-0.2, shape="crest")
+    R, cy, cz = 13.0, 61.0, 8.0
+    orbs = m.bone("stage3_orb_halo", "head", (0, cy, cz))
+    for k, ang in enumerate(range(-30, 211, 40)):                                       # open at the bottom
+        sz = 5 if ang == 90 else (4 if k % 2 == 0 else 3)
+        a = math.radians(ang)
+        orbs.box((R * math.cos(a), cy + R * math.sin(a), cz), (sz, sz, sz), "orb", inflate=0.2)
 
 
 def build_trident(b, x, y, z):
@@ -424,6 +495,79 @@ def shade_tooth(ctx):
     return ramp(BARN, np.full(ctx.N, 0.85) - ctx.t * 0.2), 255, False
 
 
+ORB = palette("#0b3f8f", "#1263b8", "#1c8ad8", "#30b2ee", "#5fd6fa", "#a6efff", "#eafdff")
+
+
+def shade_barn_plate(ctx):
+    """Old crusted shell plate: grey-teal crust pitted with barnacle rings, three glowing gill slits on
+    the broad faces."""
+    p = ctx.p
+    f1, f2, cid = worley(p, 0.55, 33)
+    v = 0.55 + (fbm(p, 0.3, 3, 34) - 0.5) * 0.45 + (cid - 0.5) * 0.15
+    v += edge_term(ctx, 0.2, 0.18, 0.06) + vgrad(ctx, 0.12) - ctx.ao * 0.5
+    rgb = ramp(BARN, v) * 0.7 + ramp(SHELL, v) * 0.3
+    ring = (f1 > 0.16) & (f1 < 0.3) & (cid > 0.55)
+    rgb[ring] = ramp(BARN, np.full(ring.sum(), 0.85))
+    hole = (f1 <= 0.16) & (cid > 0.55)
+    rgb[hole] = np.array([18, 24, 26])
+    alg = fbm(p, 0.25, 3, 35) > 0.66
+    rgb[alg] = rgb[alg] * 0.6 + np.array([40, 80, 40]) * 0.4
+    glow = np.zeros(ctx.N, dtype=bool)
+    if ctx.face in ("west", "east"):
+        zf = (p[:, 2] - ctx.lo[2]) / (ctx.hi[2] - ctx.lo[2])
+        yf = (p[:, 1] - ctx.lo[1]) / (ctx.hi[1] - ctx.lo[1])
+        g = np.zeros(ctx.N, bool)
+        halo = np.zeros(ctx.N, bool)
+        for k in range(3):
+            curve = 0.28 + k * 0.22 + 0.07 * np.sin((yf - 0.15) * 3.2)
+            span = (yf > 0.16) & (yf < 0.86)
+            g |= (np.abs(zf - curve) < 0.03) & span
+            halo |= (np.abs(zf - curve) < 0.07) & (yf > 0.13) & (yf < 0.89)
+        halo &= ~g
+        rgb[halo] = rgb[halo] * 0.35 + np.array([30, 170, 175]) * 0.65
+        rgb[g] = GLOW[1]
+        rgb[g & (np.abs(yf - 0.5) < 0.2)] = GLOW[2]
+        glow = g | halo
+    elif ctx.face in ("north", "south"):                    # one long slit down the narrow edge
+        g = (np.abs(ctx.s - 0.5) < 0.18) & (ctx.t > 0.14) & (ctx.t < 0.86)
+        rgb[g] = GLOW[1]
+        glow = g
+    return rgb, 255, glow
+
+
+def shade_stage_fin(ctx):
+    """Stage fins: the regular fin membrane with a bioluminescent outline and glowing ray tips."""
+    rgb, alpha, glow = shade_fin(ctx)
+    p = ctx.p
+    shape = ctx.params.get("shape", "dorsal")
+    a = (p[:, 2] - ctx.lo[2]) / (ctx.hi[2] - ctx.lo[2])
+    b = (p[:, 1] - ctx.lo[1]) / (ctx.hi[1] - ctx.lo[1])
+    inside = alpha > 0
+    if shape == "dorsal":
+        rim = inside & ~fin_mask(shape, a + 0.09, b)
+    else:
+        rim = inside & ~fin_mask(shape, a, b + 0.09)
+    rgb[rim] = GLOW[1]
+    rgb[rim & (_th(ctx, 9) > 0.6)] = GLOW[2]
+    spots = inside & ~rim & (_th(ctx, 5) > 0.94)
+    rgb[spots] = GLOW[0]
+    return rgb, alpha, glow | rim | spots
+
+
+def shade_orb(ctx):
+    """Floating water orb: deep blue rim, bright cyan heart and a white glint (fully emissive)."""
+    x = (ctx.s - 0.5) * 2
+    y = (0.5 - ctx.t) * 2
+    r = np.sqrt(x * x + y * y)
+    v = 0.95 - r * 0.62
+    if ctx.face == "down":
+        v = v - 0.2
+    rgb = ramp(ORB, v)
+    glint = (np.abs(x + 0.35) < 0.22) & (np.abs(y - 0.35) < 0.22) & (ctx.face != "down")
+    rgb[glint] = ORB[-1]
+    return rgb, 255, True
+
+
 SHADERS = {
     "scales": shade_scales,
     "belly_scales": lambda c: shade_scales(c, belly=True),
@@ -440,6 +584,10 @@ SHADERS = {
     "pearl": shade_pearl,
     "claw": shade_claw,
     "tooth": shade_tooth,
+    # boss-stage parts
+    "barn_plate": shade_barn_plate,
+    "stage_fin": shade_stage_fin,
+    "orb": shade_orb,
 }
 
 # =============================================================================== animations

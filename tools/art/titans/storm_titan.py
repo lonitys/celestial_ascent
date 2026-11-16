@@ -112,7 +112,80 @@ def build_model():
         for x, z in ((14.6, -4.0), (17.0, -4.3), (19.4, -4.0)):
             fore.box((x * s, 16.6, z), (2, 5, 2), "claw", rot=[-18, 0, 0])
         fore.box((13.0 * s, 20.0, -2.5), (2, 4, 2), "claw", rot=[0, 0, 20 * s])  # thumb
+    build_stages(m)
     return m
+
+# =============================================================================== boss stages
+# Bones named stage2_* are shown from boss stage 2 on, stage3_* only in stage 3; the renderer hides them
+# by name prefix and scales them in from 0 about their pivot. They are created after every base bone so
+# the base cubes keep their order (shaders hash ctx.index), and _install_stage_ao keeps them out of the
+# base cubes' baked AO, so with all stage bones hidden the model looks exactly as before.
+
+STAGE_PREFIXES = ("stage2_", "stage3_")
+
+
+def is_stage_bone(bone):
+    while bone is not None:
+        if bone.name.startswith(STAGE_PREFIXES):
+            return True
+        bone = bone.model.bones.get(bone.parent) if bone.parent else None
+    return False
+
+
+def _install_stage_ao():
+    """Stage parts are hidden in stage 1, so they must not darken the always-visible cubes. Wraps the
+    shared painter's AO (a no-op for models without stage bones; installed once per process)."""
+    if getattr(tl.Painter, "_stage_ao", False):
+        return
+    base_ao = tl.Painter._ao
+    far = np.full(3, np.inf)
+
+    def _ao(self, pw, nw, cm, face, ci, boxes):
+        if not is_stage_bone(boxes[ci][0].bone):
+            boxes = [b if not is_stage_bone(b[0].bone) else b[:5] + (far, far) for b in boxes]
+        return base_ao(self, pw, nw, cm, face, ci, boxes)
+
+    tl.Painter._ao = _ao
+    tl.Painter._stage_ao = True
+
+
+_install_stage_ao()
+
+
+def lightning_rod(bone, base, direction, length):
+    """Copper rod (one box along direction) capped with a glowing charge ball."""
+    d = tl.unit(direction)
+    bone.spike(base, d, length, 2, "rod", segs=[1.0], spin=0.0)
+    bone.box(np.asarray(base) + d * (length - 0.4), (2, 2, 2), "rod_tip", rot=tl.orient(d), inflate=0.35)
+
+
+def build_stages(m):
+    # ---- stage 2 "Gathering Storm": a crown of copper lightning rods on the head and shoulders
+    crown = m.bone("stage2_rod_crown", "head", (0, 62.2, -4))
+    crown.box((0, 62.2, -4.0), (11, 2, 11), "copper", inflate=0.2, ring=True)            # copper circlet
+    lightning_rod(crown, (0, 62.4, -9.0), (0, 1.0, -0.08), 11)
+    for s in (-1, 1):
+        lightning_rod(crown, (3.2 * s, 62.4, -8.8), (0.18 * s, 1.0, -0.08), 9)
+        lightning_rod(crown, (5.4 * s, 62.4, -7.4), (0.42 * s, 1.0, -0.05), 7)
+    for s, nm in ((-1, "right"), (1, "left")):
+        rods = m.bone(f"stage2_{nm}_shoulder_rods", f"{nm}_arm", (17.5 * s, 54.5, -5.5))
+        lightning_rod(rods, (14.6 * s, 54.4, -5.6), (0.08 * s, 1.0, -0.1), 11)
+        lightning_rod(rods, (20.4 * s, 53.2, -5.2), (0.3 * s, 1.0, -0.1), 14)
+    # ---- stage 3 "Tempest": a great storm halo behind the back, thunderclouds and jagged charged plates
+    R, cy, cz, n = 22.0, 55.0, 15.0, 10
+    halo = m.bone("stage3_storm_halo", "chest", (0, cy, cz))
+    for k in range(n):
+        th = 360.0 * (k + 0.5) / n + 90                                          # a gap at the very top
+        a = math.radians(th)
+        rot = tl.euler(tl.axis_angle([0, 0, 1], th + 90))
+        halo.box((R * math.cos(a), cy + R * math.sin(a), cz), (11, 4, 3), "halo", rot=rot)
+    for s, nm in ((-1, "right"), (1, "left")):
+        # a dark thunderhead swallows the white shoulder cloud; charged slate shards burst out of it
+        tb = m.bone(f"stage3_{nm}_thunder", f"{nm}_arm", (19.0 * s, 55.0, 0))
+        tb.box((19.5 * s, 59.6, 2.2), (12, 7, 12), "storm_cloud", mane=True)
+        tb.spike((22.0 * s, 56.0, 0.5), (1.0 * s, 0.55, 0.0), 15, 5, "thunder", segs=[0.6, 0.4])
+        tb.spike((18.5 * s, 59.5, 5.0), (0.35 * s, 1.0, 0.55), 13, 5, "thunder", segs=[0.6, 0.4])
+        tb.spike((23.0 * s, 54.0, -3.0), (1.0 * s, 0.2, -0.5), 11, 4, "thunder", segs=[0.6, 0.4])
 
 # =============================================================================== shaders
 
@@ -274,6 +347,72 @@ def shade_claw(ctx):
     return ramp(PLATE, v), 255, False
 
 
+def shade_rod(ctx):
+    """Copper lightning rod: polished shaft with ring collars and verdigris, lit on one side."""
+    p = ctx.p
+    along = p[:, 1] - ctx.params["spike_base"][1]
+    v = 0.55 + (fbm(p, 0.4, 2, 6) - 0.5) * 0.2
+    if ctx.face not in ("up", "down"):
+        v += np.where(ctx.s < 0.5, 0.14, -0.12)
+    collar = np.mod(along, 3.5) < 0.6
+    v += collar * 0.22
+    v += edge_term(ctx, 0.1, 0.1, 0.0) - ctx.ao * 0.45
+    rgb = ramp(COPPER, v)
+    verd = (fbm(p, 0.6, 2, 33) > 0.62) & ~collar
+    rgb[verd] = ramp(VERD, 0.4 + (fbm(p, 1.0, 2, 7)[verd] - 0.5) * 0.6)
+    return rgb, 255, False
+
+
+def shade_rod_tip(ctx):
+    x = (ctx.s - 0.5) * 2
+    y = (0.5 - ctx.t) * 2
+    v = 0.95 - np.sqrt(x * x + y * y) * 0.45
+    return ramp(VEIN, v), 255, True
+
+
+def shade_halo(ctx):
+    """Storm-halo segments: dark charged slate with a crackling core line and bright rims."""
+    rgb, _, glow = shade_stone(ctx, plate=True)
+    rgb = rgb * 0.8
+    glow = glow | vein_layer(ctx, rgb, density=0.25, width=0.03)
+    if ctx.face in ("north", "south"):
+        mid = np.abs(ctx.t - 0.5) < 0.17
+        zz = np.abs(np.mod(ctx.i, 10) - 5) / 5.0
+        bolt = np.abs(ctx.t - (0.3 + 0.4 * zz)) < 0.12
+        rgb[bolt | mid & (zz > 0.9)] = VEIN[2]
+        glow = glow | bolt | (mid & (zz > 0.9))
+    rim = (ctx.j == 0) & (ctx.face not in ("up", "down"))
+    rgb[rim] = VEIN[0]
+    return rgb, 255, glow | rim
+
+
+def shade_thunder(ctx):
+    """Jagged thunder plates: slate shards split by glowing lightning, the tip white-hot."""
+    rgb, _, glow = shade_stone(ctx, plate=True)
+    glow = glow | vein_layer(ctx, rgb, density=0.1, width=0.026)
+    prm = ctx.params
+    prog = np.clip((ctx.p[:, 1] - prm["spike_base"][1]) / prm["spike_len"], 0, 1)
+    side = ctx.face not in ("up", "down")
+    edge = side & ((ctx.i == 0) | (ctx.i == ctx.tw - 1)) & (prog > 0.35)
+    rgb[edge] = VEIN[1]
+    tip = side & (prog > 0.8) | ((ctx.face == "up") & (prm["seg"] == prm["nseg"] - 1))
+    rgb[tip] = VEIN[3]
+    return rgb, 255, glow | edge | tip
+
+
+def shade_storm_cloud(ctx):
+    """Black-bellied thunderhead: the cloud billows darkened and blued, crackling with sparks."""
+    rgb, alpha, _ = shade_cloud(ctx, dark=True)
+    rgb = rgb * 0.55 + np.array([10, 14, 30])
+    spark = (_th(ctx, 43) > 0.972) & (alpha > 0)
+    rgb[spark] = VEIN[2]
+    p = ctx.p
+    n = vnoise(p, 0.3, 77)
+    fork = (np.abs(n - 0.5) < 0.018) & (fbm(p, 0.12, 2, 78) > 0.55) & (alpha > 0)
+    rgb[fork] = VEIN[1]
+    return rgb, alpha, spark | fork
+
+
 SHADERS = {
     "stone": shade_stone,
     "plate": lambda c: shade_stone(c, plate=True),
@@ -285,6 +424,12 @@ SHADERS = {
     "horn": shade_horn,
     "eye": shade_eye,
     "claw": shade_claw,
+    # boss-stage parts
+    "rod": shade_rod,
+    "rod_tip": shade_rod_tip,
+    "halo": shade_halo,
+    "thunder": shade_thunder,
+    "storm_cloud": shade_storm_cloud,
 }
 
 # =============================================================================== animations

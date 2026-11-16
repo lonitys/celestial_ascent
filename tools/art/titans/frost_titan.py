@@ -100,7 +100,78 @@ def build_model():
         foot = m.bone(f"{nm}_foot", f"{nm}_shin", (6.5 * s, 3.5, 0.5))
         foot.boxb(6.5 * s, 0, -1.5, 11, 4, 14, "stone")                         # foot
         foot.box((6.5 * s, 1.5, -9.2), (10, 3, 2), "ice")                       # ice toe cap
+    build_stages(m)
     return m
+
+# =============================================================================== boss stages
+# Bones named stage2_* are shown from boss stage 2 on, stage3_* only in stage 3; the renderer hides them
+# by name prefix and scales them in from 0 about their pivot. They are created after every base bone so
+# the base cubes keep their order (shaders hash ctx.index), and _install_stage_ao keeps them out of the
+# base cubes' baked AO, so with all stage bones hidden the model looks exactly as before.
+
+STAGE_PREFIXES = ("stage2_", "stage3_")
+
+
+def is_stage_bone(bone):
+    while bone is not None:
+        if bone.name.startswith(STAGE_PREFIXES):
+            return True
+        bone = bone.model.bones.get(bone.parent) if bone.parent else None
+    return False
+
+
+def _install_stage_ao():
+    """Stage parts are hidden in stage 1, so they must not darken the always-visible cubes. Wraps the
+    shared painter's AO (a no-op for models without stage bones; installed once per process)."""
+    if getattr(tl.Painter, "_stage_ao", False):
+        return
+    base_ao = tl.Painter._ao
+    far = np.full(3, np.inf)
+
+    def _ao(self, pw, nw, cm, face, ci, boxes):
+        if not is_stage_bone(boxes[ci][0].bone):
+            boxes = [b if not is_stage_bone(b[0].bone) else b[:5] + (far, far) for b in boxes]
+        return base_ao(self, pw, nw, cm, face, ci, boxes)
+
+    tl.Painter._ao = _ao
+    tl.Painter._stage_ao = True
+
+
+_install_stage_ao()
+
+
+def box_point(center, size, rot, f):
+    """Point of a box given like Bone.box(center, size, rot) at fractions f (-1..1 of each half size)."""
+    R = tl.gp.rot_b(rot)
+    return np.asarray(center, float) + R @ (np.asarray(size, float) / 2 * np.asarray(f, float))
+
+
+def build_stages(m):
+    # ---- stage 2 "Glacial Wrath": a towering ice crown and icicle-fringed pauldrons
+    crown = m.bone("stage2_crown", "head", (0, 58.6, -10))
+    crown.spike((0, 58.4, -7.0), (0, 1.0, 0.3), 19, 5, "glacier")                         # tall back spire
+    for s in (-1, 1):
+        crown.spike((4.0 * s, 58.4, -6.6), (0.45 * s, 1.0, 0.4), 15, 4, "glacier", segs=[0.6, 0.4])
+        crown.spike((5.0 * s, 55.0, -11.5), (1.0 * s, 0.75, -0.05), 15, 4, "glacier", segs=[0.6, 0.4])  # temple horns
+    for s, nm in ((-1, "right"), (1, "left")):
+        rim = ((20.2 * s, 44.2, 0), (14, 2, 16), (0, 0, -12 * s))                         # the pauldron rim cube
+        pd = m.bone(f"stage2_{nm}_pauldron", f"{nm}_arm", tuple(box_point(*rim, (0.2 * s, -1, 0))))
+        for fx, fz, L, w in ((0.0, -0.8, 9, 3), (0.55, -0.75, 11, 4), (0.9, -0.15, 14, 4), (0.85, 0.55, 11, 3)):
+            base = box_point(*rim, (fx * s, -0.55, fz))
+            pd.spike(base, (0.12 * s, -1.0, 0.1 * fz), L, w, "glacier", segs=[0.55, 0.45], icicle=True)
+    # ---- stage 3 "Absolute Zero": glacier spikes burst from the back, frozen claws, a blazing core
+    gl = m.bone("stage3_glacier", "chest", (0, 40, 8.5))
+    gl.spike((0, 36.5, 8.0), (0, 0.6, 1.0), 20, 7, "glacier")                             # straight back
+    for s in (-1, 1):                                                                     # towering side spires
+        gl.spike((7.0 * s, 40.0, 8.0), (0.5 * s, 1.0, 0.32), 32, 9, "glacier", segs=[0.42, 0.33, 0.25])
+    # the solar-plexus rune cracks open into a blazing core (the only chest spot clear of the beard)
+    core = m.bone("stage3_core", "chest", (0, 34.5, -9.6))
+    core.box((0, 34.5, -10.0), (9, 9, 2), "core_frame", rot=[0, 0, 45])
+    core.box((0, 34.5, -10.9), (6, 6, 2), "core", rot=[0, 0, 45], inflate=0.1)
+    for s, nm in ((-1, "right"), (1, "left")):                                            # hooked ice talons
+        cl = m.bone(f"stage3_{nm}_claws", f"{nm}_forearm", (18.5 * s, 13.0, -5.5))
+        for x in (22.0, 18.5, 15.0):
+            cl.curve_spike((x * s, 13.6, -5.4), [(0, -0.35, -1.0), (0, -1.0, -0.2)], [6, 8], [3, 2], "claw")
 
 # =============================================================================== shaders
 
@@ -255,6 +326,81 @@ def shade_eye(ctx):
     return ramp(EYE, v), 255, True
 
 
+def _spike_prog(ctx):
+    """0 at the base .. 1 at the tip of a spike / curve_spike (per texel)."""
+    prm = ctx.params
+    seg_prog = np.clip((ctx.p[:, 1] - prm["spike_base"][1]) / prm["spike_len"], 0, 1)
+    if "curve_prog0" in prm:
+        return prm["curve_prog0"] + (prm["curve_prog1"] - prm["curve_prog0"]) * seg_prog
+    return seg_prog
+
+
+def shade_glacier(ctx):
+    """Stage crystals: the faceted crystal look with a glowing cyan heart vein up the ridge and a
+    blazing tip, plus faint glowing fractures in the body."""
+    rgb, _, _ = shade_crystal(ctx, icicle=ctx.params.get("icicle", False))
+    prm = ctx.params
+    prog = _spike_prog(ctx)
+    last = prm.get("seg", 0) == prm.get("nseg", 1) - 1
+    side = ctx.face not in ("up", "down")
+    vein = side & (np.abs(ctx.s - 0.5) < 0.11) & (prog > 0.18)
+    core = vein & (np.abs(ctx.s - 0.5) < 0.05)
+    g1, g2, _ = worley(ctx.p, 0.3, 57)
+    frac = side & ((g2 - g1) < 0.05) & (prog < 0.75) & ~vein & (fbm(ctx.p, 0.25, 2, 58) > 0.45)
+    rgb[frac] = rgb[frac] * 0.45 + CRACK[2] * 0.55
+    rgb[vein] = CRACK[3]
+    rgb[core] = RUNE[3]
+    tip = np.zeros(ctx.N, dtype=bool)
+    if last:                                    # the local +Y end of the last segment is the point
+        tip = (prog > 0.84) if side else np.full(ctx.N, ctx.face == "up")
+        rgb[tip] = RUNE[3] if prm.get("icicle") else RUNE[2]
+    return rgb, 255, vein | frac | tip
+
+
+def shade_claw(ctx):
+    """Frozen talons: pale hard ice with a glowing cyan cutting edge, hottest at the point."""
+    p = ctx.p
+    prog = _spike_prog(ctx)
+    v = 0.5 - prog * 0.12 + np.where(ctx.s < 0.5, 0.08, -0.08) + (fbm(p, 0.4, 2, 23) - 0.5) * 0.12
+    v += edge_term(ctx, 0.2, 0.05, 0.08) - ctx.ao * 0.4
+    rgb = ramp(CRYS, v)
+    side = ctx.face not in ("up", "down")
+    edge = side & (np.abs(ctx.s - 0.5) < 0.14) & (prog > 0.3)
+    rgb[edge] = CRACK[3]
+    point = side & (prog > 0.82)
+    rgb[point] = RUNE[3]
+    return rgb, 255, edge | point
+
+
+def shade_core(ctx):
+    """The exposed heart of absolute zero: concentric rings of blazing cyan light."""
+    x = (ctx.s - 0.5) * 2
+    y = (0.5 - ctx.t) * 2
+    r = np.maximum(np.abs(x), np.abs(y)) if ctx.face == "north" else np.abs(x) * 0.6 + 0.4
+    v = 1.0 - r * 0.75 + (_texel_hash(ctx, 91) - 0.5) * 0.08
+    rgb = ramp(RUNE, v)
+    ring = (np.abs(r - 0.62) < 0.07) if ctx.face == "north" else np.zeros(ctx.N, bool)
+    rgb[ring] = CRACK[2]
+    if ctx.face == "north":
+        rgb[r < 0.22] = np.array([250, 255, 255])
+    return rgb, 255, True
+
+
+def shade_core_frame(ctx):
+    rgb, _, _ = shade_ice(ctx)
+    de = np.minimum(np.minimum(ctx.i, ctx.tw - 1 - ctx.i), np.minimum(ctx.j, ctx.th - 1 - ctx.j))
+    glow = np.zeros(ctx.N, dtype=bool)
+    if ctx.face == "north":
+        x = (ctx.s - 0.5) * 2
+        y = (0.5 - ctx.t) * 2
+        r = np.maximum(np.abs(x), np.abs(y))
+        halo = (r > 0.62) & (r < 0.86)
+        rgb[halo] = rgb[halo] * 0.35 + CRACK[3] * 0.65
+        glow = halo
+    rgb[de == 0] = rgb[de == 0] * 0.8
+    return rgb, 255, glow
+
+
 SHADERS = {
     "stone": shade_stone,
     "skull": lambda c: shade_stone(c, skull=True),
@@ -264,6 +410,11 @@ SHADERS = {
     "icicle": lambda c: shade_crystal(c, icicle=True),
     "rune": shade_rune,
     "eye": shade_eye,
+    # boss-stage parts
+    "glacier": shade_glacier,
+    "claw": shade_claw,
+    "core": shade_core,
+    "core_frame": shade_core_frame,
 }
 
 # =============================================================================== animations

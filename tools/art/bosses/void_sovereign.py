@@ -164,7 +164,74 @@ def build_model():
         cs.plane_from((11.5 * s, 65.5, 7.0), 14, 30, "cloak", pid=1 if s < 0 else 2, v0=0.0, v1=0.47, taper=1, total=64.0)
         csl = m.bone(f"cloak_{nm}_low", f"cloak_{nm}", (11.5 * s, 35.5, 7.0), rotation=[-2, 0, 0])
         csl.plane_from((11.5 * s, 35.5, 7.0), 14, 34, "cloak", pid=1 if s < 0 else 2, v0=0.47, v1=1.0, total=64.0)
+    build_stages(m)
     return m
+
+
+# =============================================================================== evolution stages
+# BossRenderer hides bones named stage2_* below stage 2 and stage3_* below stage 3 (with their children)
+# and grows them from scale 0 about their pivot. Stage bones come after every base bone (base cube order
+# seeds the shaders' noise) and their cubes are no_ao, so with them hidden the model is unchanged.
+# validate.py allows 140 cubes and the base uses 130, so the ten stage cubes lean on alpha cutout:
+#   stage 2: a void crown on the skull (one hollow box whose four faces are cut into spikes) and a
+#            great void blade jutting from each shoulder (one thin box each, cut to a faceted spike);
+#   stage 3: a pair of spectral arms reaching out of the back (upper arm, forearm, cutout claw plane,
+#            emissive with dissolving edges) and a wheel of void shards floating behind the back.
+SPECTRAL = {  # torso space: shoulder root, elbow, wrist (right side; mirrored for the left)
+    "root": (9.0, 59.0, 7.0), "elbow": (26.0, 57.0, 8.5), "wrist": (33.5, 50.0, -2.5)}
+SHARD_RING = dict(c=(0.0, 66.0, 14.5), size=68)
+
+
+def blade_spike(bone, base, d, face, length, width, mat, sink=1.5, thick=1, **params):
+    """A spike from ONE thin box: a flat crystal blade along d whose broad faces point along `face`; the
+    shader (void_sovereign_mats.shade_taper) cuts them to a faceted spike and leaves the narrow sides open.
+    `sink` buries the base."""
+    ey = tl.unit(d)
+    n = np.asarray(face, dtype=float)
+    ez = tl.unit(n - ey * float(n @ ey))
+    R = np.column_stack([np.cross(ey, ez), ey, ez])
+    b0 = np.asarray(base, dtype=float) - ey * sink
+    return bone.box(b0 + ey * (length / 2.0), (width, length, thick), mat, rot=R, **params)   # turns about its centre
+
+
+def frame_down(down, across):
+    """Rotation taking plane-local -Y (texture down) to `down` and +X towards `across`."""
+    ey = -tl.unit(down)
+    ex = np.asarray(across, dtype=float)
+    ex = tl.unit(ex - ey * float(ex @ ey))
+    return np.column_stack([ex, ey, np.cross(ex, ey)])
+
+
+def build_stages(m):
+    # ---------------------------------------------------------------- stage 2: void crown + shoulder spikes
+    cr = m.bone("stage2_void_crown", "head", (0, 81.5, -1.5))
+    cr.cube((-5.5, 81.0, -6.2), (11, 12, 10), "void_crown")
+    for s, nm in sides():
+        sp = m.bone(f"stage2_shoulder_spike_{nm}", f"{nm}_arm", (19.0 * s, 65.0, 1.0))
+        blade_spike(sp, (19.0 * s, 65.0, 1.0), (1.0 * s, -0.06, -0.3), (0, 0.45, -1.0), 20, 7, "void_spike", sink=2.5)
+
+    # ---------------------------------------------------------------- stage 3: spectral arms + shard wheel
+    for s, nm in sides():
+        root, elbow, wrist = (np.array([p[0] * s, p[1], p[2]]) for p in (SPECTRAL["root"], SPECTRAL["elbow"],
+                                                                          SPECTRAL["wrist"]))
+        sa = m.bone(f"stage3_spectral_arm_{nm}", "torso", tuple(root))
+        d1, d2 = elbow - root, wrist - elbow
+        L1, L2 = float(np.linalg.norm(d1)), float(np.linalg.norm(d2))
+        d1, d2 = d1 / L1, d2 / L2
+        sa.box(root + d1 * (L1 / 2), (4, int(round(L1 + 2)), 4), "spectral", rot=tl.orient(d1),
+               part="upper", side=s)
+        sa.box(elbow + d2 * (L2 / 2 - 0.5), (3, int(round(L2 + 2)), 3), "spectral", rot=tl.orient(d2),
+               part="fore", side=s)
+        # open claw hanging from the wrist, facing forward so the talons read from the front
+        R = frame_down(0.45 * d2 + np.array([0.0, -1.0, 0.0]), np.array([1.0, 0.0, 0.0]))
+        sa.plane_from(tuple(wrist - d2 * 1.0), 10, 11, "spectral_claw", rot=R, anchor_st=(0.5, 0.0), side=s)
+    c = SHARD_RING["c"]
+    ring = m.bone("stage3_shard_ring", "torso", (0.0, 62.0, 8.2))
+    ring.plane(c, SHARD_RING["size"], SHARD_RING["size"], "shard_ring")
+    for b in m.bones.values():
+        if b.name.startswith(("stage2_", "stage3_")):
+            for cb in b.cubes:
+                cb.params["no_ao"] = True
 
 
 # =============================================================================== animation helpers

@@ -261,7 +261,6 @@ public class LangGen extends LanguageProvider {
         add("constellation.celestialascent.sovereign", "The Void Sovereign");
 
         // ---- boss stages ----
-        add("boss.celestialascent.stage", "Stage %s: %s");
         add("boss.celestialascent.frost_titan.stage2", "Glacial Wrath");
         add("boss.celestialascent.frost_titan.stage3", "Absolute Zero");
         add("boss.celestialascent.tide_titan.stage2", "Rising Tide");
@@ -291,6 +290,26 @@ public class LangGen extends LanguageProvider {
         add("message.celestialascent.hint.overload", "Jump over the beam!");
         add("message.celestialascent.hint.crystal_choir", "Break the crystals before they heal it!");
         add("message.celestialascent.hint.devour", "Run from its maw!");
+
+        // ---- stages: banner, armor evolution ----
+        add("boss.celestialascent.banner", "STAGE %s");
+        add("tooltip.celestialascent.stage", "Stage %s");
+        add("tooltip.celestialascent.max_stage", "Fully evolved");
+        add("tooltip.celestialascent.resonance", "%s / %s resonance");
+        add("tooltip.celestialascent.ready", "Ready to evolve at: %s");
+        add("tooltip.celestialascent.resonance_hint", "Fight while wearing it to fill its resonance");
+        add("message.celestialascent.resonance_full", "%s is resonating! Complete its evolution at: %s");
+        add("message.celestialascent.evolved", "%s reached stage %s!");
+        add("tooltip.celestialascent.set_stage.titan.2", "Set stage II: every element counts one level higher");
+        add("tooltip.celestialascent.set_stage.titan.3", "Set stage III: permanent Resistance I");
+        add("tooltip.celestialascent.set_stage.imperial.2", "Set stage II: blink 16 blocks, every 3.75 s");
+        add("tooltip.celestialascent.set_stage.imperial.3", "Set stage III: blink 20 blocks, every 2.5 s, shockwave on arrival");
+        add("tooltip.celestialascent.set_stage.stellar.2", "Set stage II: Regeneration II under the night sky");
+        add("tooltip.celestialascent.set_stage.stellar.3", "Set stage III: falling stars strike your attackers at night");
+        add("tooltip.celestialascent.set_stage.void.2", "Set stage II: Void Dash every 3 s");
+        add("tooltip.celestialascent.set_stage.void.3", "Set stage III: Void Dash every 2 s, tears through monsters");
+        add("tooltip.celestialascent.set_stage.ascendant.2", "Set stage II: farther blink, faster dash");
+        add("tooltip.celestialascent.set_stage.ascendant.3", "Set stage III: allies near you regenerate");
 
         // ---- codex ----
         add(com.celestialascent.guide.Guide.CODEX.get(), "Celestial Codex");

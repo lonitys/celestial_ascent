@@ -370,18 +370,18 @@ public class GuideScreen extends Screen {
         y += 24;
         for (int i = 0; i < GuideChapters.ALL.size(); i++) {
             Chapter c = GuideChapters.ALL.get(i);
-            int rowY = y + i * 12;
-            boolean hov = over(mx, my, x, rowY - 1, PAGE_W, 12);
-            if (hov) g.fill(x - 2, rowY - 1, x + PAGE_W + 2, rowY + 11, HOVER_ROW);
+            int rowY = y + i * 11;
+            boolean hov = over(mx, my, x, rowY - 1, PAGE_W, 11);
+            if (hov) g.fill(x - 2, rowY - 1, x + PAGE_W + 2, rowY + 10, HOVER_ROW);
             g.pose().pushPose();
-            g.pose().translate(x, rowY - 1, 0);
-            g.pose().scale(0.75f, 0.75f, 1f);
+            g.pose().translate(x + 1, rowY - 1, 0);
+            g.pose().scale(0.65f, 0.65f, 1f);
             g.renderItem(new ItemStack(c.icon().get()), 0, 0);
             g.pose().popPose();
             Component name = Component.translatable(c.titleKey()).withStyle(hov ? Style.EMPTY.withUnderlined(true) : Style.EMPTY);
             g.drawString(font, ellipsize(name, PAGE_W - 16), x + 16, rowY + 1, hov ? LINK : INK, false);
             int index = i;
-            hits.add(new Hit(x, rowY - 1, x + PAGE_W, rowY + 11, () -> {
+            hits.add(new Hit(x, rowY - 1, x + PAGE_W, rowY + 10, () -> {
                 chapter = index;
                 spread = 0;
                 turn();

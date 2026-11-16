@@ -63,6 +63,18 @@ public final class Showcase {
         return "summon armor_stand " + x + " 201 6 {ShowArms:1b,NoBasePlate:1b,NoGravity:1b,Rotation:[180f,0f],ArmorItems:[" + sb + "]}";
     }
 
+    /** An armor stand wearing a full set at an evolution stage (front view). */
+    private static String stagedStand(double x, String set, String element, int stage) {
+        String comp = ",components:{\"celestialascent:armor_stage\":" + stage + (element == null ? "" : ",\"celestialascent:element\":\"" + element + "\"") + "}";
+        String[] pieces = {"boots", "leggings", "chestplate", "helmet"};
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 4; i++) {
+            if (i > 0) sb.append(',');
+            sb.append("{id:\"celestialascent:").append(set).append('_').append(pieces[i]).append("\",count:1").append(comp).append('}');
+        }
+        return "summon armor_stand " + x + " 200 -5 {ShowArms:1b,NoBasePlate:1b,NoGravity:1b,Rotation:[180f,0f],ArmorItems:[" + sb + "]}";
+    }
+
     private static String boss(String id, double x, double y, double z) {
         return "summon celestialascent:" + id + " " + x + " " + y + " " + z + " {NoAI:1b,Rotation:[180f,0f],PersistenceRequired:1b}";
     }
@@ -97,6 +109,23 @@ public final class Showcase {
             step(50, t, 0, big ? -10 : 0, CLEAR, boss(t, 0, t.equals("astral_seraph") || t.equals("nebula_leviathan") ? 202 : 200, 3),
                     "tp @s 0 " + (big ? "203" : "202.5") + " " + (big ? "-9" : "-6") + " 0 0");
         }
+        // Armor evolution: each set at stage I, II and III
+        for (String[] set : new String[][]{{"titan", "frost"}, {"imperial", null}, {"stellar", null}, {"void", null}, {"ascendant", null}}) {
+            step(40, "armor_stages_" + set[0], 0, 8, CLEAR, stagedStand(-2.2, set[0], set[1], 1), stagedStand(0, set[0], set[1], 2),
+                    stagedStand(2.2, set[0], set[1], 3), "tp @s 0 201.3 -8.6 0 8");
+            step(25, "armor_stages_" + set[0] + "_back", 180, 8, "tp @s 0 201.3 -1.4 180 8");
+        }
+        // HUD: the custom boss bar and the stage banner (a real stage change: the titan loses health)
+        // Earlier shots leave bosses whose bars would fill the screen (named so it only runs with the HUD shots).
+        step(90, "hud_clear", 0, 0, "kill @e[type=!minecraft:player]", "fill -24 200 -12 24 230 24 minecraft:air");
+        STEPS.add(new Step(50, p -> {
+            cmd(p, "summon celestialascent:frost_titan 0 200 10 {Rotation:[180f,0f],PersistenceRequired:1b}");
+            cmd(p, "tp @s 0 202 -3 0 5");
+        }, "hud_bar", 0, 5, CameraType.FIRST_PERSON));
+        step(14, "hud_banner", 0, 5, "data merge entity @e[type=celestialascent:frost_titan,limit=1] {Health:220f}");
+        step(95, "hud_stage2", 0, 5, "tp @s 0 202 -3 0 5");
+        step(14, "hud_banner3", 0, 5, "data merge entity @e[type=celestialascent:frost_titan,limit=1] {Health:110f}");
+        step(95, "hud_stage3", 0, 5, "tp @s 0 202 -3 0 5");
         // Evolution: each boss in its three stages side by side (stage textures, growth)
         Object[][] stages = {{"frost_titan", 5, 12, 200}, {"tide_titan", 5, 12, 200}, {"storm_titan", 5, 12, 200}, {"magma_titan", 5, 12, 200},
                 {"sentinel_construct", 4, 10, 200}, {"ender_colossus", 7, 17, 200}, {"astral_seraph", 5, 12, 202},
@@ -183,7 +212,7 @@ public final class Showcase {
         codex("codex_front_late", Constellations.ALL.stream().map(c -> c.boss().toString()).toList(), null, null);
         String[][] spreads = {{"intro", null}, {"economy", null}, {"titans", "titans"}, {"titans", "titan_armor"}, {"dragon", null},
                 {"empire", "empire"}, {"empire", "imperial_armor"}, {"stargate", null}, {"stars", "celestials"}, {"stars", "stellar_armor"},
-                {"abyss", "abyss"}, {"abyss", "void_armor"}, {"ascendant", null}, {"constellations", null}, {"projecte", null}};
+                {"abyss", "abyss"}, {"abyss", "void_armor"}, {"ascendant", null}, {"evolution", null}, {"constellations", null}, {"projecte", null}};
         for (String[] sp : spreads) codex("codex_" + sp[0] + (sp[1] == null ? "" : "_" + sp[1]), null, sp[0], sp[1]);
         STEPS.add(new Step(10, p -> Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(null)), null, 0, 0, CameraType.FIRST_PERSON));
         // Constellations
@@ -270,7 +299,7 @@ public final class Showcase {
             s = STEPS.get(index);
         }
         Step step = s;
-        mc.options.hideGui = true;
+        mc.options.hideGui = step.shot() == null || !step.shot().startsWith("hud_"); // HUD shots keep the HUD
         mc.options.setCameraType(step.camera());
         timer = step.ticks();
         MinecraftServer server = mc.getSingleplayerServer();

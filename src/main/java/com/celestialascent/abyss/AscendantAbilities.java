@@ -49,7 +49,15 @@ public class AscendantAbilities implements ArmorAbility {
         for (ArmorAbility a : parts) a.tick(p);
         p.getFoodData().setFoodLevel(20);
         p.getFoodData().setSaturation(Math.max(p.getFoodData().getSaturationLevel(), 10f));
-        if (p.tickCount % 40 == 0) p.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 60, 1, true, false, true));
+        if (p.tickCount % 40 == 0) {
+            p.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 60, 1, true, false, true));
+            if (com.celestialascent.armor.ArmorStages.setStage(p) >= 3) {
+                // Set stage III: allies close by regenerate too.
+                for (var ally : p.level().getEntitiesOfClass(ServerPlayer.class, p.getBoundingBox().inflate(8), o -> o != p && o.isAlive())) {
+                    ally.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 60, 0, true, true, true));
+                }
+            }
+        }
     }
 
     @Override

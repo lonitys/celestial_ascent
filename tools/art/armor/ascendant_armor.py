@@ -31,6 +31,7 @@ GEMS = {
 ELEMENT_RGB = {"frost": (110, 210, 255), "tide": (70, 230, 200), "storm": (255, 226, 80), "magma": (255, 130, 40)}
 LIGHT = M.pal("#b08a3a", "#d2ae5a", "#ebcd82", "#f8e3a8", "#fff1cc", "#fff9e8", "#ffffff")
 IRIDESCENT = [np.array([255, 214, 236]), np.array([206, 236, 255]), np.array([255, 240, 206])]
+LUMEN = M.pal("#6f8fe0", "#93b2f2", "#b8cefa", "#d8e6ff", "#eef4ff", "#ffffff")   # luminous light wings
 
 
 # =============================================================================== geometry
@@ -142,7 +143,142 @@ def build_model():
         wb = m.bone(f"ankleWing{'R' if side < 0 else 'L'}", "armorRightBoot" if side < 0 else "armorLeftBoot",
                     (5.0 * side, 3.5, 0.5), rotation=[0, 24 * side, 0])
         cube(wb, (5.0 * side, 2.0, 0.5), (0, 5, 5), "hwing", side=side, small=True)
+    build_stage_parts(m)
     return m
+
+
+# =============================================================================== stage parts
+# Evolving armor: bones named "stage2_*" are shown when the piece is stage 2 or 3, "stage3_*" only at
+# stage 3 (the renderer toggles them by that prefix). They are created after every base bone, so base
+# cubes keep their cube index (texel hashes), and StagedPainter keeps them out of the base AO: with the
+# stage bones hidden every piece renders exactly as it did before.
+
+STAGE_PREFIXES = ("stage2_", "stage3_")
+
+
+def stage_level(name):
+    return 3 if name.startswith("stage3_") else 2 if name.startswith("stage2_") else 1
+
+
+def stage_bone(m, name, parent, pivot):
+    assert name.startswith(STAGE_PREFIXES), name
+    return m.bone(name, parent, [round(float(x), 4) for x in pivot])
+
+
+def stage_pair(m, name, limb, pivot_r):
+    """Mirrored stage bones <name>R / <name>L under armorRight<limb> / armorLeft<limb>."""
+    x, y, z = pivot_r
+    return (stage_bone(m, name + "R", "armorRight" + limb, (x, y, z)),
+            stage_bone(m, name + "L", "armorLeft" + limb, (-x, y, z)))
+
+
+class StagedPainter(al.Painter):
+    """AO that follows stage visibility: a cube only receives occlusion from cubes that are visible
+    whenever it is (base <- base, stage 2 <- base + stage 2, stage 3 <- everything)."""
+
+    def _ao(self, pw, nw, cm, face, ci, boxes):
+        lvl = stage_level(boxes[ci][0].bone.name)
+        far = (np.full(3, 1e9), np.full(3, -1e9))       # empty bounds: skipped by the AO loop
+        boxes = [b if b[0] is None or stage_level(b[0].bone.name) <= lvl else b[:5] + far for b in boxes]
+        return super()._ao(pw, nw, cm, face, ci, boxes)
+
+
+def check_stage_bones(m):
+    names = list(m.bones)
+    first = next((i for i, n in enumerate(names) if stage_level(n) > 1), len(names))
+    assert all(stage_level(n) > 1 for n in names[first:]), "stage bones must come after every base bone"
+    for b in m.bones.values():
+        if b.parent and stage_level(b.parent) > 1:
+            assert stage_level(b.name) == stage_level(b.parent), f"{b.name} needs its parent's stage prefix"
+
+
+def paint_staged(m, shaders, ao=0.85):
+    check_stage_bones(m)
+    return StagedPainter(m, shaders, ao_strength=ao, occluders=ak.BODY_BOXES).paint()
+
+
+def sym_rows(br, bl, x0, rows, mats, width=1, rot=None, pivot=None, **params):
+    """Mirrored pixel-stepped fin in the YZ plane: rows = [(y, z0, z1), ...] of 1 px tall bars spanning
+    x0..x0+width on the right bone (mirrored onto the left one). mats: one per row, or a single name."""
+    for k, (y, z0, z1) in enumerate(rows):
+        mat = mats[k] if isinstance(mats, (list, tuple)) else mats
+        sym(br, bl, (x0, y, z0), (width, 1, z1 - z0), mat, rot=rot, pivot=pivot, **params)
+
+
+def build_stage_parts(m):
+    # ------------------------------------------------------------------ helmet
+    # stage 2: radiant halo - an outer, counter-rotating ring of light rays around the halo
+    hr = stage_bone(m, "stage2_haloRays", "armorHead", (0, 36.2, 0))
+    for k in range(8):
+        a = math.radians(k * 45 + 22.5)
+        sa, ca = math.sin(a), math.cos(a)
+        cross_sprite(hr, (round(6.6 * sa, 3), 35.6, round(-6.6 * ca, 3)), (0.75 * sa, 0.66, -0.75 * ca), 3, 2, "ray",
+                     spin=k * 45 + 22.5)
+    # stage 3: gold crown - jeweled band round the temples and back, stepped spires, prism-set centre spire
+    cr = stage_bone(m, "stage3_crown", "armorHead", (0, 30.0, 0))
+    sym(cr, cr, (-6.4, 30.0, -4.4), (1, 2, 10), "gold", band=True)                       # side bands
+    cube(cr, (-6.4, 30.0, 5.6), (13, 2, 1), "gold", band=True)                           # back band
+    for k, w in enumerate((3, 2, 1)):                                                    # centre spire
+        cr.boxb(0, 31.4 + k, -5.8, w, 1, 1, "gold")
+    boxc(cr, (0, 32.9, -6.45), (1, 1, 1), "gem", rot=[0, 0, 45], element="prism", inflate=0.1)
+    for x in (-3.3, 3.3):                                                                # front side spires
+        for k, w in enumerate((2, 1)):
+            cr.boxb(x, 31.0 + k, -5.3, w, 1, 1, "gold")
+    for side in (-1, 1):                                                                 # side spires
+        for z in (-2.0, 2.6):
+            for k, d in enumerate((2, 1)):
+                cr.boxb(5.9 * side, 32.0 + k, z, 1, 1, d, "gold")
+    for x in (-3.2, 0.0, 3.2):                                                           # back spires
+        for k, w in enumerate((2, 1)):
+            cr.boxb(x, 32.0 + k, 6.1, w, 1, 1, "gold")
+    for (x, z, el) in ((-5.9, -4.4, "magma"), (5.9, -4.4, "frost"), (-5.9, 5.6, "tide"), (5.9, 5.6, "storm")):
+        gem(cr, (x, 32.6, z), (1, 1, 1), el, rot=(0, 45, 0), inflate=0.12)               # corner jewels
+
+    # ------------------------------------------------------------------ chestplate
+    # stage 2: ornate pauldrons - jeweled gold cap, extra gold-trimmed lame, pearl and gold star medallion
+    pr, pl = stage_pair(m, "stage2_pauldron", "Arm", (-7.4, 25.0, 0))
+    sym(pr, pl, (-10.4, 25.0, -3.5), (6, 1, 7), "gold", band=True)
+    sym(pr, pl, (-11.0, 17.4, -4.0), (6, 2, 8), "pearl", rot=[0, 0, 20], pivot=[-7.8, 19.4, 0], trim=("bottom",))
+    sym_boxc(pr, pl, (-10.95, 22.6, 0.0), (1, 3, 3), "gold")
+    sym_boxc(pr, pl, (-10.75, 22.6, 0.0), (1, 3, 3), "pearl", rot=[45, 0, 0], trim=("left", "right", "top", "bottom"))
+    gem(pr, (-11.55, 22.6, 0.0), (1, 2, 2), "magma", rot=(45, 0, 0))
+    gem(pl, (11.55, 22.6, 0.0), (1, 2, 2), "frost", rot=(45, 0, 0))
+    # stage 3: the third pair of wings - luminous light wings folded upright behind the shoulders
+    for side in (-1, 1):
+        s = "R" if side < 0 else "L"
+        lw = stage_bone(m, f"stage3_lightWing{s}", "armorBody", (1.8 * side, 22.5, 5.0))
+        lw.rotation = [-8.0, -28.0 * side, 10.0 * side]
+        x0 = 1.8 if side > 0 else -1.8 - 10
+        cube(lw, (x0, 21.7, 5.0), (10, 13, 0), "lwing", side=side)
+
+    # ------------------------------------------------------------------ leggings
+    # stage 2: gold diamond knee medallions with their element gem
+    kr, kl = stage_pair(m, "stage2_kneeMedallion", "Leg", (-2.3, 5.3, -3.6))
+    sym_boxc(kr, kl, (-2.3, 5.3, -4.1), (3, 3, 1), "gold", rot=[0, 0, 45])
+    gem(kr, (-2.3, 5.3, -4.75), (2, 2, 1), "tide")
+    gem(kl, (2.3, 5.3, -4.75), (2, 2, 1), "storm")
+    # stage 3: feathered gold wings at the outer hips (below the hands)
+    for side in (-1, 1):
+        s = "R" if side < 0 else "L"
+        hb = stage_bone(m, f"stage3_hipWing{s}", "armorRightLeg" if side < 0 else "armorLeftLeg",
+                        (5.5 * side, 9.0, -0.6))
+        hb.rotation = [0.0, 24.0 * side, 0.0]
+        cube(hb, (5.5 * side, 6.4, -0.6), (0, 4, 5), "hwing", side=side, small=True)
+
+    # ------------------------------------------------------------------ boots
+    # stage 2: the ankle wings grow (a larger feather layer behind the original)
+    for side in (-1, 1):
+        s = "R" if side < 0 else "L"
+        wb = stage_bone(m, f"stage2_ankleWing{s}", "armorRightBoot" if side < 0 else "armorLeftBoot",
+                        (5.15 * side, 3.5, 0.3))
+        wb.rotation = [0.0, 24.0 * side, 0.0]
+        cube(wb, (5.15 * side, 1.3, 0.3), (0, 6, 7), "hwing", side=side, small=True)
+    # stage 3: light spurs - gold neck, prism gem and a ray of light streaming back from each heel
+    sr, sl = stage_pair(m, "stage3_lightSpur", "Boot", (-2.4, 1.9, 3.2))
+    sym(sr, sl, (-2.9, 1.4, 3.1), (1, 1, 2), "gold")
+    gem(sr, (-2.4, 1.9, 5.3), (1, 1, 1), "prism", rot=(0, 0, 45), inflate=0.15)
+    gem(sl, (2.4, 1.9, 5.3), (1, 1, 1), "prism", rot=(0, 0, 45), inflate=0.15)
+    sym_cross_sprite(sr, sl, (-2.4, 1.9, 5.6), (0, 0.2, 1.0), 3, 2, "ray")
 
 
 # =============================================================================== shaders
@@ -427,8 +563,61 @@ def make_shaders():
         rgb[tips] = M.ramp(LIGHT, 0.5 + u[tips] * 0.5)
         return rgb, np.where(inside, 255, 0), tips
 
+    def lwing(ctx):
+        """Luminous light wing folded upright (single-face plane, south face painted): a fan of glowing
+        primaries rising from the root with element-tinted tips, a few coverts over the root."""
+        if ctx.face != "south":
+            return np.zeros((ctx.N, 3)), np.zeros(ctx.N), np.zeros(ctx.N, dtype=bool)
+        x, y = ctx.p[:, 0], ctx.p[:, 1]
+        u = np.abs(x) - 1.8                       # outward from the root
+        v = y - 22.5                              # up from the root
+        N = ctx.N
+        kind = np.zeros(N, dtype=int)
+        val = np.zeros(N)
+        outline = np.zeros(N, dtype=bool)
+        shaft = np.zeros(N, dtype=bool)
+        fid = np.full(N, -1)
+        prog = np.zeros(N)
+        for k, (ang, L) in enumerate(((54, 7.4), (45, 8.8), (36, 10.0), (27, 11.0), (18, 11.8), (10, 12.3), (3, 12.4))):
+            a = math.radians(ang)
+            tt = u * math.sin(a) + v * math.cos(a)
+            nn = u * math.cos(a) - v * math.sin(a)
+            p = tt / L
+            half = 1.25 * np.where(p < 0.15, 0.55 + p / 0.15 * 0.45,
+                                   np.where(p < 0.78, 1.0, np.sqrt(np.clip((1 - p) / 0.22, 0, 1))))
+            ins = (p >= -0.02) & (p <= 1) & (np.abs(nn) <= half)
+            kind = np.where(ins, 1, kind)
+            val = np.where(ins, 0.98 - np.abs(nn) / np.maximum(half, 1e-3) * 0.28 - np.clip(p, 0, 1) * 0.1, val)
+            outline = np.where(ins, (nn > half - 0.5) | (p > 1 - 0.45 / L), outline)
+            shaft = np.where(ins, (np.abs(nn) < 0.25) & (p > 0.08) & (p < 0.85), shaft)
+            fid = np.where(ins, k, fid)
+            prog = np.where(ins, p, prog)
+        for k in range(5):                         # rounded coverts over the root
+            a = math.radians(8 + k * 11)
+            cu, cv = 0.5 + k * 1.0, 1.7 + k * 0.1
+            tt = (u - cu) * math.sin(a) + (v - cv) * math.cos(a)
+            nn = (u - cu) * math.cos(a) - (v - cv) * math.sin(a)
+            r = np.sqrt((tt / 2.4) ** 2 + (nn / 1.1) ** 2)
+            ins = r <= 1.0
+            kind = np.where(ins, 2, kind)
+            val = np.where(ins, 1.0 - r * 0.2, val)
+            outline = np.where(ins, (r > 0.78) & (tt > 0.6), outline)
+            shaft = np.where(ins, False, shaft)
+        inside = kind > 0
+        rgb = M.ramp(LUMEN, val, ctx, 0.3)
+        rgb[outline] = LUMEN[1]
+        rgb[shaft] = (255, 255, 255)
+        cols = np.array([ELEMENT_RGB[e] for e in ("frost", "tide", "storm", "magma")], dtype=float)
+        tipm = (kind == 1) & (prog > 0.72)
+        ci = np.clip(fid, 0, 6) % 4
+        mix = np.clip((prog - 0.72) / 0.28, 0, 1)[:, None] * 0.55
+        rgb[tipm] = rgb[tipm] * (1 - mix[tipm]) + cols[ci[tipm]] * mix[tipm]
+        sp = inside & (M.texel_hash(ctx, 29) > 0.96)
+        rgb[sp] = (255, 255, 255)
+        return rgb, np.where(inside, 255, 0), inside
+
     return {"pearl": pearl, "gold": gold, "helm": helm, "mask": mask, "gem": gemsh, "halo": halo, "ray": ray,
-            "wing": wing, "hwing": hwing}
+            "wing": wing, "hwing": hwing, "lwing": lwing}
 
 
 # =============================================================================== animation
@@ -447,6 +636,12 @@ def build_clips():
         c.f(f"helmWing{s}", "rotation", lambda t, sd=side: [0, sd * 4.0 * math.sin(w * 2 * t), 0])
         c.f(f"ankleWing{s}", "rotation", lambda t, sd=side: [0, sd * 6.0 * math.sin(w * 2 * t + 1.0), 0])
         c.f(f"pauldronWing{s}", "rotation", lambda t, sd=side: [0, 0, sd * -3.0 * math.sin(w * 2 * t + 0.6)])
+        c.f(f"stage2_ankleWing{s}", "rotation", lambda t, sd=side: [0, sd * 6.0 * math.sin(w * 2 * t + 1.0), 0])
+        c.f(f"stage3_lightWing{s}", "rotation",
+            lambda t, sd=side: [1.5 * math.sin(w * 2 * t + 0.2), sd * -6.0 * (0.5 + 0.5 * math.sin(w * 2 * t + 0.2)), 0])
+        c.f(f"stage3_hipWing{s}", "rotation", lambda t, sd=side: [0, sd * 5.0 * math.sin(w * 2 * t + 1.6), 0])
+    c.f("stage2_haloRays", "rotation", lambda t: [0, 180.0 * t / T, 0])      # 8-fold: seamless counter-spin
+    c.f("stage2_haloRays", "position", lambda t: [0, 0.35 * math.sin(w * t), 0])
     return [c]
 
 
@@ -459,7 +654,7 @@ def build(preview=False):
     geo = ak.export_geo(m, paths["geo"])
     print(f"{NAME}: {m.cube_count()} cubes, uv {W}x{H}, png {W * 2}x{H * 2}")
     anims = al.export_anims(build_clips(), paths["anim"])
-    rgba, glow = ak.paint(m, make_shaders())
+    rgba, glow = paint_staged(m, make_shaders())
     ak.save_textures(NAME, "", rgba, glow)
     if preview:
         import geo_preview as gp
@@ -471,6 +666,8 @@ def build(preview=False):
         an = anims["animations"]["idle"]
         ak.sheet_anim("ascendant idle", g, rgba, glow, an, [0, 0.5, 1.0, 1.5], view=("3/4 back", 205, -12)).save(
             os.path.join(ak.PREVIEW, "ascendant_idle.png"))
+        import stage_preview
+        stage_preview.stage_sheet("ascendant")
     return m, geo, (rgba, glow), anims
 
 

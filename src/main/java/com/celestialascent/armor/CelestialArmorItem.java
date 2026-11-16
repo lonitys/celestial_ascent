@@ -60,6 +60,13 @@ public class CelestialArmorItem extends ArmorItem implements GeoItem {
             if (!net.minecraft.locale.Language.getInstance().has(key)) break;
             lines.add(Component.literal(" ").append(Component.translatable(key)).withStyle(ChatFormatting.GRAY));
         }
+        // What the set ability gains at set stages II and III (the lowest stage of the four pieces counts).
+        for (int st = 2; st <= ArmorStages.MAX_STAGE; st++) {
+            boolean active = ArmorStages.stage(stack) >= st;
+            lines.add(Component.literal(" ").append(Component.translatable("tooltip.celestialascent.set_stage." + set.key + "." + st))
+                    .withStyle(active ? ChatFormatting.AQUA : ChatFormatting.DARK_GRAY));
+        }
+        ArmorStages.tooltip(stack, lines);
         super.appendHoverText(stack, ctx, lines, flag);
     }
 

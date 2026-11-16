@@ -96,7 +96,142 @@ def build_model():
     sym(RB, LB, (-5.1, 5.4, -3.5), (5, 2, 7), "stone", inflate=0.1)               # boot cuff
     sym(RB, LB, (-3.5, 2.0, -3.75), (2, 3, 1), "crystal")                         # shin crystal
     sym(RB, LB, (-4.0, 0.5, 2.9), (3, 2, 1), "steel", rivets=True)                # heel plate
+    build_stage_parts(m)
     return m
+
+
+# =============================================================================== stage parts
+# Evolving armor: bones named "stage2_*" are shown when the piece is stage 2 or 3, "stage3_*" only at
+# stage 3 (the renderer toggles them by that prefix). They are created after every base bone, so base
+# cubes keep their cube index (texel hashes), and StagedPainter keeps them out of the base AO: with the
+# stage bones hidden every piece renders exactly as it did before.
+
+STAGE_PREFIXES = ("stage2_", "stage3_")
+
+
+def stage_level(name):
+    return 3 if name.startswith("stage3_") else 2 if name.startswith("stage2_") else 1
+
+
+def stage_bone(m, name, parent, pivot):
+    assert name.startswith(STAGE_PREFIXES), name
+    return m.bone(name, parent, [round(float(x), 4) for x in pivot])
+
+
+def stage_pair(m, name, limb, pivot_r):
+    """Mirrored stage bones <name>R / <name>L under armorRight<limb> / armorLeft<limb>."""
+    x, y, z = pivot_r
+    return (stage_bone(m, name + "R", "armorRight" + limb, (x, y, z)),
+            stage_bone(m, name + "L", "armorLeft" + limb, (-x, y, z)))
+
+
+class StagedPainter(al.Painter):
+    """AO that follows stage visibility: a cube only receives occlusion from cubes that are visible
+    whenever it is (base <- base, stage 2 <- base + stage 2, stage 3 <- everything)."""
+
+    def _ao(self, pw, nw, cm, face, ci, boxes):
+        lvl = stage_level(boxes[ci][0].bone.name)
+        far = (np.full(3, 1e9), np.full(3, -1e9))       # empty bounds: skipped by the AO loop
+        boxes = [b if b[0] is None or stage_level(b[0].bone.name) <= lvl else b[:5] + far for b in boxes]
+        return super()._ao(pw, nw, cm, face, ci, boxes)
+
+
+def check_stage_bones(m):
+    names = list(m.bones)
+    first = next((i for i, n in enumerate(names) if stage_level(n) > 1), len(names))
+    assert all(stage_level(n) > 1 for n in names[first:]), "stage bones must come after every base bone"
+    for b in m.bones.values():
+        if b.parent and stage_level(b.parent) > 1:
+            assert stage_level(b.name) == stage_level(b.parent), f"{b.name} needs its parent's stage prefix"
+
+
+def paint_staged(m, shaders, ao=0.85):
+    check_stage_bones(m)
+    return StagedPainter(m, shaders, ao_strength=ao, occluders=ak.BODY_BOXES).paint()
+
+
+def tipped_spike(bone, base, d, L, w, tip_len=2, mat="steel", **params):
+    """Steel spike with a glowing crystal tip continuing along the same axis."""
+    d = al.unit(d)
+    base = np.asarray(base, dtype=float)
+    bone.spike(base, d, L, w, mat, segs=[1.0], **params)
+    bone.spike(base + d * (L - 0.6), d, tip_len, max(1, w - 1), "crystal", segs=[1.0], **params)
+
+
+def build_stage_parts(m):
+    # ------------------------------------------------------------------ helmet
+    # stage 2: crystal-tipped steel bull horns sweeping out of the brow corners, stone root collars
+    for side in (-1, 1):
+        s = "R" if side < 0 else "L"
+        base = np.array([5.3 * side, 30.3, -2.4])
+        hb = stage_bone(m, f"stage2_horn{s}", "armorHead", base)
+        boxc(hb, base.tolist(), (2, 3, 3), "stone", side=side)                           # root collar
+        d1, d2 = al.unit([side, 0.24, -0.2]), al.unit([0.5 * side, 1.0, -0.1])
+        hb.curve_spike(base, [d1, d2], [4, 4], [3, 2], "steel", side=side, panel=False)
+        tip = base + d1 * 3.3 + d2 * 3.3
+        hb.spike(tip, (0.12 * side, 1.0, 0.3), 3, 2, "crystal", segs=[0.67, 0.5], side=side)
+
+    # stage 3: carved crown - riveted steel band with gem studs and stone tines
+    cr = stage_bone(m, "stage3_crown", "armorHead", (0, 31.5, 0))
+    cube(cr, (-5.6, 31.5, -5.6), (11, 2, 1), "steel", panel=False, rivets=True)          # front band
+    cube(cr, (-5.6, 31.5, 4.6), (11, 2, 1), "steel", panel=False, rivets=True)           # back band
+    sym(cr, cr, (-5.6, 31.5, -4.6), (1, 2, 9), "steel", panel=False)                     # side bands
+    for x in (-3.4, 0.0, 3.4):
+        boxc(cr, (x, 32.5, -5.8), (1, 1, 1), "gem", inflate=0.12)                         # gem studs
+    for (x, z, ax) in ((-3.0, -5.1, "x"), (3.0, -5.1, "x"), (-3.2, 5.1, "x"), (0.0, 5.1, "x"), (3.2, 5.1, "x"),
+                       (-5.1, -2.2, "z"), (5.1, -2.2, "z")):
+        for k, w in enumerate((3, 2, 1)):                                                # pixel-triangle tines
+            sx, sz = (w, 1) if ax == "x" else (1, w)
+            cr.boxb(x, 33.4 + k, z, sx, 1, sz, "stone")
+    for x, z in ((-5.1, -5.1), (5.1, -5.1), (-5.1, 5.1), (5.1, 5.1)):
+        cr.boxb(x, 33.4, z, 1, 3, 1, "steel", panel=False)                               # corner posts
+        boxc(cr, (x, 37.0, z), (1, 1, 1), "gem", inflate=0.15)                           # crown jewels
+
+    # ------------------------------------------------------------------ chestplate
+    # stage 2: larger pauldrons - outer stone shield plate with its own rune, wider second lame, ridge
+    pr, pl = stage_pair(m, "stage2_pauldron", "Arm", (-7.4, 24.8, 0))
+    sym(pr, pl, (-11.6, 19.0, -5.0), (1, 7, 10), "stone", rune="pauldron", rot=[0, 0, 8], pivot=[-11.1, 26.0, 0])
+    sym(pr, pl, (-11.2, 17.4, -4.6), (6, 2, 9), "steel", rot=[0, 0, 18], pivot=[-8.0, 19.4, 0], rivets=True)
+    sym(pr, pl, (-11.4, 25.4, -4.0), (2, 1, 8), "steel", panel=False)                    # top ridge
+
+    # stage 3: elemental core crystal on chest and back
+    cf = stage_bone(m, "stage3_coreFront", "armorBody", (0, 20.2, -4.0))
+    cube(cf, (-2.5, 17.7, -5.4), (5, 5, 1), "stone", rot=[0, 0, 45], pivot=[0, 20.2, -4.9])   # diamond setting
+    boxc(cf, (0, 20.2, -6.0), (3, 3, 2), "gem", rot=[0, 0, 45])                               # the core
+    for side in (-1, 1):
+        cf.spike((2.4 * side, 20.2, -5.0), (side, 0.12, -0.3), 3, 2, "crystal", segs=[0.67, 0.5])
+    cb = stage_bone(m, "stage3_coreBack", "armorBody", (0, 19.3, 5.3))
+    cube(cb, (-2.5, 16.8, 5.3), (5, 5, 1), "stone", rot=[0, 0, 45], pivot=[0, 19.3, 5.8])
+    boxc(cb, (0, 19.3, 6.9), (3, 3, 2), "gem", rot=[0, 0, 45])
+    for side in (-1, 1):
+        cb.spike((2.2 * side, 17.4, 5.8), (0.8 * side, -0.7, 0.45), 3, 2, "crystal", segs=[0.67, 0.5])
+
+    # stage 3: gauntlet spikes along the outer stone cuff
+    gr, gl = stage_pair(m, "stage3_gauntlet", "Arm", (-10.1, 17.0, 0))
+    for z, dz in ((-2.0, -0.3), (0.2, 0.0), (2.4, 0.3)):
+        for b, sd in ((gr, -1), (gl, 1)):
+            tipped_spike(b, (10.0 * sd, 17.0, z), (sd, 0.35, dz), 3, 2, side=sd)
+
+    # ------------------------------------------------------------------ leggings
+    # stage 2: stone knee guards with a crystal and riveted side discs
+    kr, kl = stage_pair(m, "stage2_knee", "Leg", (-2.3, 5.8, -3.4))
+    sym(kr, kl, (-4.6, 4.2, -4.6), (5, 4, 1), "stone")                                   # poleyn
+    sym(kr, kl, (-3.3, 5.2, -5.3), (2, 2, 1), "gem")                                     # knee gem
+    sym(kr, kl, (-5.6, 4.4, -2.4), (1, 3, 3), "steel", rivets=True, panel=False)         # side disc
+    # stage 3: crystal knee spikes and crystal slabs set into the front tassets
+    sr3, sl3 = stage_pair(m, "stage3_legCrystals", "Leg", (-2.3, 6.4, -4.6))
+    sym_spike(sr3, sl3, (-2.3, 6.4, -4.4), (0, 0.55, -1.0), 4, 2, "crystal", segs=[0.62, 0.45])
+    sym(sr3, sl3, (-3.4, 7.4, -4.25), (2, 3, 1), "crystal", rot=[-7, 0, 0], pivot=[-2.4, 10.4, -3.1])
+
+    # ------------------------------------------------------------------ boots
+    # stage 2: crystal-rowel heel spurs and stone outer ankle guards
+    br, bl = stage_pair(m, "stage2_spur", "Boot", (-2.4, 1.9, 3.3))
+    sym(br, bl, (-2.9, 1.4, 3.3), (1, 1, 2), "steel")                                    # spur neck
+    sym_boxc(br, bl, (-2.4, 1.9, 6.0), (1, 2, 2), "crystal", rot=[45, 0, 0], inflate=0.1)  # rowel
+    sym(br, bl, (-5.6, 1.4, -1.6), (1, 3, 4), "stone")                                   # ankle guard
+    # stage 3: crystal fins growing back out of the ankle guards
+    ar3, al3 = stage_pair(m, "stage3_ankleCrystals", "Boot", (-5.6, 3.4, 1.4))
+    sym_spike(ar3, al3, (-5.4, 3.0, 1.2), (-0.5, 0.4, 1.0), 4, 2, "crystal", segs=[0.62, 0.45])
 
 
 # =============================================================================== themes
@@ -379,6 +514,8 @@ def build_clips():
     c.f("pauldronCrystalsL", "scale", pulse(0.06, 3.6))
     c.f("pauldronCrystalsR", "position", lambda t: [0, 0.25 + 0.25 * math.sin(w * t + 0.6), 0])
     c.f("pauldronCrystalsL", "position", lambda t: [0, 0.25 + 0.25 * math.sin(w * t + 3.6), 0])
+    c.f("stage3_coreFront", "scale", pulse(0.05, 0.3))                  # elemental cores breathe
+    c.f("stage3_coreBack", "scale", pulse(0.05, 0.3))
     return [c]
 
 
@@ -393,7 +530,7 @@ def build(preview=False):
     anims = al.export_anims(build_clips(), paths["anim"])
     out = {}
     for theme in THEMES:
-        rgba, glow = ak.paint(m, make_shaders(theme))
+        rgba, glow = paint_staged(m, make_shaders(theme))
         ak.save_textures(NAME, theme, rgba, glow)
         out[theme] = (rgba, glow)
     if preview:
@@ -407,6 +544,9 @@ def build(preview=False):
         ak.texture_sheet(rgba, glow).save(os.path.join(ak.PREVIEW, "titan_texture.png"))
         ak.lineup([(f"titan{th or ' neutral'}", g, rg, gl) for th, (rg, gl) in out.items()],
                   os.path.join(ak.PREVIEW, "titan_variants.png"))
+        import stage_preview
+        stage_preview.stage_sheet("titan")
+        stage_preview.variant_sheet("titan")
     return m, geo, out, anims
 
 

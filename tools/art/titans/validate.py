@@ -121,11 +121,26 @@ def check_titan(name, spec, R):
             cur = bmap[par]
         if cur["name"] != "root":
             R.err(f"{name}: bone {b['name']} does not descend from root")
+    def in_stage(bone):
+        """True for evolution parts: the bone or one of its parents is named stage2_* / stage3_*."""
+        cur, guard = bone, 0
+        while cur is not None and guard < 64:
+            if cur["name"].startswith(("stage2_", "stage3_")):
+                return True
+            cur = bmap.get(cur.get("parent"))
+            guard += 1
+        return False
+
     ncubes = 0
+    nstage = 0
     occupancy = np.zeros((th, tw), dtype=np.int16)
     for b in bones:
+        staged = in_stage(b)
         for c in b.get("cubes", []):
-            ncubes += 1
+            if staged:
+                nstage += 1
+            else:
+                ncubes += 1
             if not (is_vec3(c.get("origin")) and is_vec3(c.get("size"))):
                 R.err(f"{name}: bad cube in {b['name']}")
                 continue
@@ -143,7 +158,9 @@ def check_titan(name, spec, R):
     if over:
         R.warn(f"{name}: {over} texture pixels shared by more than one face")
     if not (40 <= ncubes <= 120):
-        R.err(f"{name}: {ncubes} cubes (want 40-120)")
+        R.err(f"{name}: {ncubes} base cubes (want 40-120)")
+    if nstage > 70:
+        R.err(f"{name}: {nstage} stage cubes (want at most 70)")
     head = bmap.get("head")
     if head and head.get("rotation") and any(head["rotation"]):
         R.warn(f"{name}: head bone has a rest rotation {head['rotation']} (look-at code may overwrite it)")

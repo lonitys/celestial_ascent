@@ -168,7 +168,71 @@ def build_model():
         foot = m.bone(f"{nm}_foot", f"{nm}_shin", (3.6 * s, 2.5, 0.3))
         foot.boxb(3.6 * s, 0, -1.2, 5, 3, 8, "gold_soft")                            # sabaton
         foot.box((3.6 * s, 1.0, -5.6), (3, 2, 3), "gold_soft", rot=[0, 45, 0])       # pointed toe
+    build_stages(m)
     return m
+
+
+# =============================================================================== evolution stages
+# BossRenderer shows bones named stage2_* from stage 2 on and stage3_* only in stage 3 (hiding a
+# bone hides its children) and scales them in from 0 at their pivot, so every pivot sits where the
+# part attaches. Stage bones come after all base bones (base cube indices, which seed the cloth
+# folds and hems, stay the same) and never occlude the base model in the baked AO, so the base
+# texture is unchanged with them hidden.
+FIRE_R = 23.0                      # stage 2 ring of fire: band radius (outside the 20.5 long rays)
+WING_ROOT = (4.0, 43.0, 6.0)       # stage 3 wing root (left wing; mirrored), on the upper back
+WING_SPLIT, WING_WRIST = 16.0, (16.0, 13.0)
+WING_A = dict(w=16, h=37, top=15.0, yaw=25.0)     # inner wing: arm, coverts, secondaries
+WING_B = dict(w=24, h=42, top=3.0, yaw=48.0)      # outer wing: primaries fanning from the wrist
+
+# feathers in wing coordinates (u outward from the root, y up from it): (base, tip, width)
+SECONDARIES = [((1.0 + 14.0 * f, 0.6 + 11.0 * f), (min(15.0, 2.6 + 13.4 * f), -21.0 + 4.0 * f), 5.6)
+               for f in np.linspace(0, 1, 6)]
+COVERTS = [((16.0 * f, 13.0 * f - 0.4), (16.0 * f + 1.4, 13.0 * f - 7.6), 3.8) for f in (np.arange(7) + 0.45) / 7]
+PRIMARIES = [((16.6, 12.4), (22.0, -22.5), 5.6), ((18.0, 12.4), (27.0, -19.5), 5.6), ((19.5, 12.2), (31.5, -14.5), 5.4),
+             ((21.0, 12.0), (35.0, -9.0), 5.2), ((22.5, 11.8), (37.6, -3.0), 4.8), ((24.0, 11.5), (39.2, 3.0), 4.2),
+             ((25.0, 11.0), (39.4, 8.6), 3.4)]
+ARM = [(0.0, 0.0), WING_WRIST, (25.5, 10.8)]
+
+
+def stage_bone(m, name, parent, pivot):
+    assert name.startswith(("stage2_", "stage3_")), name
+    return m.bone(name, parent, pivot)
+
+
+def build_stages(m):
+    # ---- stage 2: a second, larger ring of fire around the halo and sun plates on the shoulders
+    fire = stage_bone(m, "stage2_halo_fire", "halo", HALO_C)          # spins with the flame disc
+    fire.plane((HALO_C[0], HALO_C[1], HALO_C[2] + 1.4), 58, 58, "fire_ring", r_band=FIRE_R)
+    for s, nm in sides():
+        c = np.array([17.0 * s, 44.5, -0.5])
+        R = tl.axis_angle([0, 1, 0], -40 * s) @ tl.axis_angle([1, 0, 0], -10)   # faces out, front and a bit down
+        sp = stage_bone(m, f"stage2_{nm}_sun_plate", f"{nm}_arm", (15.0 * s, 42.5, 0.3))
+        sp.plane(c, 16, 16, "sun_plate", rot=R, r_disc=3.9)
+
+    # ---- stage 3: wings of light from the shoulder blades and a crown of sun rays on the head
+    for s, nm in sides():
+        root = np.array([WING_ROOT[0] * s, WING_ROOT[1], WING_ROOT[2]])
+        wb = stage_bone(m, f"stage3_{nm}_wing", "torso", root)
+        Ra = tl.axis_angle([0, 1, 0], -WING_A["yaw"] * s)
+        wb.plane_from(root, WING_A["w"], WING_A["h"], "light_wing", rot=Ra,
+                      anchor_st=(0.0 if s > 0 else 1.0, WING_A["top"] / WING_A["h"]),
+                      side=s, u0=0.0, y_top=WING_A["top"], feathers=SECONDARIES, coverts=COVERTS, arm=ARM[:2])
+        wrist = root + Ra @ np.array([WING_WRIST[0] * s, WING_WRIST[1], 0.0])
+        Rb = tl.axis_angle([0, 1, 0], -WING_B["yaw"] * s)
+        wb.plane_from(wrist, WING_B["w"], WING_B["h"], "light_wing", rot=Rb,
+                      anchor_st=(0.0 if s > 0 else 1.0, WING_B["top"] / WING_B["h"]),
+                      side=s, u0=WING_SPLIT, y_top=WING_WRIST[1] + WING_B["top"], feathers=PRIMARIES[::-1], arm=ARM[1:])
+    cr = stage_bone(m, "stage3_sun_crown", "head", (0, 57.5, 1.6))
+    for a_deg, L, w in ((0, 14, 3), (24, 12, 3), (-24, 12, 3), (48, 10, 2), (-48, 10, 2), (70, 8, 2), (-70, 8, 2)):
+        a = math.radians(a_deg)
+        back = abs(a_deg) / 70.0                                   # outer rays wrap back around the hood
+        base = np.array([6.0 * math.sin(a), 52.0 + 6.0 * math.cos(a), 1.6 + 1.6 * back])
+        cr.spike(base, (math.sin(a), math.cos(a), 0.15 + 0.6 * back), L, w, "sun_spike", segs=[0.56, 0.52], taper=0.6,
+                 overlap=0.8)
+    for b in m.bones.values():
+        if b.name.startswith(("stage2_", "stage3_")):
+            for c in b.cubes:
+                c.params["no_ao"] = True        # never darkens the base model (it must look unchanged)
 
 
 # =============================================================================== animation helpers

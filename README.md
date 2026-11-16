@@ -27,7 +27,7 @@ Every boss kill adds a **constellation** to your night sky and gives a small per
 
 ### Three stages
 
-Every boss evolves twice, at 66% and at 33% of its health: it changes form (darker body, glowing veins in its element's colour), grows, its aura thickens, and new attacks unlock. A title names the new stage, and the boss bar keeps showing it. In the third stage each boss has an ultimate attack of its own, and the action bar tells you how to survive it:
+Every boss evolves twice, at 66% and at 33% of its health: new model parts grow out of it (crowns, horns, extra wings and arms), its body darkens with glowing veins in its element's colour, and new attacks unlock. A banner slides in to name the new stage. The boss bar is Celestial Ascent's own: a frame in the boss's colour, notches at the stage thresholds, a trail of recently lost health, three stage gems and the stage name. In the third stage each boss has an ultimate attack of its own, and the action bar tells you how to survive it:
 
 | Boss | Stage 2 | Stage 3 | Ultimate |
 |---|---|---|---|
@@ -42,9 +42,26 @@ Every boss evolves twice, at 66% and at 33% of its health: it changes form (dark
 | Sun Herald | Eclipse | Supernova | find cover |
 | Void Sovereign | The Deep Calls | The Unmaking | the Abyss collapses |
 
+## Armor evolution
+
+Every armor piece evolves through three stages:
+
+1. **Resonance:** fight while wearing it. Each monster you defeat gives every worn piece a third of its health in resonance; a boss gives half of its health to everyone at the fight. Stage II needs 600, stage III 1,800.
+2. **Completion:** put the resonating piece in its set's station with a boss material.
+
+| Set | Station | To stage II | To stage III |
+|---|---|---|---|
+| Titan | Titan Forge | core of the piece's own element + 3 Titan Shards | 2 cores + 6 shards |
+| Imperial | Imperial Forge | 3 Imperial Plating + 2 Ender Gears | Colossus Core + 3 Gears + 3 Plating |
+| Stellar | Sky Altar (night) | 12 Stardust | Star Core + 16 Stardust |
+| Void | Void Infuser | 8 Void Essence | Primordial Core + 12 Void Essence |
+| Ascendant | Ascension Altar | Star Core + 16 Void Essence | Primordial Core + Star Core + Dragon Heart |
+
+Each stage adds armor and toughness and shows new parts on the armor. A full set counts as its lowest piece's stage and strengthens its ability: Titan elements one level higher and then permanent Resistance; Imperial blink 16 and then 20 blocks with an arrival shockwave; Stellar Regeneration II and then falling stars that strike attackers; Void dash every 3 and then 2 seconds, tearing through monsters; Ascendant faster blink and dash, then regeneration for allies nearby. Upgrading a piece into the next set starts its evolution over.
+
 ## The Celestial Codex
 
-Every player gets the **Celestial Codex** the first time they join (craft another from a book and an amethyst shard). Its first page shows your next step, worked out from the bosses you have defeated, and a click takes you to the right chapter. Eleven chapters explain every step with the real crafting and station recipes. The whole mod, codex included, is translated into German.
+Every player gets the **Celestial Codex** the first time they join (craft another from a book and an amethyst shard). Its first page shows your next step, worked out from the bosses you have defeated, and a click takes you to the right chapter. Twelve chapters explain every step with the real crafting and station recipes. The whole mod, codex included, is translated into German.
 
 ## Existing worlds
 

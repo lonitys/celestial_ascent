@@ -74,8 +74,8 @@ public final class GuideChapters {
                             "Ein Treffer nimmt höchstens 8 %% der Lebenspunkte eines Bosses, du brauchst also viele Treffer. Bosse lassen sich nicht weiter als 48 Blöcke von ihrem Altar weglocken und teleportieren sich zu dir, wenn du dich auf einer Säule versteckst.")
                     .h("stages", "Three stages", "Drei Stufen")
                     .p("stages.text",
-                            "Every boss evolves twice: at two thirds and at one third of its health it changes form, grows, glows brighter and learns new attacks. The boss bar shows the name of its stage.",
-                            "Jeder Boss entwickelt sich zweimal: Bei zwei Dritteln und bei einem Drittel seiner Lebenspunkte verwandelt er sich, wächst, leuchtet stärker und lernt neue Angriffe. Die Lebensleiste zeigt den Namen seiner Stufe.")
+                            "Every boss evolves twice: at two thirds and at one third of its health new parts grow out of it, it changes colour and learns new attacks. A banner announces each stage, and the boss bar keeps showing it.",
+                            "Jeder Boss entwickelt sich zweimal: Bei zwei Dritteln und bei einem Drittel seiner Lebenspunkte wachsen ihm neue Teile, er verändert seine Farben und lernt neue Angriffe. Ein Banner kündigt jede Stufe an, und die Lebensleiste zeigt sie weiter an.")
                     .tip("stages.ultimate",
                             "In its third stage every boss has an ultimate attack of its own. When it starts, your action bar tells you how to survive it.",
                             "In der dritten Stufe hat jeder Boss einen eigenen Ultimate-Angriff. Wenn er beginnt, sagt dir die Aktionsleiste, wie du ihn überlebst.")
@@ -455,6 +455,35 @@ public final class GuideChapters {
                             "%s: Ender Blink\nSneak + %s: Void Dash\n%s: night vision",
                             "%s: Enderblink\nSchleichen + %s: Leerensprint\n%s: Nachtsicht",
                             ABILITY, ABILITY, TOGGLE)
+                    .build(),
+
+            // ------------------------------------------------------------------ armor evolution
+            chapter("evolution", Stars.HELMET, "Armor Evolution", "Rüstungsentwicklung")
+                    .p("intro",
+                            "Every piece of Celestial armor grows with you through three stages. Each stage adds armor and toughness, new parts appear on the armor, and a full set's ability gets stronger.",
+                            "Jedes Teil der Himmelsrüstungen wächst in drei Stufen mit dir. Jede Stufe bringt mehr Rüstung und Härte, neue Teile erscheinen an der Rüstung, und die Fähigkeit eines vollen Sets wird stärker.")
+                    .h("resonance", "Resonance", "Resonanz")
+                    .p("resonance.text",
+                            "Fight while wearing it. Every monster you defeat adds resonance to each piece (a third of its health); a boss gives half of its health to everyone at the fight. Stage II needs 600 resonance, stage III 1,800.",
+                            "Kämpfe, während du sie trägst. Jedes besiegte Monster gibt jedem Teil Resonanz (ein Drittel seiner Lebenspunkte); ein Boss gibt allen, die mitkämpfen, die Hälfte seiner Lebenspunkte. Stufe II braucht 600 Resonanz, Stufe III 1.800.")
+                    .tip("resonance.tip",
+                            "The tooltip shows each piece's stage and resonance. When a piece is full, a message tells you.",
+                            "Der Tooltip zeigt Stufe und Resonanz jedes Teils. Ist ein Teil voll, bekommst du eine Nachricht.")
+                    .h("complete", "Completing the evolution", "Die Entwicklung abschließen")
+                    .p("complete.text",
+                            "Put the resonating piece into its set's station with the materials below (first for stage II, then for stage III):",
+                            "Leg das resonierende Teil mit den folgenden Materialien in die Station seines Sets (zuerst für Stufe II, dann für Stufe III):")
+                    .p("complete.list",
+                            "Titan (%s): a core of the piece's own element and 3 Titan Shards; then 2 cores and 6 shards.\n\nImperial (%s): 3 Imperial Plating and 2 Ender Gears; then a Colossus Core, 3 Gears and 3 Plating.\n\nStellar (%s, at night): 12 Stardust; then a Star Core and 16 Stardust.\n\nVoid (%s): 8 Void Essence; then a Primordial Core and 12 Void Essence.\n\nAscendant (%s): a Star Core and 16 Void Essence; then a Primordial Core, a Star Core and a Dragon Heart.",
+                            "Titan (%s): ein Kern vom eigenen Element des Teils und 3 Titanensplitter; danach 2 Kerne und 6 Splitter.\n\nImperial (%s): 3 Imperiale Panzerplatten und 2 Enderzahnräder; danach ein Kolosskern, 3 Zahnräder und 3 Platten.\n\nStellar (%s, nachts): 12 Sternenstaub; danach ein Sternkern und 16 Sternenstaub.\n\nLeere (%s): 8 Leerenessenz; danach ein Urkern und 12 Leerenessenz.\n\nAufgestiegen (%s): ein Sternkern und 16 Leerenessenz; danach ein Urkern, ein Sternkern und ein Drachenherz.",
+                            i(Titans.TITAN_FORGE), i(Empire.IMPERIAL_FORGE), i(Stars.SKY_ALTAR), i(Abyss.VOID_INFUSER), i(Abyss.ASCENSION_ALTAR))
+                    .tip("complete.reset",
+                            "Upgrading a piece into the next set starts its evolution over, so evolve the set you are going to keep.",
+                            "Wertest du ein Teil ins nächste Set auf, beginnt seine Entwicklung von vorn. Entwickle also das Set, das du behalten willst.")
+                    .h("sets", "Set stages", "Set-Stufen")
+                    .p("sets.text",
+                            "A full set counts as the lowest stage among its four pieces:\n\nTitan: II every element one level higher, III permanent Resistance.\n\nImperial: II blink 16 blocks, III 20 blocks with a shockwave.\n\nStellar: II Regeneration II at night, III falling stars strike attackers.\n\nVoid: II dash every 3 s, III every 2 s, tearing through monsters.\n\nAscendant: II farther blink and faster dash, III allies near you regenerate.",
+                            "Ein volles Set zählt als die niedrigste Stufe seiner vier Teile:\n\nTitan: II jedes Element eine Stufe höher, III dauerhaft Resistenz.\n\nImperial: II Blink 16 Blöcke, III 20 Blöcke mit Druckwelle.\n\nStellar: II Regeneration II bei Nacht, III Sternschnuppen treffen Angreifer.\n\nLeere: II Sprint alle 3 s, III alle 2 s, reißt Monster mit.\n\nAufgestiegen: II weiterer Blink und schnellerer Sprint, III Verbündete in deiner Nähe regenerieren.")
                     .build(),
 
             // ------------------------------------------------------------------ constellations

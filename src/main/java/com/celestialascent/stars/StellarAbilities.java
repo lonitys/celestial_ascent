@@ -26,7 +26,8 @@ public class StellarAbilities implements ArmorAbility {
             p.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 10, 0, true, false, true));
         }
         if (p.tickCount % 40 == 0 && underNightSky(p)) {
-            p.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 60, 0, true, false, true));
+            int amp = com.celestialascent.armor.ArmorStages.setStage(p) >= 2 ? 1 : 0;
+            p.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 60, amp, true, false, true));
         }
         if (!nightVisionOff.contains(p.getUUID())) {
             MobEffectInstance nv = p.getEffect(MobEffects.NIGHT_VISION);
@@ -44,6 +45,27 @@ public class StellarAbilities implements ArmorAbility {
         } else {
             p.displayClientMessage(Component.translatable("message.celestialascent.night_vision_on"), true);
         }
+    }
+
+    private final java.util.Map<UUID, Long> lastStar = new java.util.HashMap<>();
+
+    /** Set stage III: under the night sky, a falling star strikes whoever hurts you (every 2 s at most). */
+    @Override
+    public void onHurt(ServerPlayer p, net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent e) {
+        if (com.celestialascent.armor.ArmorStages.setStage(p) < 3 || !underNightSky(p)) return;
+        if (!(e.getSource().getEntity() instanceof net.minecraft.world.entity.LivingEntity attacker) || attacker == p) return;
+        long now = p.level().getGameTime();
+        if (now - lastStar.getOrDefault(p.getUUID(), -1000L) < 40) return;
+        lastStar.put(p.getUUID(), now);
+        var level = p.serverLevel();
+        var at = attacker.position();
+        com.celestialascent.core.Fx.fall(level, at, Stars.STAR_CRYSTAL.get().defaultBlockState(), 1.0f, 12f, 10);
+        com.celestialascent.core.Scheduler.later(level, 10, () -> {
+            if (!attacker.isAlive()) return;
+            attacker.hurt(p.damageSources().indirectMagic(p, p), 8);
+            level.sendParticles(net.minecraft.core.particles.ParticleTypes.WAX_ON, at.x, at.y + 1, at.z, 25, 0.5, 0.6, 0.5, 0.3);
+            level.playSound(null, attacker.blockPosition(), net.minecraft.sounds.SoundEvents.AMETHYST_CLUSTER_BREAK, net.minecraft.sounds.SoundSource.PLAYERS, 1f, 1.2f);
+        });
     }
 
     @Override

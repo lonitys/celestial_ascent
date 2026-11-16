@@ -513,6 +513,74 @@ def fin(ctx):
     raise ValueError(kind)
 
 
+# ----------------------------------------------------------------------------- evolution stage parts
+
+
+def _spike_prog(ctx):
+    """0 at the base of a spike / curve_spike, 1 at its tip (per texel)."""
+    prm = ctx.params
+    loc = ctx.p[:, 1] - ctx.lo[1]
+    if "curve_prog0" in prm:
+        f = np.clip(loc / max(prm["spike_len"], 1e-6), 0, 1)
+        prog = prm["curve_prog0"] + (prm["curve_prog1"] - prm["curve_prog0"]) * f
+    elif "spike_len" in prm:
+        prog = np.clip((prm["spike_y0"] + loc) / prm["spike_len"], 0, 1)
+    else:
+        prog = np.clip(1 - ctx.t, 0, 1)
+    if ctx.face == "up":
+        prog = np.full(ctx.N, float(prog.max()))
+    elif ctx.face == "down":
+        prog = np.full(ctx.N, float(prog.min()))
+    return prog
+
+
+def spine(ctx):
+    """Stage spines and crown spikes: dark violet crystal (the horn ramp) growing paler towards the
+    tip, with a glowing magenta core running up each face and a white-hot starlit tip."""
+    prog = _spike_prog(ctx)
+    side = {"east": 0.05, "north": 0.04, "west": -0.05, "south": -0.04}.get(ctx.face, 0.0)
+    v = 0.14 + 0.62 * prog ** 1.3 + side + tone(ctx, 0.04, 0.06, 0.3)
+    v = v + bevel(ctx, 1.2, 0.08, 0.08) + (fbm(ctx.p, 0.6, 2, 991) - 0.5) * 0.06 + dither(ctx, 0.02)
+    rgb = mix(sramp(P_HORN, v), sramp(P_VIOLET, v + 0.05), 0.3 * (1 - prog))
+    glow = np.zeros(ctx.N, dtype=bool)
+    last = ctx.params.get("seg", 0) == ctx.params.get("nseg", 1) - 1
+    if ctx.face not in ("up", "down"):
+        w = np.abs(ctx.s - 0.5) * 2
+        k = np.clip(1 - w / (0.46 - 0.2 * prog), 0, 1) * smoothstep(0.04, 0.2, prog)
+        rgb = mix(rgb, sramp(P_MAW, 0.3 + 0.25 * k), np.clip(k * 1.4, 0, 1) * 0.55)
+        core = k > 0.3
+        rgb[core] = sramp(P_MAW, 0.48 + 0.3 * k[core] + 0.18 * prog[core])
+        glow |= core
+        tip = last & (prog > 0.9)
+        rgb[tip] = sramp(P_EDGE, 0.42 + 0.3 * (prog[tip] - 0.9) / 0.1)
+        glow |= tip
+    elif ctx.face == "up" and last:
+        rgb = sramp(P_EDGE, np.full(ctx.N, 0.6))
+        glow |= True
+    return rgb, 255, glow
+
+
+def orb(ctx):
+    """Stage 3 nebula orb set into the flank: each face shows a round glowing orb (corners cut away so
+    the box reads rounded) with a swirling magenta-violet nebula, pin stars and a white-hot heart,
+    ringed by a dark violet socket rim."""
+    x, y = (ctx.s - 0.5) * 2, (0.5 - ctx.t) * 2
+    r = np.sqrt(x * x + y * y)
+    a = np.arctan2(y, x)
+    sw = fbm(np.c_[np.cos(a + 2.2 * r) * r * 3, np.sin(a + 2.2 * r) * r * 3, np.full(ctx.N, ctx.index * 1.7)], 1.0, 3, 997)
+    v = 0.98 - 0.5 * r + (sw - 0.5) * 0.45
+    hb = np.clip(0.5 + (sw - 0.5) * 1.6, 0, 1)
+    rgb = mix(sramp(P_MAGENTA, v), sramp(P_VIOLET, v + 0.06), hb)
+    heart = r < 0.32
+    rgb[heart] = sramp(P_MAW, 0.82 + 0.18 * (1 - r[heart] / 0.32))
+    st = (hash3(ctx.i, ctx.j, np.full(ctx.N, ctx.index), 1001) < 0.06) & (r < 0.85) & ~heart
+    rgb[st] = STAR
+    rim = r > 0.9
+    rgb[rim] = sramp(P_VIOLET, 0.16 + 0.08 * (r[rim] < 1.0) + dither(ctx, 0.03)[rim])
+    inside = r < 1.22
+    return rgb, np.where(inside, 255, 0), inside & ~rim
+
+
 # ----------------------------------------------------------------------------- shader table
 
 
@@ -536,4 +604,7 @@ SHADERS = {
     "horn": horn,
     "teeth": teeth,
     "fin": fin,
+    # evolution stages
+    "spine": spine,
+    "orb": orb,
 }

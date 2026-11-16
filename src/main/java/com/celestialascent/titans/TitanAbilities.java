@@ -46,6 +46,7 @@ public class TitanAbilities implements ArmorAbility {
             if (e != null) out.merge(e, 1, Integer::sum);
         }
         out.replaceAll((e, n) -> Math.min(2, n));
+        if (com.celestialascent.armor.ArmorStages.setStage(p) >= 2) out.replaceAll((e, lv) -> Math.min(2, lv + 1)); // set stage II
         return out;
     }
 
@@ -68,6 +69,9 @@ public class TitanAbilities implements ArmorAbility {
     @Override
     public void tick(ServerPlayer p) {
         Map<Element, Integer> L = levels(p);
+        if (p.tickCount % 40 == 0 && com.celestialascent.armor.ArmorStages.setStage(p) >= 3 && com.celestialascent.armor.ArmorSets.fullSet(p) == com.celestialascent.armor.SetId.TITAN) {
+            p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DAMAGE_RESISTANCE, 60, 0, true, false, true));
+        }
         int frost = lvl(L, Element.FROST), tide = lvl(L, Element.TIDE), storm = lvl(L, Element.STORM), magma = lvl(L, Element.MAGMA);
 
         if (frost > 0) {

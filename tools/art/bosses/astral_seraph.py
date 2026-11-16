@@ -232,7 +232,132 @@ def build_model():
     for pos in WPOS:
         for s, nm in sides():
             build_wing(m, pos, s, nm)
+    build_stages(m)
     return m
+
+
+# =============================================================================== evolution stages
+# BossRenderer hides bones named stage2_* below stage 2 and stage3_* below stage 3 (hiding a bone hides
+# its children) and grows them in from scale 0 about their pivot. Stage bones are added after every base
+# bone (so the base cubes keep their order, which seeds their noise) and every stage cube is no_ao, so
+# with the stage bones hidden the base model renders exactly as before.
+#
+# The base seraph already has six wings, so its evolution adds two more pairs that hinge on the existing
+# wing joints and inherit their flight motion:
+#   stage 2: a pair of "veil" wings under the lower pair, sweeping down past the robe (the wings that
+#            cover the feet), with golden glowing rims;
+#   stage 3: a pair of "crown" wings rising almost vertically behind the head (the wings that cover the
+#            face) with radiant gold tips, and a great 12-fold crystal halo behind the golden one.
+
+STAGE_WINGS = {
+    # parent wing, world root (right side mirrored), arm lengths, rest pose (fan = raise, sweep = back),
+    # tip bend, secondaries length/angles, primaries lengths/angles (deg from hanging down towards the tip)
+    "veil": dict(stage=2, parent="lower", root=(2.4, 26.6, 10.1), L1=10, L2=11, fan=-47, sweep=8, bend=(-4, 6),
+                 sec=13.0, sec_phi=(14, 36), prim=(13, 15, 16.5, 17.5, 16.0), prim_phi=(48, 62, 76, 89, 102),
+                 rim=(255, 214, 120), tip="astral"),
+    "crown": dict(stage=3, parent="upper", root=(2.2, 37.6, 9.3), L1=10, L2=12, fan=68, sweep=8, bend=(8, 4),
+                  sec=14.0, sec_phi=(8, 28), prim=(15, 17.5, 19.5, 20.5, 19.0), prim_phi=(34, 50, 65, 79, 92),
+                  rim=(255, 246, 206), tip="radiant"),
+}
+CRYSTAL_HALO = dict(z=4.4, size=48)
+
+
+def rest_matrix(m, name):
+    """Rest-pose model matrix of a bone (Bedrock space, same convention as geo_preview)."""
+    b = m.bones[name]
+    M = np.eye(4) if b.parent is None else rest_matrix(m, b.parent)
+    R = gp.rot_b(b.rotation) if b.rotation else np.eye(3)
+    piv = np.array(b.pivot, dtype=float)
+    return M @ gp.trans(piv) @ gp.mat4(R) @ gp.trans(-piv)
+
+
+def attach(m, name, parent, world_pivot, world_rot):
+    """New bone under `parent` whose canonical frame, at rest, is rotated by world_rot about a canonical
+    point c that sits exactly at world_pivot. Returns (bone, c); build the cubes around c."""
+    Mp = rest_matrix(m, parent)
+    c = (np.linalg.inv(Mp) @ np.array([*world_pivot, 1.0]))[:3]
+    R_rel = Mp[:3, :3].T @ world_rot
+    return m.bone(name, parent, tuple(c), rotation=tl.euler(R_rel)), c
+
+
+def _spt(c, s, a, b, dz=0.0):
+    """Stage wing point: wing coords (a along the arm, b below it) around canonical root c."""
+    return np.array([c[0] + s * a, c[1] - b, c[2] + dz])
+
+
+def sband_plane(bone, c, s, feathers, mat, dz, tilt=0.0, margin=0.6, **params):
+    """band_plane for a stage wing rooted at canonical point c."""
+    pts = np.concatenate([feather_outline(f) for f in feathers])
+    amin, bmin = pts.min(0) - margin
+    amax, bmax = pts.max(0) + margin
+    w = int(math.ceil(amax - amin))
+    h = int(math.ceil(bmax - bmin))
+    top = _spt(c, s, (amin + amax) / 2, bmin, dz)
+    origin = top - np.array([w / 2, h, 0.0])
+    rot = tl.euler(tl.axis_angle([1, 0, 0], -tilt)) if tilt else None
+    return bone.cube(origin, (w, h, 0), mat, 0.0, top if rot else None, rot, faces=["north"],
+                     side=s, x_root=c[0], y_root=c[1], feathers=list(feathers), **params)
+
+
+def build_stage_wing(m, key, s, nm):
+    cfg = STAGE_WINGS[key]
+    st = cfg["stage"]
+    L1, L2 = cfg["L1"], cfg["L2"]
+    rx, ry, rz = cfg["root"]
+    Rw = gp.rot_b((0, -s * cfg["sweep"], -s * cfg["fan"]))
+    w, c = attach(m, f"stage{st}_wing_{key}_{nm}", f"wing_{cfg['parent']}_{nm}", (rx * s, ry, rz), Rw)
+    look = dict(rim=cfg["rim"], tip=cfg["tip"], stage=st)
+    w.box(_spt(c, s, L1 / 2 - 1.0, 0), (L1 + 2, 3, 3), "wing_arm", side=s, x_root=c[0], band_a=L1 - 0.6,
+          glow_band=True)
+    n = 5 if L1 < 10 else 6
+    secs = []
+    for k in range(n):
+        f = k / (n - 1)
+        phi = cfg["sec_phi"][0] + f * (cfg["sec_phi"][1] - cfg["sec_phi"][0])
+        secs.append((0.6 + f * (L1 - 1.0), 0.4, phi, cfg["sec"] * (0.80 + 0.2 * f), 6.4))
+    sband_plane(w, c, s, secs, "feather", dz=0.8, tilt=6, ast=0.5, kind="sec", **look)
+    covs = []
+    nc = 4 if L1 < 10 else 5
+    for k in range(nc):
+        f = k / (nc - 1)
+        phi = cfg["sec_phi"][0] + 4 + f * (cfg["sec_phi"][1] - cfg["sec_phi"][0])
+        covs.append((0.8 + f * (L1 - 1.2), 3.0, phi, 6.4 + 1.2 * f, 4.8))
+    for k in range(nc - 1):
+        f = (k + 0.5) / (nc - 1)
+        phi = cfg["sec_phi"][0] + 6 + f * (cfg["sec_phi"][1] - cfg["sec_phi"][0])
+        covs.append((0.8 + f * (L1 - 1.2), 0.2, phi, 4.8 + 0.8 * f, 4.2))
+    sband_plane(w, c, s, covs, "covert", dz=-0.55, tilt=3, ast=9.0, kind="cov", **look)
+
+    bz, by = cfg["bend"]
+    tip = m.bone(f"stage{st}_wing_{key}_{nm}_tip", w.name, tuple(_spt(c, s, L1, 0)), rotation=(0, -s * by, -s * bz))
+    tip.box(_spt(c, s, L1 + L2 / 2, 0), (L2 + 1, 2, 2), "wing_arm", side=s, x_root=c[0], band_a=L1 + 0.4,
+            glow_band=True)
+    # all primaries share one plane; the outermost is listed first so the inner ones lie on top
+    prims = []
+    for k in range(5):
+        f = k / 4
+        prims.append((L1 + 0.8 + f * (L2 - 1.4), 0.3, cfg["prim_phi"][k], cfg["prim"][k], 7.4))
+    sband_plane(tip, c, s, prims[::-1], "primary", dz=0.45, tilt=4, ast=0.44, kind="prim", **look)
+    pc = []
+    for k in range(5):
+        f = k / 4
+        pc.append((L1 + 0.2 + f * (L2 - 1.0), 0.6, cfg["prim_phi"][0] - 6 + f * 40, 7.0 + 1.5 * f, 4.8))
+    sband_plane(tip, c, s, pc, "covert", dz=-0.45, tilt=3, ast=9.0, kind="pcov", **look)
+
+
+def build_stages(m):
+    for key in ("veil", "crown"):
+        for s, nm in sides():
+            build_stage_wing(m, key, s, nm)
+    # great crystal halo: rides on the spinning golden halo (12-fold symmetric, so the halo's 30 degree
+    # spin wrap stays invisible), behind the wing roots
+    z = CRYSTAL_HALO["z"]
+    ch = m.bone("stage3_crystal_halo", "halo", (0, 43.0, z))
+    ch.plane((0, 43.0, z), CRYSTAL_HALO["size"], CRYSTAL_HALO["size"], "crystal_halo")
+    for b in m.bones.values():
+        if b.name.startswith(("stage2_", "stage3_")):
+            for cb in b.cubes:
+                cb.params["no_ao"] = True
 
 
 # =============================================================================== shading helpers
@@ -572,6 +697,56 @@ def shade_halo_inner(ctx):
     return rgb, np.where(shape, 255, 0), shape
 
 
+def _crystal(r, dt, r0, r1, hw, waist=0.32):
+    """Elongated faceted crystal pointing outward from r0 to r1 (r, radii in texels; dt = signed arc
+    distance in texels from its axis). Returns (inside, u along the crystal 0..1, signed v -1..1)."""
+    u = (r - r0) / (r1 - r0)
+    prof = np.where(u < waist, 0.45 + 0.55 * u / waist, 1 - (u - waist) / (1 - waist))
+    half = hw * np.clip(prof, 0, 1)
+    inside = (u >= 0) & (u <= 1) & (np.abs(dt) <= half)
+    return inside, u, dt / np.maximum(half, 1e-3)
+
+
+def shade_crystal_halo(ctx):
+    """Stage 3 crystal halo: 12 long and 12 short faceted crystals (pearl-white glass with an astral
+    blue heart and a white-gold glowing ridge) set in a thin gold ring, 12-fold symmetric."""
+    x, y = fx.plane_xy(ctx)
+    R = ctx.tw / 2.0
+    r = np.sqrt(x * x + y * y) * R                    # texels
+    a = np.mod(np.arctan2(y, x), TAU)
+    sec = TAU / 12
+    la = np.mod(a, sec) / sec
+    dmaj = (np.where(la < 0.5, la, la - 1)) * sec * r  # signed arc distance to the long crystal axis
+    dmin = (la - 0.5) * sec * r                        # ... to the short crystal axis
+    big, ub, vb = _crystal(r, dmaj, 0.615 * R, 1.0 * R, 4.6)
+    sml, us, vs = _crystal(r, dmin, 0.63 * R, 0.84 * R, 3.4)
+    rr = r / R
+    ring = np.abs(rr - 0.6) < 0.016
+    node = (np.abs(rr - 0.6) * R / 2.0 + np.abs(dmin) / 2.0 < 1.0)
+    rgb = np.zeros((ctx.N, 3))
+    glow = np.zeros(ctx.N, dtype=bool)
+    for ins, u, v in ((sml, us, vs), (big, ub, vb)):
+        # sapphire glass: two facets lit from the upper left (the lit one paler), a white-gold ridge
+        # along the axis, a gold setting at the base and gold edges
+        lit = np.where(v < 0, 0.62, 0.36) + 0.22 * u - 0.1 * np.abs(v) ** 2
+        col = fx.sramp(ASTRAL, lit + fx.dither(ctx, 0.04))
+        glint = (v < -0.25) & (v > -0.6) & (np.abs(u - 0.55) < 0.2)
+        col[glint] = fx.sramp(PEARL, 0.72 + fx.dither(ctx, 0.04))[glint]
+        ridge = (np.abs(v) < 0.2) & (u > 0.06) & (u < 0.97)
+        edge = (np.abs(v) > 0.78) & (u > 0.04)
+        base = u < 0.07
+        col[ridge] = fx.sramp(RADIANT, 0.7 + 0.28 * u[ridge])
+        col[edge | base] = fx.sramp(GOLD, 0.62 + 0.25 * u[edge | base])
+        rgb[ins] = col[ins]
+        glow |= ins & (ridge | glint)
+    gold = (ring | node) & ~big & ~sml
+    rgb[gold] = fx.sramp(GOLD, 0.66 + fx.dither(ctx, 0.04)[gold])
+    rgb[node & ~big & ~sml] = fx.sramp(RADIANT, 0.8 + fx.dither(ctx, 0.04))[node & ~big & ~sml]
+    glow |= node | ring
+    shape = big | sml | ring | node
+    return rgb, np.where(shape, 255, 0), glow & shape
+
+
 def shade_wing_arm(ctx):
     """Leading edge: small overlapping marginal coverts with a gold band at the wrist."""
     s = ctx.params["side"]
@@ -590,6 +765,11 @@ def shade_wing_arm(ctx):
     rgb = fx.sramp(IVORY, v + fx.dither(ctx, 0.03))
     band = np.abs(a - ctx.params["band_a"]) < 0.75
     rgb[band] = fx.sramp(GOLD, gold_value(ctx) + fx.dither(ctx, 0.05))[band]
+    if ctx.params.get("glow_band"):
+        # stage wings: the wrist band is a glowing radiant inlay
+        core = band & (np.abs(a - ctx.params["band_a"]) < 0.4) & (ctx.face != "down")
+        rgb[core] = fx.sramp(RADIANT, 0.72 + fx.dither(ctx, 0.05))[core]
+        return rgb, 255, core
     return rgb, 255, False
 
 
@@ -676,23 +856,34 @@ def shade_feathers(ctx):
         warm = fx.mix(ivory, ivory * (WARM / 245.0), fx.smoothstep(0.0, 0.25, ta) * 0.6)
         av = 0.52 + 0.2 * (1 - vn ** 2) + crease - 0.3 * fx.smoothstep(u0 + 0.25, 1.0, U) + 0.03 * barb + jit * 0.08
         av -= 0.15 * shadow + ctx.ao * 0.3
-        ast = fx.sramp(ASTRAL, av + fx.dither(ctx, 0.05))
         shade = (val - 0.86)[:, None]
-        lil = np.array([206, 196, 240.0]) * (1.0 + shade)
-        peri = np.array([128, 146, 222.0]) * (1.0 + shade)
         k1 = fx.smoothstep(0.12, 0.4, ta)
         k2 = fx.smoothstep(0.32, 0.6, ta)
         k3 = fx.smoothstep(0.5, 0.88, ta)
+        if pr.get("tip") == "radiant":
+            # ascended feathers (stage 3): ivory -> pale gold -> deep gold with a white-hot rim
+            ast = fx.sramp(GOLD, av * 0.9 + 0.22 + fx.dither(ctx, 0.05))
+            lil = np.array([255, 238, 196.0]) * (1.0 + shade)
+            peri = np.array([246, 204, 120.0]) * (1.0 + shade)
+        else:
+            ast = fx.sramp(ASTRAL, av + fx.dither(ctx, 0.05))
+            lil = np.array([206, 196, 240.0]) * (1.0 + shade)
+            peri = np.array([128, 146, 222.0]) * (1.0 + shade)
         rgb = fx.mix(fx.mix(fx.mix(warm, lil, k1), peri, k2), ast, k3)
         deep = ta > 0.6
         st = deep & (ed > 0.7) & (hash3(ctx.i, ctx.j, np.full(N, ctx.index), 91) < 0.026)
-        rgb[st] = STAR
+        rgb[st] = STAR if pr.get("tip") != "radiant" else np.array([255, 250, 232.0])
         rim = (ed < 0.5) & (ta > 0.66) & has
-        rgb[rim] = EDGE
+        rgb[rim] = np.array(pr["rim"], dtype=float) if "rim" in pr else EDGE
         glow = st | rim
     # faint warm shaft: a tint, not a stripe
     rach = (np.abs(V) < 0.24) & (U < 0.9) & has
     rgb[rach] = fx.mix(rgb[rach], fx.sramp(GOLD, 0.82 - 0.1 * ta[rach]), 0.45)
+    if pr.get("stage") and kind in ("sec", "prim"):
+        # stage wings: a glowing golden shaft runs out along every flight feather
+        hot = (np.abs(V) < 0.32) & (U > 0.18) & (U < 0.86) & has & ~split
+        rgb[hot] = fx.sramp(RADIANT, 0.5 + 0.35 * U[hot])
+        glow = glow | hot
     alpha = np.where(has & ~split, 255, 0)
     return rgb, alpha, glow & has
 
@@ -714,6 +905,7 @@ SHADERS = {
     "mask": shade_mask,
     "halo": shade_halo,
     "halo_inner": shade_halo_inner,
+    "crystal_halo": shade_crystal_halo,
     "wing_arm": shade_wing_arm,
     "feather": shade_feathers,
     "covert": shade_feathers,

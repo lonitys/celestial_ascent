@@ -200,9 +200,66 @@ def build_model():
     fan.plane_from((0, YC + 0.5, 87.5), 13, 20, "fin", rot=frame((0, 0.25, 1), (0, -1, 0.25)), anchor_st=(0, 0.5),
                    kind="fan")
 
-    m.shift_bones(["head", "jaw", "frill_right", "frill_left", "whisker_right", "whisker_left"], (0, HEAD_LIFT, 0))
+    build_stages(m)
+    m.shift_bones(["head", "jaw", "frill_right", "frill_left", "whisker_right", "whisker_left"] + STAGE_HEAD_BONES,
+                  (0, HEAD_LIFT, 0))
     m.shift_bones(list(m.bones.keys())[1:], (0, 0, ZOFF))
     return m
+
+
+# =============================================================================== evolution stages
+# BossRenderer hides bones named stage2_* below stage 2 and stage3_* below stage 3 (with their children)
+# and grows them from scale 0 about their pivot. Stage bones are created after every base bone (base cube
+# order seeds the shaders' noise) and their cubes are no_ao, so with them hidden the model is unchanged.
+# Each stage bone hangs off the chain element it sits on, so it rides the travelling body wave.
+#   stage 2: a row of tall glowing crystal spines rising through the dorsal sail along the back;
+#   stage 3: a crown of five glowing spikes on the head, an extra pair of tail fins and glowing nebula
+#            orbs set into the flanks.
+# (segment, spine length, base width)
+DORSAL_SPINES = [("body", 15, 3), ("seg1", 15, 3), ("seg2", 14, 3), ("seg3", 12, 3), ("seg4", 11, 3),
+                 ("seg5", 9, 2), ("seg6", 8, 2), ("seg7", 6, 2), ("seg8", 5, 2)]
+# (x, y, z) base on the head (pre-shift head space), segment directions, lengths, widths
+CROWN = [((0.0, 28.6, -25.2), [(0, 1, 0.1), (0, 1, 0.42), (0, 0.8, 0.8)], [5, 5, 4], [3, 2, 1.2]),
+         ((2.7, 28.4, -27.4), [(0.22, 1, -0.12), (0.3, 1, 0.3)], [5, 4], [2.4, 1.3]),
+         ((5.6, 29.0, -28.6), [(0.5, 1, -0.2), (0.6, 1, 0.25)], [4, 4], [2.2, 1.1])]
+ORBS = [("seg1", 4), ("seg2", 4), ("seg4", 3), ("seg5", 3)]
+TAIL_FIN_SEG = "seg7"
+STAGE_HEAD_BONES = ["stage3_crown"]
+
+
+def _seg(name):
+    return BODY if name == "body" else next(s for s in SEGS if s[0] == name)
+
+
+def build_stages(m):
+    # ---------------------------------------------------------------- stage 2: dorsal spines
+    for name, ln, wd in DORSAL_SPINES:
+        _, z0, L, W, H, _, _ = _seg(name)
+        base = np.array([0.0, YC + H / 2 + 0.3, z0 + L * 0.42])
+        b = m.bone(f"stage2_spines_{name}", name, tuple(base))
+        segs = [0.44, 0.36, 0.3] if ln >= 10 else ([0.58, 0.52] if ln >= 7 else [1.0])
+        b.spike(base, (0, 1, 0.55), ln, wd, "spine", segs=segs, spin=45, taper=0.62)
+    # ---------------------------------------------------------------- stage 3: crown, tail fins, orbs
+    cr = m.bone("stage3_crown", "head", (0, 28.4, -25.5))
+    for (x, y, z), dirs, lens, wids in CROWN:
+        for s in ((-1, 1) if x else (1,)):
+            dd = [(dx * s, dy, dz) for dx, dy, dz in dirs]
+            cr.curve_spike((x * s, y, z), dd, lens, wids, "spine", crown=True)
+    _, z0, L, W, H, _, _ = _seg(TAIL_FIN_SEG)
+    for s, nm_ in ((-1, "right"), (1, "left")):
+        tf = m.bone(f"stage3_tail_fin_{nm_}", TAIL_FIN_SEG, (W / 2 * s, YC - 0.5, z0 + 1.5))
+        tf.plane_from((W / 2 * s, YC - 0.5, z0 + 1.5), 17, 10, "fin", rot=frame((1.0 * s, -0.35, 0.55), (0, -0.1, 1)),
+                      anchor_st=(0, 0), kind="pectoral", figure=False)
+    for name, sz in ORBS:
+        _, z0, L, W, H, _, _ = _seg(name)
+        for s, nm_ in ((-1, "right"), (1, "left")):
+            c = np.array([(W / 2 - sz * 0.3) * s, YC + 1.2, z0 + L * 0.5])
+            ob = m.bone(f"stage3_orb_{name}_{nm_}", name, tuple(c))
+            ob.box(c, (sz, sz, sz), "orb", inflate=0.3, side=s)
+    for b in m.bones.values():
+        if b.name.startswith(("stage2_", "stage3_")):
+            for cb in b.cubes:
+                cb.params["no_ao"] = True
 
 
 # =============================================================================== animation helpers

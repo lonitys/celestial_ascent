@@ -693,6 +693,152 @@ def bronze(ctx):
     return dramp(BRONZE, v, ctx, 0.6), np.zeros(ctx.N, dtype=bool)
 
 
+# =============================================================================== evolution stage parts
+
+def tongues(r, a, r0, n, length, width, wob=0.18, offset=0.0, inward=False):
+    """n flame tongues around a ring at radius r0 (outward, or inward towards the centre). The wobble
+    depends on the radius only, so the pattern keeps its 360/n symmetry (spinning parts loop clean).
+    Returns (mask, progress 0 base..1 tip, |offset| 0 centre..1 edge)."""
+    d = (r0 - r) if inward else (r - r0)
+    u = a * n / TAU + wob * np.sin(d * 0.85) + offset
+    fq = u - np.floor(u + 0.5)
+    prog = np.clip((d + 0.3) / (length + 0.3), 0, 1)
+    w = width * np.clip(1 - prog, 0, 1) ** 0.7
+    m = (d >= -0.3) & (np.abs(fq) < w) & (prog < 1)
+    return m, prog, np.abs(fq) / np.maximum(w, 1e-3)
+
+
+def fire_ring(ctx):
+    """Stage 2 outer halo: a gold band with a white-hot seam, 24 long flame tongues licking outward
+    with 24 short ones between them, and short licks curling inward. 15-degree symmetric, radial
+    shading only (it spins with the flame disc)."""
+    X, Y, r, a, R = polar(ctx)
+    rb = ctx.params.get("r_band", 23.0)
+    b0, b1 = rb - 0.95, rb + 0.95
+    rgb = np.zeros((ctx.N, 3))
+    glow = np.zeros(ctx.N, dtype=bool)
+    m_out, p_out, e_out = tongues(r, a, b1, 24, 4.9, 0.44)
+    m_mid, p_mid, e_mid = tongues(r, a, b1, 24, 2.9, 0.3, offset=0.5)
+    m_in, p_in, e_in = tongues(r, a, b0, 24, 1.8, 0.3, inward=True, offset=0.5)
+    for m, p, e in ((m_in, p_in, e_in), (m_mid, p_mid, e_mid), (m_out, p_out, e_out)):
+        vf = 0.86 - 0.56 * p - 0.16 * e ** 2
+        rgb[m] = sramp(SUN, (vf + dither(ctx, 0.04))[m])
+        rim = m & (e > 0.74)
+        rgb[rim] = sramp(SAFFRON, (0.62 - 0.25 * p + dither(ctx, 0.04))[rim])
+        glow |= m & ~rim
+    band = (r >= b0) & (r < b1)
+    fr = (r - b0) / (b1 - b0)
+    vb = 0.74 - 0.3 * fr + 0.14 * (fr < 0.22) - 0.16 * (fr > 0.82)
+    rgb[band] = sramp(GOLD, (vb + dither(ctx, 0.04))[band])
+    seam = band & (np.abs(fr - 0.5) < 0.17)
+    rgb[seam] = SUN[7]
+    stud = band & (np.abs(np.mod(a * 24 / TAU, 1.0) - 0.5) > 0.42) & (np.abs(fr - 0.5) < 0.34)
+    rgb[stud] = SUN[8]
+    glow |= seam | stud
+    m = band | m_out | m_mid | m_in
+    return rgb, np.where(m, 255, 0), glow & m
+
+
+def sun_plate(ctx):
+    """Shoulder sun plate (plane): an engraved gold disc with a glowing heart, a raised rim and 12
+    alternating long/short rays whose long tips glow."""
+    X, Y, r, a, R = polar(ctx)
+    rd = ctx.params.get("r_disc", 3.4)
+    disc = r < rd
+    v = 0.66 - 0.12 * (r / rd) + 0.12 * (Y > 0) - 0.08 * (X > 0)
+    v = v - 0.2 * (np.abs(r - rd * 0.62) < 0.22) + 0.18 * (r > rd - 0.45)
+    n = 12
+    u = a * n / TAU
+    k = np.floor(u + 0.5)
+    fq = u - k
+    longer = np.mod(k, 2) == 0
+    r1 = np.where(longer, R - 0.25, R * 0.74)
+    prog = np.clip((r - rd) / (r1 - rd), 0, 1)
+    w = 0.42 * (1 - prog) ** 0.8 + 0.03
+    ray = (r >= rd - 0.2) & (r < r1) & (np.abs(fq) < w)
+    vr = 0.64 + 0.16 * (fq < 0) - 0.14 * (np.abs(fq) > w * 0.62) - 0.1 * prog
+    vv = np.where(disc, v, vr) + dither(ctx, 0.04)
+    rgb = sramp(GOLD, vv)
+    glow = np.zeros(ctx.N, dtype=bool)
+    core = r < rd * 0.42
+    rgb[core] = sramp(SUN, 0.92 - 0.3 * r[core] / (rd * 0.42))
+    tip = ray & longer & (prog > 0.68)
+    rgb[tip] = sramp(SUN, 0.62 + 0.3 * prog[tip])
+    glow |= core | tip
+    m = disc | ray
+    return rgb, np.where(m, 255, 0), glow & m
+
+
+def _feather(u, y, base, tip, width):
+    """Pointed feather blade from base to tip: (inside, along 0..1, across |b| / half-width)."""
+    bx, by = base
+    dx, dy = tip[0] - bx, tip[1] - by
+    L = math.hypot(dx, dy)
+    dx, dy = dx / L, dy / L
+    a = ((u - bx) * dx + (y - by) * dy) / L
+    b = (u - bx) * (-dy) + (y - by) * dx
+    ac = np.clip(a, 0, 1)
+    hw = width / 2 * (ac ** 0.42 * (1 - ac) ** 0.62) / 0.52
+    inside = (a >= 0) & (a <= 1) & (np.abs(b) <= hw)
+    return inside, a, np.abs(b) / np.maximum(hw, 1e-3), b, L
+
+
+def light_wing(ctx):
+    """Stage 3 wing of light (plane): pointed feathers of white-gold light that burn to saffron at
+    their tips, each with a bright quill and a thin darker rim so the layers read, coverts over the
+    secondaries and a white-hot leading edge. params: side, u0, y_top, feathers, coverts, arm (all in
+    wing coordinates: u outward from the root, y up)."""
+    prm = ctx.params
+    W, H = ctx.tw / 2.0, ctx.th / 2.0
+    s = ctx.s if prm["side"] > 0 else 1 - ctx.s
+    u = prm["u0"] + s * W
+    y = prm["y_top"] - ctx.t * H
+    rgb = np.zeros((ctx.N, 3))
+    glow = np.zeros(ctx.N, dtype=bool)
+    shape = np.zeros(ctx.N, dtype=bool)
+    layers = [(f, 0.0) for f in prm.get("feathers", [])] + [(f, 0.08) for f in prm.get("coverts", [])]
+    for k, ((base, tip, width), lift) in enumerate(layers):
+        m, a, e, b, L = _feather(u, y, base, tip, width)
+        if not m.any():
+            continue
+        a = np.clip(a, 0, 1)
+        barb = 0.05 * np.sin((a * L - np.abs(b) * 1.3) * 2.4)
+        v = 0.92 + lift - 0.06 * (k % 2) - 0.5 * a ** 1.2 - 0.12 * e ** 2 + barb + dither(ctx, 0.04)
+        col = sramp(SUN, v)
+        hot = a > 0.7
+        col[hot] = sramp(SAFFRON, 0.86 - (a[hot] - 0.7) * 1.25 + barb[hot] + dither(ctx, 0.04)[hot])
+        quill = (np.abs(b) < 0.22) & (a < 0.86)
+        col[quill] = SUN[8]
+        rim = e > 0.7
+        col[rim] = sramp(GOLD, 0.4 + 0.18 * (1 - a[rim]) + dither(ctx, 0.04)[rim])
+        rgb[m] = col[m]
+        glow[m] = ~rim[m]
+        shape |= m
+    arm = prm.get("arm")
+    if arm:
+        from bosslib import polyline_dist
+        d = polyline_dist(u, y, arm)
+        edge = d < 1.25
+        rgb[edge] = sramp(SUN, 0.95 - 0.3 * d[edge] / 1.25)
+        rgb[edge & (d > 0.95)] = GOLD[6]
+        glow |= edge & (d <= 0.95)
+        shape |= edge
+    return rgb, np.where(shape, 255, 0), glow & shape
+
+
+def sun_spike(ctx):
+    """Crown ray (stacked spike segments): polished sun-gold brightening outward, white-hot point."""
+    pr = ctx.params
+    prog = np.clip((ctx.p[:, 1] - pr["spike_base"][1]) / pr["spike_len"], 0, 1)
+    v = gold_value(ctx, 0.6) + 0.22 * prog + (0.5 - np.abs(ctx.s - 0.5)) * 0.16
+    rgb = sramp(GOLD, v + dither(ctx, 0.05))
+    glow = np.zeros(ctx.N, dtype=bool)
+    tip = prog > 0.8
+    rgb[tip] = sramp(SUN, 0.62 + 0.36 * (prog[tip] - 0.8) / 0.2)
+    glow |= tip
+    return rgb, 255, glow
+
+
 def _w(fn):
     def sh(ctx):
         rgb, glow = fn(ctx)
@@ -729,4 +875,9 @@ SHADERS = {
     "staff_shaft": staff_shaft,
     "staff_sun": staff_sun,
     "bronze": _w(bronze),
+    # evolution stage parts
+    "fire_ring": fire_ring,
+    "sun_plate": sun_plate,
+    "light_wing": light_wing,
+    "sun_spike": sun_spike,
 }

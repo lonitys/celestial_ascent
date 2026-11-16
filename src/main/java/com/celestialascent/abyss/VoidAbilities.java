@@ -46,7 +46,8 @@ public class VoidAbilities implements ArmorAbility {
     public void onKey(ServerPlayer p, int key) {
         if (key != 0) return;
         long now = p.level().getGameTime();
-        if (now - lastDash.getOrDefault(p.getUUID(), -1000L) < DASH_COOLDOWN) return;
+        int stage = com.celestialascent.armor.ArmorStages.setStage(p);
+        if (now - lastDash.getOrDefault(p.getUUID(), -1000L) < DASH_COOLDOWN - 20 * Math.max(0, stage - 1)) return;
         lastDash.put(p.getUUID(), now);
         invulnerableUntil.put(p.getUUID(), now + 12);
         Vec3 look = p.getLookAngle();
@@ -55,6 +56,20 @@ public class VoidAbilities implements ArmorAbility {
         p.resetFallDistance();
         p.serverLevel().sendParticles(ParticleTypes.REVERSE_PORTAL, p.getX(), p.getY() + 1, p.getZ(), 40, 0.4, 0.8, 0.4, 0.2);
         p.serverLevel().playSound(null, p.blockPosition(), SoundEvents.ENDER_DRAGON_FLAP, SoundSource.PLAYERS, 0.8f, 1.6f);
+        if (stage >= 3) {
+            // Set stage III: the dash tears through the monsters it passes.
+            java.util.Set<UUID> hit = new java.util.HashSet<>();
+            for (int t = 1; t <= 8; t++) {
+                com.celestialascent.core.Scheduler.later(p.serverLevel(), t, () -> {
+                    if (!p.isAlive()) return;
+                    for (var e : p.level().getEntitiesOfClass(net.minecraft.world.entity.LivingEntity.class, p.getBoundingBox().inflate(1.2),
+                            e -> e != p && e instanceof net.minecraft.world.entity.monster.Enemy && hit.add(e.getUUID()))) {
+                        e.hurt(p.damageSources().playerAttack(p), 5);
+                        p.serverLevel().sendParticles(ParticleTypes.REVERSE_PORTAL, e.getX(), e.getY() + 1, e.getZ(), 20, 0.3, 0.5, 0.3, 0.2);
+                    }
+                });
+            }
+        }
     }
 
     @Override

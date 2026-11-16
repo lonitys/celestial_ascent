@@ -301,7 +301,6 @@ public class LangGenDe extends LanguageProvider {
         de("constellation.celestialascent.sovereign", "Der Leerenherrscher");
 
         // ---- boss stages ----
-        de("boss.celestialascent.stage", "Stufe %s: %s");
         de("boss.celestialascent.frost_titan.stage2", "Gletscherzorn");
         de("boss.celestialascent.frost_titan.stage3", "Absoluter Nullpunkt");
         de("boss.celestialascent.tide_titan.stage2", "Steigende Flut");
@@ -331,6 +330,26 @@ public class LangGenDe extends LanguageProvider {
         de("message.celestialascent.hint.overload", "Spring über den Strahl!");
         de("message.celestialascent.hint.crystal_choir", "Zerschlag die Kristalle, bevor sie ihn heilen!");
         de("message.celestialascent.hint.devour", "Lauf weg von seinem Schlund!");
+
+        // ---- stages: banner, armor evolution ----
+        de("boss.celestialascent.banner", "STUFE %s");
+        de("tooltip.celestialascent.stage", "Stufe %s");
+        de("tooltip.celestialascent.max_stage", "Voll entwickelt");
+        de("tooltip.celestialascent.resonance", "%s / %s Resonanz");
+        de("tooltip.celestialascent.ready", "Bereit zur Entwicklung: %s");
+        de("tooltip.celestialascent.resonance_hint", "Kämpfe damit, um die Resonanz zu füllen");
+        de("message.celestialascent.resonance_full", "%s resoniert! Schließe die Entwicklung ab: %s");
+        de("message.celestialascent.evolved", "%s hat Stufe %s erreicht!");
+        de("tooltip.celestialascent.set_stage.titan.2", "Set-Stufe II: Jedes Element zählt eine Stufe höher");
+        de("tooltip.celestialascent.set_stage.titan.3", "Set-Stufe III: dauerhaft Resistenz I");
+        de("tooltip.celestialascent.set_stage.imperial.2", "Set-Stufe II: Blink 16 Blöcke, alle 3,75 s");
+        de("tooltip.celestialascent.set_stage.imperial.3", "Set-Stufe III: Blink 20 Blöcke, alle 2,5 s, Druckwelle bei der Ankunft");
+        de("tooltip.celestialascent.set_stage.stellar.2", "Set-Stufe II: Regeneration II unter dem Nachthimmel");
+        de("tooltip.celestialascent.set_stage.stellar.3", "Set-Stufe III: Sternschnuppen treffen nachts deine Angreifer");
+        de("tooltip.celestialascent.set_stage.void.2", "Set-Stufe II: Leerensprint alle 3 s");
+        de("tooltip.celestialascent.set_stage.void.3", "Set-Stufe III: Leerensprint alle 2 s, reißt Monster mit");
+        de("tooltip.celestialascent.set_stage.ascendant.2", "Set-Stufe II: weiterer Blink, schnellerer Sprint");
+        de("tooltip.celestialascent.set_stage.ascendant.3", "Set-Stufe III: Verbündete in deiner Nähe regenerieren");
 
         // ---- codex ----
         de("item.celestialascent.celestial_codex", "Himmelskodex");

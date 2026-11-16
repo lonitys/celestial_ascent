@@ -1,8 +1,5 @@
 package com.celestialascent.boss;
 
-import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
-import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
-import net.minecraft.network.protocol.game.ClientboundSetTitlesAnimationPacket;
 import com.celestialascent.core.ModConfig;
 import com.celestialascent.progress.Constellations;
 import com.celestialascent.progress.Progress;
@@ -114,8 +111,16 @@ public abstract class CelestialBoss extends Monster implements GeoEntity {
         return STAGES;
     }
 
-    /** Colour of the stage title, matching the boss bar. */
+    /** Element colour of each boss (same as the veins of its stage textures, tools/art/bosses/gen_stages.py). */
+    private static final java.util.Map<String, Integer> ACCENT = java.util.Map.of(
+            "frost_titan", 0x7FE6F5, "tide_titan", 0x5CA0FF, "storm_titan", 0xFFE45C, "magma_titan", 0xFF8228,
+            "sentinel_construct", 0xC77DFF, "ender_colossus", 0x8E6BFF, "astral_seraph", 0xFFECAA,
+            "nebula_leviathan", 0xC86EFF, "sun_herald", 0xFFBE32, "void_sovereign", 0x963CFF);
+
+    /** Colour of the boss bar, stage banner and hints. */
     protected int stageColor() {
+        Integer accent = ACCENT.get(bossId().getPath());
+        if (accent != null) return accent;
         return switch (barColor()) {
             case PINK -> 0xFF8AD8;
             case BLUE -> 0x6FB7FF;
@@ -127,8 +132,6 @@ public abstract class CelestialBoss extends Monster implements GeoEntity {
         };
     }
 
-    /** Extra particle shown around the boss in its last stage (defaults to the ambient one). */
-    protected ParticleOptions stageParticle() { return ambientParticle(); }
 
     protected abstract BossEvent.BossBarColor barColor();
 
@@ -210,20 +213,22 @@ public abstract class CelestialBoss extends Monster implements GeoEntity {
 
     public void setHome(BlockPos pos) { this.home = pos; }
 
+    /** Models reach well past the hitbox (wings, halos, stage parts), so culling uses a larger box. */
+    @Override
+    public net.minecraft.world.phys.AABB getBoundingBoxForCulling() {
+        float w = getBbWidth();
+        return getBoundingBox().inflate(w * 0.8 + 1.5, getBbHeight() * 0.35 + 1, w * 0.8 + 1.5);
+    }
+
     // ---- ticking ---------------------------------------------------------------------------
 
     @Override
     public void tick() {
         super.tick();
         if (level().isClientSide) {
-            // The aura thickens with every stage; the last stage adds its own particle.
             ParticleOptions p = ambientParticle();
-            for (int k = 0; k <= phase(); k++) {
-                if (p != null && random.nextInt(2) == 0) level().addParticle(p, getRandomX(1.2 + 0.3 * phase()), getRandomY(), getRandomZ(1.2 + 0.3 * phase()), 0, 0.02, 0);
-            }
-            ParticleOptions extra = stageParticle();
-            if (phase() >= 2 && extra != null && random.nextInt(3) == 0) {
-                level().addParticle(extra, getRandomX(1.6), getRandomY(), getRandomZ(1.6), 0, 0.05, 0);
+            if (p != null && random.nextInt(2) == 0) {
+                level().addParticle(p, getRandomX(1.2), getRandomY(), getRandomZ(1.2), 0, 0.02, 0);
             }
         }
     }
@@ -344,27 +349,43 @@ public abstract class CelestialBoss extends Monster implements GeoEntity {
                 : Component.empty().append(getDisplayName()).append(Component.literal(" \u00B7 ").withColor(0xAAAAAA)).append(stage.copy().withColor(stageColor())));
     }
 
-    /** Title on every nearby player's screen: the boss's name and its new stage. */
+    /** Every player watching the boss bar sees the stage banner (client: StageBanner / BossBarOverlay). */
     private void announceStage(int newPhase) {
         refreshBarName();
-        if (!(level() instanceof ServerLevel sl)) return;
-        Component title = getDisplayName().copy().withColor(stageColor());
-        Component subtitle = Component.translatable("boss.celestialascent.stage", newPhase + 1, stageName()).withColor(0xEEEEEE);
-        for (ServerPlayer p : sl.getEntitiesOfClass(ServerPlayer.class, getBoundingBox().inflate(64))) {
-            p.connection.send(new ClientboundSetTitlesAnimationPacket(5, 50, 15));
-            p.connection.send(new ClientboundSetTitleTextPacket(title));
-            p.connection.send(new ClientboundSetSubtitleTextPacket(subtitle));
-        }
+        for (ServerPlayer p : bossEvent.getPlayers()) sendStage(p, true);
+    }
+
+    /** Tells a client which boss its bar belongs to and the current stage, for the custom boss bar. */
+    private void sendStage(ServerPlayer p, boolean announce) {
+        if (p.connection == null || !p.connection.hasChannel(BossStagePayload.TYPE)) return; // mock players, vanilla clients
+        net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(p, new BossStagePayload(bossEvent.getId(), bossId(), phase(), stageColor(), announce));
     }
 
     // ---- client: growth when evolving ----
 
     private int stageChangedTick = -1000;
+    private int stageBefore;
+    private int stageNow;
 
     @Override
     public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
         super.onSyncedDataUpdated(key);
-        if (key.equals(PHASE) && level().isClientSide && tickCount > 5) stageChangedTick = tickCount;
+        if (key.equals(PHASE) && level().isClientSide) {
+            stageBefore = tickCount > 5 ? stageNow : phase();
+            stageNow = phase();
+            if (tickCount > 5) stageChangedTick = tickCount;
+        }
+    }
+
+    /** 0 to 1 over the second after the last stage change (eased); 1 otherwise. */
+    public float stageGrowth(float partialTick) {
+        float t = Math.min(1, Math.max(0, (tickCount + partialTick - stageChangedTick) / 20f));
+        return t * t * (3 - 2 * t);
+    }
+
+    /** The stage before the last change (client). */
+    public int stageBefore() {
+        return stageBefore;
     }
 
     /** Render scale: the boss grows 8% per stage, easing into its new size over a second. */
@@ -568,6 +589,7 @@ public abstract class CelestialBoss extends Monster implements GeoEntity {
     public void startSeenByPlayer(ServerPlayer player) {
         super.startSeenByPlayer(player);
         bossEvent.addPlayer(player);
+        sendStage(player, false);
     }
 
     @Override

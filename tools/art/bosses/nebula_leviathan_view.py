@@ -120,3 +120,20 @@ def closeup(name, geo, rgba, glow, focus, views, frame=46, px=520, pose=None, ta
     p = os.path.join(PREVIEW, f"{name}_closeup{tag}.png")
     grid([tiles]).save(p)
     return p
+
+
+def stage_sheet(name, geo, rgba, glow, views=(("side", 90, -6), ("3/4", 35, -14), ("front", 0, -6),
+                                              ("top", 90, -75)), W=520, H=260, pose=None, out=None, title=None):
+    """Evolution comparison: columns = stage 1 (stage2_*/stage3_* bones hidden), stage 2, stage 3; each
+    row (view) is framed once on the full stage 3 model so the columns line up."""
+    import stage_preview as sp
+    g = gp.load_geo(geo)
+    gs = [sp.stage_geo(g, k) for k in (1, 2, 3)]
+    rows = []
+    for vn, yaw, pitch in views:
+        s, c = fit(bounds(_points(g, pose), yaw, pitch), W, H)
+        rows.append([tile(gk, rgba, glow, pose, yaw, pitch, W, H, f"stage {k + 1}  {vn}", None, s, c)
+                     for k, gk in enumerate(gs)])
+    p = out or os.path.join(PREVIEW, f"{name}_stages.png")
+    grid(rows, title or f"{name}: stage bones hidden (stage 1) vs stage 2 vs stage 3").save(p)
+    return p

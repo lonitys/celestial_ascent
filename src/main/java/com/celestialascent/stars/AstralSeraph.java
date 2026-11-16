@@ -46,7 +46,6 @@ public class AstralSeraph extends FlyingBoss {
     @Override public double baseMaxHealth() { return 1200; }
     @Override protected BossEvent.BossBarColor barColor() { return BossEvent.BossBarColor.WHITE; }
     @Override protected ParticleOptions ambientParticle() { return ParticleTypes.WAX_ON; }
-    @Override protected ParticleOptions stageParticle() { return ParticleTypes.GLOW; }
     @Override protected String moveAnimation() { return "fly"; }
     @Override protected int animTransition() { return 0; } // spinning halo/crown parts
 

@@ -127,6 +127,7 @@ public final class Empire {
     public static ItemStack upgrade(ItemStack base, Item result) {
         ItemStack out = new ItemStack(result.builtInRegistryHolder(), 1, base.getComponentsPatch());
         out.remove(DataComponents.DAMAGE);
+        com.celestialascent.armor.ArmorStages.reset(out); // a new set starts its evolution over
         return out;
     }
 

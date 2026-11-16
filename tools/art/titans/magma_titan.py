@@ -103,7 +103,84 @@ def build_model():
     # raise everything above the hips: the titan towers to its 4.6-block hitbox
     m.shift_bones(["body", "chest", "neck", "head", "jaw", "right_arm", "left_arm", "right_forearm",
                    "left_forearm"], (0, 3, 0))
+    build_stages(m)
     return m
+
+# =============================================================================== boss stages
+# Bones named stage2_* are shown from boss stage 2 on, stage3_* only in stage 3; the renderer hides them
+# by name prefix and scales them in from 0 about their pivot. They are created after every base bone so
+# the base cubes keep their order, and _install_stage_ao keeps them out of the base cubes' baked AO, so
+# with all stage bones hidden the model looks exactly as before.
+
+STAGE_PREFIXES = ("stage2_", "stage3_")
+
+
+def is_stage_bone(bone):
+    while bone is not None:
+        if bone.name.startswith(STAGE_PREFIXES):
+            return True
+        bone = bone.model.bones.get(bone.parent) if bone.parent else None
+    return False
+
+
+def _install_stage_ao():
+    """Stage parts are hidden in stage 1, so they must not darken the always-visible cubes. Wraps the
+    shared painter's AO (a no-op for models without stage bones; installed once per process)."""
+    if getattr(tl.Painter, "_stage_ao", False):
+        return
+    base_ao = tl.Painter._ao
+    far = np.full(3, np.inf)
+
+    def _ao(self, pw, nw, cm, face, ci, boxes):
+        if not is_stage_bone(boxes[ci][0].bone):
+            boxes = [b if not is_stage_bone(b[0].bone) else b[:5] + (far, far) for b in boxes]
+        return base_ao(self, pw, nw, cm, face, ci, boxes)
+
+    tl.Painter._ao = _ao
+    tl.Painter._stage_ao = True
+
+
+_install_stage_ao()
+
+
+def build_stages(m):
+    """Authored in the same (pre-shift) coordinates as build_model, then raised with the upper body."""
+    names = []
+
+    def bone(name, parent, pivot):
+        names.append(name)
+        return m.bone(name, parent, pivot)
+
+    # ---- stage 2 "Molten Core": obsidian horns and dripping magma rocks on the shoulders
+    horns = bone("stage2_horns", "head", (0, 54.5, -13))
+    for s in (-1, 1):                                       # out from the temples, then high above the crown
+        horns.curve_spike((6.0 * s, 54.5, -13.0),
+                          [(1.0 * s, 0.35, 0.0), (0.5 * s, 1.0, 0.05), (0.05 * s, 1.0, -0.2), (-0.35 * s, 1.0, -0.45)],
+                          [6, 6, 6, 5], [6, 5, 4, 3], "horn")
+    for s, nm in ((-1, "right"), (1, "left")):
+        rk = bone(f"stage2_{nm}_magma_rocks", f"{nm}_arm", (19.5 * s, 55.0, 1))
+        rk.box((24.0 * s, 54.5, -3.5), (7, 6, 7), "magma_rock", rot=[10, 20 * s, -15 * s])
+        rk.box((16.5 * s, 56.0, 6.0), (6, 5, 6), "magma_rock", rot=[-12, -10 * s, 8 * s])
+        rk.spike((26.0 * s, 47.5, -3.0), (0.1 * s, -1.0, -0.05), 8, 3, "lava_drip", segs=[0.6, 0.4], spin=0.0)
+        rk.spike((15.0 * s, 46.5, -6.0), (-0.05 * s, -1.0, -0.1), 6, 3, "lava_drip", segs=[0.6, 0.4], spin=0.0)
+    # ---- stage 3 "Cataclysm": volcanic spines, a molten crown and lava-cracked gauntlet plates
+    vs = bone("stage3_volcanic_spikes", "chest", (0, 50, 11))
+    vs.spike((0, 44.0, 11.0), (0, 0.55, 1.0), 16, 6, "volcanic")
+    for s in (-1, 1):
+        vs.spike((7.0 * s, 50.0, 9.5), (0.45 * s, 1.0, 0.75), 24, 7, "volcanic", segs=[0.42, 0.33, 0.25])
+        vs.spike((12.5 * s, 44.0, 8.5), (1.0 * s, 0.55, 0.6), 13, 5, "volcanic", segs=[0.6, 0.4])
+    mc = bone("stage3_molten_crown", "head", (0, 58.6, -13))
+    mc.box((0, 58.6, -13.0), (15, 2, 13), "molten", inflate=0.2)                          # lava circlet
+    for s in (-1, 1):
+        mc.spike((2.4 * s, 59.0, -18.6), (0.15 * s, 1.0, -0.3), 11, 3, "molten_spike", segs=[0.6, 0.4])
+        mc.spike((7.4 * s, 58.6, -16.0), (0.65 * s, 1.0, -0.2), 9, 3, "molten_spike", segs=[0.6, 0.4])
+    for s, nm in ((-1, "right"), (1, "left")):
+        fp = bone(f"stage3_{nm}_fist_plates", f"{nm}_forearm", (20.0 * s, 9.0, 0))
+        fp.box((20.0 * s, 16.6, 0.5), (16, 3, 15), "fist_plate", pool=False)               # back-of-hand slab
+        fp.box((28.4 * s, 8.6, 0.0), (3, 13, 15), "fist_plate", pool=False)                # outer slab
+        fp.spike((29.4 * s, 12.0, -3.0), (1.0 * s, 0.35, -0.3), 6, 3, "obsidian", segs=[1.0])
+        fp.spike((29.4 * s, 5.5, 3.0), (1.0 * s, 0.2, 0.25), 5, 3, "obsidian", segs=[1.0])
+    m.shift_bones(names, (0, 3, 0))
 
 # =============================================================================== shaders
 
@@ -254,6 +331,84 @@ def shade_eye(ctx):
     return ramp(EYE, v), 255, True
 
 
+def _prog(ctx):
+    """0 at the base .. 1 at the tip of a spike / curve_spike (per texel)."""
+    prm = ctx.params
+    seg = np.clip((ctx.p[:, 1] - prm["spike_base"][1]) / prm["spike_len"], 0, 1)
+    if "curve_prog0" in prm:
+        return prm["curve_prog0"] + (prm["curve_prog1"] - prm["curve_prog0"]) * seg
+    return seg
+
+
+def shade_horn(ctx):
+    """Obsidian horns: glassy ringed obsidian, a molten seam up the inner edge and a white-hot tip."""
+    rgb, _, _ = shade_obsidian(ctx)
+    prog = _prog(ctx)
+    side = ctx.face not in ("up", "down")
+    rings = (np.mod(prog * 9.0, 1.0) < 0.14) & side
+    rgb[rings] = rgb[rings] * 0.6
+    seam = side & (np.abs(ctx.s - 0.5) < 0.1) & (prog > 0.2)
+    lv, _ = lava_rgb(ctx, 0.25)
+    rgb[seam] = lv[seam]
+    hot = side & (prog > 0.8) | ((ctx.face == "up") & (ctx.params["seg"] == ctx.params["nseg"] - 1))
+    rgb[hot] = ramp(LAVA, np.clip(0.55 + (prog[hot] - 0.8) * 2.2, 0, 0.99))
+    return rgb, 255, seam | hot
+
+
+def shade_magma_rock(ctx, seams=0.13, crack_w=0.07, crack_f=0.45):
+    """Freshly torn magma boulders: basalt crust split by wide molten seams, a lava pool on top."""
+    rgb, _, glow = shade_basalt(ctx, seams=seams)
+    p = ctx.p
+    g1, g2, _ = worley(p, crack_f, 71)
+    crack = ((g2 - g1) < crack_w) & ~glow
+    lr, _ = lava_rgb(ctx, 0.2)
+    rgb[crack] = lr[crack]
+    glow = glow | crack
+    if ctx.face == "up" and ctx.params.get("pool", True):
+        pool = (np.abs(ctx.s - 0.5) < 0.32) & (np.abs(ctx.t - 0.5) < 0.32)
+        rgb[pool] = ramp(LAVA, 0.7 + (fbm(p, 0.6, 2, 3)[pool] - 0.5) * 0.4)
+        glow = glow | pool
+    return rgb, 255, glow
+
+
+def shade_lava_drip(ctx):
+    """Hanging lava drip: hot at the root, cooling to a dark red bead at the tip (all emissive)."""
+    prog = _prog(ctx)
+    v = 0.85 - prog * 0.45 + (fbm(ctx.p, 0.8, 2, 9) - 0.5) * 0.2
+    if ctx.face not in ("up", "down"):
+        v += np.where(ctx.s < 0.4, 0.08, -0.04)
+    return ramp(LAVA, v), 255, True
+
+
+def shade_volcanic(ctx):
+    """Volcanic spines: columnar basalt with molten veins running up the faces and a glowing vent tip."""
+    rgb, _, glow = shade_basalt(ctx, seams=0.05)
+    p = ctx.p
+    prog = _prog(ctx)
+    side = ctx.face not in ("up", "down")
+    wob = fbm(p, 0.35, 2, 17) * 0.5
+    vein = side & (np.abs(np.mod(ctx.s * 2.0 + wob + ctx.index * 0.37, 1.0) - 0.5) < 0.07) & (prog > 0.08)
+    lv, _ = lava_rgb(ctx, 0.15 + 0.3 * prog)
+    rgb[vein] = lv[vein]
+    last = ctx.params["seg"] == ctx.params["nseg"] - 1
+    tip = (side & (prog > 0.84)) | ((ctx.face == "up") & last)
+    rgb[tip] = ramp(LAVA, np.full(int(tip.sum()), 0.82))
+    return rgb, 255, glow | vein | tip
+
+
+def shade_molten(ctx, spike=False):
+    """The molten crown: bright flowing lava with a few dark crust flakes."""
+    p = ctx.p
+    rgb, v = lava_rgb(ctx, -0.02 if not spike else -0.08 + 0.32 * _prog(ctx))
+    f1, f2, cid = worley(p, 0.5, 91)
+    crust = (f1 < 0.3) & (cid > 0.45)
+    rgb[crust] = ramp(BASALT, 0.35 + (cid[crust] - 0.5) * 0.3)
+    if spike:
+        tip = (_prog(ctx) > 0.82) & (ctx.params["seg"] == ctx.params["nseg"] - 1)
+        rgb[tip & ~crust] = LAVA[-1]
+    return rgb, 255, ~crust
+
+
 SHADERS = {
     "basalt": lambda c: shade_basalt(c, seams=0.055),
     "plate": lambda c: shade_basalt(c, seams=0.035, plate=True),
@@ -266,6 +421,14 @@ SHADERS = {
     "vent": shade_vent,
     "ember": shade_ember,
     "eye": shade_eye,
+    # boss-stage parts
+    "horn": shade_horn,
+    "magma_rock": shade_magma_rock,
+    "lava_drip": shade_lava_drip,
+    "volcanic": shade_volcanic,
+    "molten": shade_molten,
+    "molten_spike": lambda c: shade_molten(c, spike=True),
+    "fist_plate": lambda c: shade_magma_rock(c, seams=0.12, crack_w=0.04, crack_f=0.28),
 }
 
 # =============================================================================== animations
