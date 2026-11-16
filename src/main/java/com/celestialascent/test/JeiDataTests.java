@@ -1,14 +1,29 @@
 package com.celestialascent.test;
 
 import com.celestialascent.CelestialAscent;
+import com.celestialascent.boss.BossDrops;
+import com.celestialascent.boss.BossSummons;
 import com.celestialascent.core.station.StationRecipe;
 import com.celestialascent.core.station.StationType;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /** The display data recipe viewers (JEI) show: it has to agree with what the game really does. */
 @GameTestHolder(CelestialAscent.MODID)
@@ -34,6 +49,42 @@ public final class JeiDataTests {
             }
         }
         h.assertTrue(n > 100, "expected well over 100 examples, got " + n);
+        h.succeed();
+    }
+
+    /** The drops JEI lists for each boss are exactly what its generated loot table gives (without looting). */
+    @GameTest(template = CoreTests.FLOOR)
+    public static void bossDropsMatchLootTables(GameTestHelper h) {
+        var server = h.getLevel().getServer();
+        h.assertTrue(BossDrops.all().size() == 10, "ten bosses have drop tables, got " + BossDrops.all().size());
+        for (BossDrops.Entry e : BossDrops.all()) {
+            EntityType<?> type = e.type().get();
+            LootTable table = server.reloadableRegistries().getLootTable(type.getDefaultLootTable());
+            LootParams params = new LootParams.Builder(h.getLevel())
+                    .withParameter(LootContextParams.THIS_ENTITY, h.makeMockPlayer(GameType.SURVIVAL))
+                    .withParameter(LootContextParams.ORIGIN, Vec3.ZERO)
+                    .withParameter(LootContextParams.DAMAGE_SOURCE, h.getLevel().damageSources().generic())
+                    .create(LootContextParamSets.ENTITY);
+            Map<Item, BossDrops.Drop> listed = new HashMap<>();
+            for (BossDrops.Drop d : e.drops()) listed.put(d.item().get().asItem(), d);
+            Set<Item> inTable = new HashSet<>();
+            // Every boss pool is guaranteed, so rolling often sees every item and checks the counts.
+            for (int i = 0; i < 64; i++) {
+                Map<Item, Integer> roll = new HashMap<>();
+                for (ItemStack s : table.getRandomItems(params)) roll.merge(s.getItem(), s.getCount(), Integer::sum);
+                for (var r : roll.entrySet()) {
+                    inTable.add(r.getKey());
+                    BossDrops.Drop d = listed.get(r.getKey());
+                    if (d != null) h.assertTrue(r.getValue() >= d.min() && r.getValue() <= d.max(),
+                            type.getDescriptionId() + ": " + r.getValue() + " x " + r.getKey() + " is outside " + d.min() + "-" + d.max());
+                }
+            }
+            h.assertTrue(inTable.equals(listed.keySet()), type.getDescriptionId() + ": JEI lists " + listed.keySet() + " but the table drops " + inTable);
+        }
+        h.assertTrue(BossSummons.all().size() == 11, "ten bosses and the Ender Dragon can be summoned, got " + BossSummons.all().size());
+        for (BossSummons.Summon s : BossSummons.all()) {
+            h.assertTrue(!BossSummons.drops(s).isEmpty(), s.type().get().getDescriptionId() + " shows its drops");
+        }
         h.succeed();
     }
 }
