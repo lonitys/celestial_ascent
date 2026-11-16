@@ -27,7 +27,7 @@ Each piece of the five sets evolves through three stages. Fight while wearing it
 - **Player shops** that pay into your account even while you are offline
 - **Quest boards** with daily deliveries, and villages that **build new houses and stalls** as they prosper
 - Three new villager professions: **Banker, Titansmith and Relic Dealer**
-- Rare walled **trade cities** with a bank, a market and a relic pavilion
+- Rare walled **trade cities** in five biome styles: the Star Spire with a floating crystal, a bank, a market hall with stalls to rent, a relic pavilion, a forge, an inn, and roads out to farms and houses
 
 ## And also
 

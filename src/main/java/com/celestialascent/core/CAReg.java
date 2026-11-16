@@ -40,6 +40,13 @@ public final class CAReg {
     public static final DeferredRegister<PoiType> POI = DeferredRegister.create(Registries.POINT_OF_INTEREST_TYPE, M);
     public static final DeferredRegister<VillagerProfession> PROFESSIONS = DeferredRegister.create(Registries.VILLAGER_PROFESSION, M);
     public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(Registries.SOUND_EVENT, M);
+    public static final DeferredRegister<net.minecraft.world.level.levelgen.structure.StructureType<?>> STRUCTURE_TYPES =
+            DeferredRegister.create(Registries.STRUCTURE_TYPE, M);
+
+    /** The trade city: a jigsaw structure that only starts on flat, dry ground. */
+    public static final DeferredHolder<net.minecraft.world.level.levelgen.structure.StructureType<?>,
+            net.minecraft.world.level.levelgen.structure.StructureType<com.celestialascent.economy.CityStructure>> CITY_STRUCTURE =
+            STRUCTURE_TYPES.register("city", () -> () -> com.celestialascent.economy.CityStructure.CODEC);
 
     /** Items shown in the creative tab, in registration order. */
     public static final List<Supplier<? extends net.minecraft.world.level.ItemLike>> TAB_ORDER = new ArrayList<>();
@@ -64,5 +71,6 @@ public final class CAReg {
         POI.register(bus);
         PROFESSIONS.register(bus);
         SOUNDS.register(bus);
+        STRUCTURE_TYPES.register(bus);
     }
 }

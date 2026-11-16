@@ -50,6 +50,7 @@ public class LangGen extends LanguageProvider {
         add(Economy.SHOP_STALL.get(), "Shop Stall");
         add(Economy.TITAN_ANVIL.get(), "Titan Anvil");
         add(Economy.RELIC_PEDESTAL.get(), "Relic Pedestal");
+        add(Economy.CELESTIAL_CRYSTAL.get(), "Celestial Crystal");
         add("entity.minecraft.villager.celestialascent.banker", "Banker");
         add("entity.minecraft.villager.celestialascent.titansmith", "Titansmith");
         add("entity.minecraft.villager.celestialascent.relic_dealer", "Relic Dealer");

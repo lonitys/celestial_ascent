@@ -198,7 +198,10 @@ public final class Retrogen {
             data.finish(key, Status.NONE, null, null);
             return "no structure in this cell";
         }
-        Holder<Structure> structure = set.get().value().structures().get(0).structure();
+        // A set can hold several structures (the trade city has one per biome style): worldgen uses the one whose
+        // biome fits, so the retrogen tries them in order and takes the first that generates here.
+        List<Holder<Structure>> options = set.get().value().structures().stream().map(e -> e.structure()).toList();
+        Holder<Structure> structure = options.get(0);
         ResourceLocation id = structure.unwrapKey().orElseThrow().location();
 
         switch (chunkState(level, origin)) {
@@ -213,18 +216,30 @@ public final class Retrogen {
             case FULL -> {}
         }
         LevelChunk chunk = level.getChunk(origin.x, origin.z);
-        StructureStart existing = chunk.getStartForStructure(structure.value());
-        if (existing != null && existing.isValid()) {
-            data.finish(key, Status.NATURAL, id, centerOf(existing.getBoundingBox()));
-            return "already generated normally";
+        for (Holder<Structure> option : options) {
+            ResourceLocation oid = option.unwrapKey().orElseThrow().location();
+            StructureStart existing = chunk.getStartForStructure(option.value());
+            if (existing != null && existing.isValid()) {
+                data.finish(key, Status.NATURAL, oid, centerOf(existing.getBoundingBox()));
+                return "already generated normally";
+            }
+            Long moved = chunk.getData(MOVED).get(oid.toString());
+            if (moved != null) {
+                data.finish(key, Status.RELOCATED, oid, BlockPos.of(moved));
+                return "already built nearby at " + BlockPos.of(moved).toShortString();
+            }
         }
-        Long moved = chunk.getData(MOVED).get(id.toString());
-        if (moved != null) {
-            data.finish(key, Status.RELOCATED, id, BlockPos.of(moved));
-            return "already built nearby at " + BlockPos.of(moved).toShortString();
+        StructureStart start = null;
+        for (Holder<Structure> option : options) {
+            StructureStart s = generate(level, option, origin);
+            if (s.isValid()) {
+                structure = option;
+                id = option.unwrapKey().orElseThrow().location();
+                start = s;
+                break;
+            }
         }
-        StructureStart start = generate(level, structure, origin);
-        if (!start.isValid()) {
+        if (start == null) {
             data.finish(key, Status.NONE, id, null);
             return "no structure here (biome)";
         }
@@ -245,16 +260,16 @@ public final class Retrogen {
                 return "no structure here (biome)";
             }
             default -> {
-                return relocate(level, key, structure, origin, p.spacing(), ignorePlayers, site.reason());
+                return relocate(level, key, structure, options, origin, p.spacing(), ignorePlayers, site.reason());
             }
         }
     }
 
     /** Looks for a free spot around the blocked one, nearest first. */
-    private static String relocate(ServerLevel level, String key, Holder<Structure> structure, ChunkPos origin, int spacing,
-                                   boolean ignorePlayers, String why) {
+    private static String relocate(ServerLevel level, String key, Holder<Structure> blocked, List<Holder<Structure>> options, ChunkPos origin,
+                                   int spacing, boolean ignorePlayers, String why) {
         RetrogenData data = RetrogenData.get(level);
-        ResourceLocation id = structure.unwrapKey().orElseThrow().location();
+        ResourceLocation blockedId = blocked.unwrapKey().orElseThrow().location();
         int reach = Math.max(4, Math.min(12, spacing / 2));
         List<ChunkPos> candidates = new ArrayList<>();
         for (int r = 3; r <= reach; r += 3) {
@@ -271,8 +286,20 @@ public final class Retrogen {
         boolean waiting = false;
         for (ChunkPos c : candidates) {
             if (chunkState(level, c) != ChunkState.FULL) continue; // only land that already exists
-            StructureStart start = generate(level, structure, c);
-            if (!start.isValid()) continue;
+            // The blocked structure first, then the other styles of its set (the biome may change nearby).
+            Holder<Structure> structure = null;
+            StructureStart start = null;
+            for (Holder<Structure> option : java.util.stream.Stream.concat(java.util.stream.Stream.of(blocked),
+                    options.stream().filter(o -> o != blocked)).toList()) {
+                StructureStart s = generate(level, option, c);
+                if (s.isValid()) {
+                    structure = option;
+                    start = s;
+                    break;
+                }
+            }
+            if (start == null) continue;
+            ResourceLocation id = structure.unwrapKey().orElseThrow().location();
             SiteCheck.Site site = SiteCheck.evaluate(level, structure, start, ignorePlayers);
             if (site.result() == SiteCheck.Result.OK) {
                 BoundingBox box = place(level, structure, start, site.dy());
@@ -290,8 +317,8 @@ public final class Retrogen {
             data.defer(key, level.getGameTime() + 1200);
             return "later: the free spots nearby have players close (" + why + ")";
         }
-        data.finish(key, Status.BLOCKED, id, null);
-        LOG.info("No free spot for {} near chunk {} ({})", id, origin, why);
+        data.finish(key, Status.BLOCKED, blockedId, null);
+        LOG.info("No free spot for {} near chunk {} ({})", blockedId, origin, why);
         return "no free spot nearby (" + why + ")";
     }
 
@@ -304,8 +331,10 @@ public final class Retrogen {
      * Chunks that do not exist yet build their part themselves when they generate.
      */
     static BoundingBox place(ServerLevel level, Holder<Structure> structure, StructureStart start, int dy) {
+        boolean city = SiteCheck.isCity(structure, start);
         if (dy != 0) {
-            start.getPieces().forEach(piece -> piece.move(0, dy, 0));
+            // A city only lifts or lowers its core: its roads follow the ground and its outskirts sit on them.
+            (city ? start.getPieces().subList(0, 1) : start.getPieces()).forEach(piece -> piece.move(0, dy, 0));
             start = new StructureStart(structure.value(), start.getChunkPos(), start.getReferences(), new PiecesContainer(start.getPieces()));
         }
         BoundingBox box = start.getBoundingBox();
@@ -322,8 +351,19 @@ public final class Retrogen {
         LevelChunk originChunk = level.getChunk(origin.x, origin.z);
         originChunk.setStartForStructure(structure.value(), start);
         level.structureCheck.onStructureLoad(origin, originChunk.getAllStarts()); // so maps and /locate see it now
-        foundations(level, box);
-        SiteCheck.groundLevel(structure, box).ifPresent(ground -> blendTerrain(level, box, ground));
+        if (city) {
+            for (var piece : start.getPieces()) {
+                if (piece instanceof net.minecraft.world.level.levelgen.structure.PoolElementStructurePiece pe
+                        && pe.getElement().getProjection() == net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool.Projection.RIGID) {
+                    foundations(level, piece.getBoundingBox());
+                }
+            }
+            BoundingBox core = start.getPieces().get(0).getBoundingBox();
+            SiteCheck.groundLevel(structure, core).ifPresent(ground -> blendTerrain(level, core, ground));
+        } else {
+            foundations(level, box);
+            SiteCheck.groundLevel(structure, box).ifPresent(ground -> blendTerrain(level, box, ground));
+        }
         return box;
     }
 

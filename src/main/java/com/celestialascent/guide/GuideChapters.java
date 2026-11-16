@@ -151,8 +151,13 @@ public final class GuideChapters {
                             "Reliquiensockel kann man nicht herstellen. Du findest sie in Handelsstädten.")
                     .h("cities", "Trade cities", "Handelsstädte")
                     .p("cities.text",
-                            "Rare walled towns in plains, savannas, deserts, taigas, meadows and snowy plains. Each has a bank, a market with stalls to rent and a relic pavilion with a Relic Dealer.",
-                            "Seltene ummauerte Städte in Ebenen, Savannen, Wüsten, Taigas, Wiesen und verschneiten Ebenen. Jede hat eine Bank, einen Markt mit Mietständen und einen Reliquienpavillon mit Reliquienhändler.")
+                            "Rare walled cities on flat land in plains, meadows, deserts, savannas, taigas and snowy plains, each built in the style of its biome. Behind the four gates: the Star Spire with its floating crystal on the central plaza, a bank with two Bankers, a market hall with 8 stalls to rent, a relic pavilion with a Relic Dealer, the Titansmith's forge, an inn with beds and quest boards. Roads lead out to farms, a windmill, a stable and houses.",
+                            "Seltene ummauerte Städte auf flachem Land in Ebenen, Wiesen, Wüsten, Savannen, Taigas und verschneiten Ebenen, jede im Stil ihres Bioms. Hinter den vier Toren: der Sternenturm mit seinem schwebenden Kristall auf dem Hauptplatz, eine Bank mit zwei Bankiers, eine Markthalle mit 8 Mietständen, ein Reliquienpavillon mit Reliquienhändler, die Schmiede des Titanenschmieds, ein Gasthaus mit Betten und Auftragstafeln. Straßen führen hinaus zu Feldern, einer Windmühle, einem Stall und Häusern.")
+                    .p("cities.crystal",
+                            "The %s on top of the Star Spire is yours to build with too: it floats, turns slowly and lights up its surroundings.",
+                            "Den %s auf der Spitze des Sternenturms kannst du auch selbst bauen: Er schwebt, dreht sich langsam und erhellt seine Umgebung.",
+                            i(Economy.CELESTIAL_CRYSTAL))
+                    .craft("celestial_crystal")
                     .build(),
 
             // ------------------------------------------------------------------ titans

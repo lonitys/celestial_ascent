@@ -29,6 +29,7 @@ SPLITS = {
     'ascension_altar': {'gem': {'gem', 'gem_spire'}, 'halo': {'halo'}},
     'imperial_pylon_restored': {'': {'crystal', 'crystal_cap', 'crystal_tip', 'band@11'}},
     'relic_pedestal': {'': {'crystal_spire', 'crystal_shard'}},
+    'celestial_crystal': {'gem': {'gem'}, 'ring': {'ring'}},
     'star_gate_pedestal_head': {'': {'skull', 'snout', 'jaw', 'nostril', 'eye', 'eye_front', 'horn', 'spine'}},
 }
 

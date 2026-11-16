@@ -47,6 +47,12 @@ public final class Economy {
                     Shapes.or(Shapes.box(0.125, 0, 0.125, 0.875, 0.1875, 0.875), Shapes.box(0.25, 0.1875, 0.25, 0.75, 0.75, 0.75),
                             Shapes.box(0.125, 0.75, 0.125, 0.875, 0.875, 0.875))));
 
+    /** Decoration: a sky-blue crystal floating and turning over a quartz socket (crowns the trade city's Star Spire). */
+    public static final DeferredBlock<FacingBlock> CELESTIAL_CRYSTAL = Content.block("celestial_crystal",
+            () -> new com.celestialascent.core.DisplayFacingBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_LIGHT_BLUE).strength(1.5f, 6f)
+                    .sound(SoundType.AMETHYST).noOcclusion().lightLevel(s -> 15),
+                    Shapes.box(0.125, 0, 0.125, 0.875, 0.1875, 0.875)));
+
     public static final DeferredBlock<QuestBoardBlock> QUEST_BOARD = Content.block("quest_board",
             () -> new QuestBoardBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).strength(2f).sound(SoundType.WOOD).noOcclusion()));
 

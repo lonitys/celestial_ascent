@@ -98,7 +98,8 @@ You can re-infuse a piece with a different element at the Titan Forge (core + 2 
 - **Shop Stall:** stock it and set a price. Buyers pay with coins or their bank balance, and you're paid into your bank even while offline. Unclaimed stalls in trade cities can be rented for 100 ✦ (sneak + right-click).
 - **Quest Board:** three delivery quests per day. They pay coins and raise the village's prosperity, and at each prosperity threshold the village constructs a new building.
 - **New villager jobs:** Banker (Bank Counter), Titansmith (Titan Anvil; sells maps to shrines), Relic Dealer (Relic Pedestal; trade cities and the Ender Empire).
-- **Trade Cities:** rare walled towns with a bank, a market and a relic pavilion.
+- **Trade Cities:** rare walled cities on flat land, built in the style of their biome (plains, desert, savanna, taiga, snowy). Inside: the Star Spire crowned by a floating Celestial Crystal, a quartz bank with two Bankers, a market hall with 8 rentable stalls, a relic pavilion, the Titansmith's forge, an inn and quest boards. Roads lead out to farms, a windmill, a stable and houses.
+- **Celestial Crystal:** a decoration block that floats, turns and gives full light (4 amethyst shards, a gold ingot, glowstone dust).
 
 ## Keys
 

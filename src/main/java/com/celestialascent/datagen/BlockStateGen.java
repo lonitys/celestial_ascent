@@ -41,7 +41,7 @@ public class BlockStateGen extends BlockStateProvider {
 
     /** Blocks whose decorative top floats: the blockstate uses the model without it (tools/split_floating.py). */
     private static final Set<String> FLOATING = Set.of("frost_altar", "tide_altar", "storm_altar", "magma_altar", "seraph_altar",
-            "leviathan_altar", "herald_altar", "sky_altar", "void_infuser", "ascension_altar", "relic_pedestal");
+            "leviathan_altar", "herald_altar", "sky_altar", "void_infuser", "ascension_altar", "relic_pedestal", "celestial_crystal");
 
     private ModelFile placed(String name) {
         return existing(FLOATING.contains(name) ? name + "_base" : name);

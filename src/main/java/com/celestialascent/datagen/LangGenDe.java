@@ -74,6 +74,7 @@ public class LangGenDe extends LanguageProvider {
         de("block.celestialascent.shop_stall", "Marktstand");
         de("block.celestialascent.titan_anvil", "Titanenamboss");
         de("block.celestialascent.relic_pedestal", "Reliquiensockel");
+        de("block.celestialascent.celestial_crystal", "Himmelskristall");
         de("entity.minecraft.villager.celestialascent.banker", "Bankier");
         de("entity.minecraft.villager.celestialascent.titansmith", "Titanenschmied");
         de("entity.minecraft.villager.celestialascent.relic_dealer", "Reliquienhändler");

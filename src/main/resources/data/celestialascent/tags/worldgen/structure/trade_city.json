@@ -1,5 +1,9 @@
 {
   "values": [
-    "celestialascent:trade_city"
+    "celestialascent:trade_city",
+    "celestialascent:trade_city_desert",
+    "celestialascent:trade_city_savanna",
+    "celestialascent:trade_city_taiga",
+    "celestialascent:trade_city_snowy"
   ]
 }

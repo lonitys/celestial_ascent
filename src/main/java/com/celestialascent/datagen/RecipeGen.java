@@ -101,6 +101,11 @@ public class RecipeGen extends RecipeProvider {
                 .define('P', ItemTags.PLANKS).define('B', Items.BOOK)
                 .unlockedBy("has_book", has(Items.BOOK)).save(out);
 
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, Economy.CELESTIAL_CRYSTAL.get())
+                .pattern(" A ").pattern("AGA").pattern(" D ")
+                .define('A', Items.AMETHYST_SHARD).define('G', Items.GOLD_INGOT).define('D', Items.GLOWSTONE_DUST)
+                .unlockedBy("has_amethyst", has(Items.AMETHYST_SHARD)).save(out);
+
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, com.celestialascent.guide.Guide.CODEX.get())
                 .requires(Items.BOOK).requires(Items.AMETHYST_SHARD)
                 .unlockedBy("has_book", has(Items.BOOK)).save(out);

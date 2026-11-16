@@ -1,4 +1,4 @@
-"""Village growth building templates and the Trade City structure."""
+"""Village growth building templates (the trade city lives in make_city.py)."""
 import math
 import os
 import random
@@ -188,108 +188,12 @@ def smithy():
     return b
 
 
-# ---- trade city ---------------------------------------------------------------------------------
-def trade_city():
-    S = 47
-    c = S // 2
-    rnd = random.Random(99)
-    b = B(S, 16, S)
-    b.clear(0, 1, 0, S - 1, 15, S - 1)
-    for x in range(S):
-        for z in range(S):
-            b.set(x, 0, z, 'dirt_path' if (abs(x - c) <= 1 or abs(z - c) <= 1) else ('stone_bricks' if math.hypot(x - c, z - c) < 7 else 'grass_block'))
-    # walls with four gates
-    for i in range(S):
-        for (x, z) in ((i, 0), (i, S - 1), (0, i), (S - 1, i)):
-            gate = abs(i - c) <= 1
-            if gate:
-                continue
-            b.box(x, 1, z, x, 3, z, 'stone_bricks')
-            if i % 2 == 0:
-                b.set(x, 4, z, 'stone_brick_wall', up='true', north='none', south='none', east='none', west='none', waterlogged='false')
-    for (x, z) in ((0, 0), (S - 1, 0), (0, S - 1), (S - 1, S - 1)):
-        b.box(x, 1, z, x, 6, z, 'chiseled_stone_bricks')
-        b.set(x, 7, z, 'lantern', hanging='false', waterlogged='false')
-    # central plaza fountain
-    for x in range(c - 2, c + 3):
-        for z in range(c - 2, c + 3):
-            edge = abs(x - c) == 2 or abs(z - c) == 2
-            b.set(x, 1, z, 'stone_brick_wall' if edge else 'water', **({'up': 'true', 'north': 'none', 'south': 'none', 'east': 'none', 'west': 'none',
-                                                                       'waterlogged': 'false'} if edge else {}))
-    b.box(c, 1, c, c, 3, c, 'chiseled_stone_bricks')
-    b.set(c, 4, c, 'gold_block')
-    b.set(c + 3, 1, c + 3, NS + ':quest_board', facing='north')
-    b.set(c - 3, 1, c - 3, NS + ':quest_board', facing='south')
-    # bank (north-east quadrant)
-    bx, bz = c + 4, 4
-    b.box(bx, 0, bz, bx + 10, 0, bz + 8, 'polished_andesite')
-    b.box(bx, 1, bz, bx + 10, 5, bz + 8, 'stone_bricks', hollow=True)
-    b.box(bx, 6, bz, bx + 10, 6, bz + 8, 'dark_oak_planks')
-    b.box(bx + 4, 1, bz + 8, bx + 6, 3, bz + 8, 'air')
-    for x in (bx + 2, bx + 8):
-        b.set(x, 1, bz + 3, NS + ':bank_counter', facing='south')
-        b.set(x, 3, bz + 3, 'gold_block')
-    for x in range(bx + 1, bx + 10, 3):
-        b.set(x, 3, bz, 'glass_pane')
-        b.set(x, 5, bz + 4, 'lantern', hanging='true', waterlogged='false')
-    b.villager(bx + 3, 1, bz + 5, NS + ':banker', 2)
-    b.villager(bx + 7, 1, bz + 5, NS + ':banker', 3)
-    # market rows (south)
-    for i in range(3):
-        market_stall(4 + i * 6, c + 4, b)
-        market_stall(4 + i * 6, c + 12, b)
-    # relic pavilion (north-west)
-    px, pz = 5, 5
-    b.box(px, 0, pz, px + 8, 0, pz + 8, 'purpur_block')
-    for (x, z) in ((px, pz), (px + 8, pz), (px, pz + 8), (px + 8, pz + 8)):
-        b.box(x, 1, z, x, 4, z, 'purpur_pillar', axis='y')
-    b.box(px, 5, pz, px + 8, 5, pz + 8, 'purpur_slab', type='bottom', waterlogged='false')
-    b.set(px + 4, 1, pz + 4, NS + ':relic_pedestal', facing='south')
-    b.set(px + 4, 4, pz + 4, 'end_rod', facing='down')
-    b.villager(px + 4, 1, pz + 6, NS + ':relic_dealer', 3)
-    # smithy (south-east) and cottages
-    sm = smithy()
-    for (x, y, z), s in sm.blocks.items():
-        e = sm.palette[s]
-        b.set(c + 6 + x, y, c + 6 + z, e['Name'], **e.get('Properties', {}))
-    b.villager(c + 9, 1, c + 9, NS + ':titansmith', 2)
-    cottage(c + 15, c + 6, b, 'spruce')
-    cottage(c + 15, c + 15, b, 'oak')
-    cottage(c + 6, c + 15, b, 'birch')
-    # lamp posts along the roads
-    for k in (6, 14, 32, 40):
-        for (x, z) in ((k, c + 3), (c - 3, k)):
-            b.box(x, 1, z, x, 3, z, 'spruce_fence')
-            b.set(x, 4, z, 'lantern', hanging='false', waterlogged='false')
-    b.villager(c, 1, c + 6, 'minecraft:none', 1)
-    b.villager(c + 6, 1, c, 'minecraft:none', 1)
-    return b
-
-
 def main():
     parts = {'market_stall': market_stall(), 'lamp_post': lamp_post(), 'cottage': cottage(), 'bank_kiosk': bank_kiosk(),
              'garden': garden(), 'fountain': fountain(), 'watchtower': watchtower(), 'smithy': smithy()}
     for name, b in parts.items():
         b.write(os.path.join(ROOT, NS, 'structure', 'village', name + '.nbt'))
-    city = trade_city()
-    city.write(os.path.join(ROOT, NS, 'structure', 'city', 'trade_city.nbt'))
-    dump(os.path.join(ROOT, NS, 'worldgen', 'structure', 'trade_city.json'), {
-        'type': 'minecraft:jigsaw', 'biomes': '#%s:has_structure/trade_city' % NS, 'step': 'surface_structures',
-        'spawn_overrides': {}, 'terrain_adaptation': 'beard_box', 'start_pool': '%s:city/trade_city' % NS, 'size': 1,
-        'start_height': {'absolute': 0}, 'project_start_to_heightmap': 'WORLD_SURFACE_WG',
-        'max_distance_from_center': 80, 'use_expansion_hack': False})
-    dump(os.path.join(ROOT, NS, 'worldgen', 'template_pool', 'city', 'trade_city.json'), {
-        'fallback': 'minecraft:empty', 'elements': [{'weight': 1, 'element': {
-            'element_type': 'minecraft:single_pool_element', 'location': '%s:city/trade_city' % NS,
-            'processors': 'minecraft:empty', 'projection': 'rigid'}}]})
-    dump(os.path.join(ROOT, NS, 'worldgen', 'structure_set', 'trade_city.json'), {
-        'structures': [{'structure': '%s:trade_city' % NS, 'weight': 1}],
-        'placement': {'type': 'minecraft:random_spread', 'spacing': 44, 'separation': 18, 'salt': 715264001}})
-    dump(os.path.join(ROOT, NS, 'tags', 'worldgen', 'biome', 'has_structure', 'trade_city.json'), {'values': [
-        'minecraft:plains', 'minecraft:sunflower_plains', 'minecraft:savanna', 'minecraft:desert', 'minecraft:taiga',
-        'minecraft:meadow', 'minecraft:snowy_plains']})
-    dump(os.path.join(ROOT, NS, 'tags', 'worldgen', 'structure', 'trade_city.json'), {'values': ['%s:trade_city' % NS]})
-    print('village parts', len(parts), 'city blocks', len(city.blocks), 'villagers', len(city.entities))
+    print('village parts', len(parts))
 
 
 if __name__ == '__main__':

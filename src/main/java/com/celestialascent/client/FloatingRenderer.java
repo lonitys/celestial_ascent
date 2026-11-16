@@ -80,6 +80,8 @@ public class FloatingRenderer<T extends BlockEntity> implements BlockEntityRende
         Part head = part("star_gate_pedestal_head", 1.5f, 1f, 0.05f, 0, false);
         spec("star_gate_pedestal", 0, new Part(head.model(), head.lift(), head.bob(), head.bobSpeed(), 0, false, 0, 0, true,
                 s -> s.getValue(StarGatePedestalBlock.HEAD)));
+        spec("celestial_crystal", 0, part("celestial_crystal_gem", 3f, 1.5f, 0.05f, 1.2f, true),
+                part("celestial_crystal_ring", 3f, 1f, 0.05f, -2.5f, true));
         spec("titan_forge", 1.4f);
         spec("imperial_forge", 1.3f);
     }

@@ -21,7 +21,7 @@ public class BlockTagGen extends BlockTagsProvider {
     @Override
     protected void addTags(HolderLookup.Provider lookup) {
         tag(BlockTags.MINEABLE_WITH_AXE).add(Economy.BANK_COUNTER.get(), Economy.SHOP_STALL.get(), Economy.QUEST_BOARD.get());
-        tag(BlockTags.MINEABLE_WITH_PICKAXE).add(Economy.TITAN_ANVIL.get(), Economy.RELIC_PEDESTAL.get(), Titans.TITAN_FORGE.get());
+        tag(BlockTags.MINEABLE_WITH_PICKAXE).add(Economy.TITAN_ANVIL.get(), Economy.RELIC_PEDESTAL.get(), Economy.CELESTIAL_CRYSTAL.get(), Titans.TITAN_FORGE.get());
         tag(BlockTags.NEEDS_IRON_TOOL).add(Economy.TITAN_ANVIL.get(), Economy.RELIC_PEDESTAL.get());
         tag(BlockTags.NEEDS_DIAMOND_TOOL).add(Titans.TITAN_FORGE.get());
         tag(BlockTags.MINEABLE_WITH_PICKAXE).add(com.celestialascent.stars.Stars.STARSTONE.get(), com.celestialascent.stars.Stars.STARLIT_STARSTONE.get(), com.celestialascent.stars.Stars.STARSTONE_BRICKS.get(),
