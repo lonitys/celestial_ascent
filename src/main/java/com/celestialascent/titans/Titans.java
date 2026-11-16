@@ -151,7 +151,7 @@ public final class Titans {
             if (level == null) return null;
             net.minecraft.core.BlockPos origin = trader.blockPosition();
             if (e == Element.MAGMA) origin = new net.minecraft.core.BlockPos(origin.getX() / 8, 64, origin.getZ() / 8);
-            var pos = level.findNearestMapStructure(shrineTag(e), origin, 100, true);
+            var pos = com.celestialascent.retrogen.Retrogen.findNearest(level, shrineTag(e), origin, true);
             if (pos == null) return null;
             ItemStack map = MapItem.create(level, pos.getX(), pos.getZ(), (byte) 2, true, true);
             MapItem.renderBiomePreviewMap(level, map);

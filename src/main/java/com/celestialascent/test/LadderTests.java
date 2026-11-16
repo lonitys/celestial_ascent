@@ -109,9 +109,13 @@ public final class LadderTests {
 
     @GameTest(template = CoreTests.FLOOR)
     public static void skyAltarNeedsNightSky(GameTestHelper h) {
-        h.getLevel().setDayTime(6000);
         BlockPos abs = h.absolutePos(new BlockPos(3, 1, 3));
-        h.assertTrue(!Stars.SKY_ALTAR_TYPE.conditionMet(h.getLevel(), abs), "not by day");
+        long before = h.getLevel().getDayTime();
+        h.getLevel().setDayTime(6000);
+        h.assertTrue(!Stars.SKY_ALTAR_TYPE.conditionMet(h.getLevel(), abs), "not by day (not even in a thunderstorm)");
+        h.getLevel().setDayTime(18000);
+        h.assertTrue(Stars.SKY_ALTAR_TYPE.conditionMet(h.getLevel(), abs), "works at night under open sky");
+        h.getLevel().setDayTime(before);
         h.assertTrue(Stars.SKY_ALTAR_TYPE.find(new ItemStack(Stars.DORMANT_STAR_CORE.get()), List.of(ItemStack.EMPTY, ItemStack.EMPTY)) != null,
                 "dormant core charges with no materials");
         h.succeed();

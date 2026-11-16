@@ -25,10 +25,6 @@ public abstract class TitanBoss extends CelestialBoss {
         return ResourceLocation.fromNamespaceAndPath(CelestialAscent.MODID, element().key + "_titan");
     }
 
-    @Override
-    protected float[] phaseThresholds() {
-        return new float[]{0.5f};
-    }
 
     @Override
     protected BossEvent.BossBarColor barColor() {

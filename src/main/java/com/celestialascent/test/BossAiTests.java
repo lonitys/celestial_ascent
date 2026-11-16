@@ -53,7 +53,7 @@ public final class BossAiTests {
         h.runAfterDelay(402, () -> {
             h.assertTrue(boss.isAlive(), "boss survived its own fight");
             h.assertTrue(seen.size() >= 2, "boss used at least two attacks, saw " + seen);
-            h.assertTrue(boss.phase() >= 1, "boss reached a later phase");
+            h.assertTrue(boss.phase() == 2, "boss reached its third stage, was " + boss.phase());
             h.assertTrue(boss.effectiveMaxHealth() >= boss.baseMaxHealth() - 0.5, "effective health not capped at 1024");
             h.succeed();
         });
@@ -69,4 +69,43 @@ public final class BossAiTests {
     @GameTest(template = CoreTests.FLOOR, timeoutTicks = 450, batch = "boss_ai") public static void leviathanFights(GameTestHelper h) { fight(h, Stars.LEVIATHAN.get()); }
     @GameTest(template = CoreTests.FLOOR, timeoutTicks = 450, batch = "boss_ai") public static void heraldFights(GameTestHelper h) { fight(h, Stars.HERALD.get()); }
     @GameTest(template = CoreTests.FLOOR, timeoutTicks = 450, batch = "boss_ai") public static void sovereignFights(GameTestHelper h) { fight(h, Abyss.VOID_SOVEREIGN.get()); }
+
+    /** Puts the boss in its third stage and runs its ultimate attack to the end. */
+    private static void ultimate(GameTestHelper h, EntityType<? extends CelestialBoss> type, String attack) {
+        ServerPlayer p = h.makeMockServerPlayerInLevel();
+        p.setGameMode(GameType.SURVIVAL);
+        p.moveTo(h.absoluteVec(new Vec3(8, 1, 4)));
+        CelestialBoss boss = h.spawn(type, new BlockPos(8, 1, 11));
+        h.runAfterDelay(2, () -> boss.setHealth(boss.getMaxHealth() * 0.2f));
+        h.runAfterDelay(60, () -> {
+            h.assertTrue(boss.phase() == 2, "boss evolved to stage 3");
+            h.assertTrue(boss.stageName() != null, "stage 3 has a name");
+            boss.forceAttack(attack, p);
+        });
+        h.runAfterDelay(62, () -> h.assertTrue(boss.currentAttack() != null && boss.currentAttack().id.equals(attack), attack + " is running"));
+        for (int t = 61; t <= 200; t++) {
+            h.runAfterDelay(t, () -> {
+                p.setHealth(p.getMaxHealth());
+                p.removeAllEffects();
+                p.clearFire();
+                p.setTicksFrozen(0);
+                if (boss.isAlive()) boss.setTarget(p);
+            });
+        }
+        h.runAfterDelay(202, () -> {
+            h.assertTrue(boss.isAlive(), "boss survived its own ultimate");
+            h.succeed();
+        });
+    }
+
+    @GameTest(template = CoreTests.FLOOR, timeoutTicks = 260, batch = "boss_ultimates") public static void frostUltimate(GameTestHelper h) { ultimate(h, Titans.FROST_TITAN.get(), "absolute_zero"); }
+    @GameTest(template = CoreTests.FLOOR, timeoutTicks = 260, batch = "boss_ultimates") public static void tideUltimate(GameTestHelper h) { ultimate(h, Titans.TIDE_TITAN.get(), "tsunami"); }
+    @GameTest(template = CoreTests.FLOOR, timeoutTicks = 260, batch = "boss_ultimates") public static void stormUltimate(GameTestHelper h) { ultimate(h, Titans.STORM_TITAN.get(), "tempest"); }
+    @GameTest(template = CoreTests.FLOOR, timeoutTicks = 260, batch = "boss_ultimates") public static void magmaUltimate(GameTestHelper h) { ultimate(h, Titans.MAGMA_TITAN.get(), "cataclysm"); }
+    @GameTest(template = CoreTests.FLOOR, timeoutTicks = 260, batch = "boss_ultimates") public static void sentinelUltimate(GameTestHelper h) { ultimate(h, Empire.SENTINEL.get(), "overload"); }
+    @GameTest(template = CoreTests.FLOOR, timeoutTicks = 260, batch = "boss_ultimates") public static void colossusUltimate(GameTestHelper h) { ultimate(h, Empire.COLOSSUS.get(), "gravity_well"); }
+    @GameTest(template = CoreTests.FLOOR, timeoutTicks = 260, batch = "boss_ultimates") public static void seraphUltimate(GameTestHelper h) { ultimate(h, Stars.SERAPH.get(), "crystal_choir"); }
+    @GameTest(template = CoreTests.FLOOR, timeoutTicks = 260, batch = "boss_ultimates") public static void leviathanUltimate(GameTestHelper h) { ultimate(h, Stars.LEVIATHAN.get(), "devour"); }
+    @GameTest(template = CoreTests.FLOOR, timeoutTicks = 260, batch = "boss_ultimates") public static void heraldUltimate(GameTestHelper h) { ultimate(h, Stars.HERALD.get(), "supernova"); }
+    @GameTest(template = CoreTests.FLOOR, timeoutTicks = 260, batch = "boss_ultimates") public static void sovereignUltimate(GameTestHelper h) { ultimate(h, Abyss.VOID_SOVEREIGN.get(), "unmaking"); }
 }

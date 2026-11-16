@@ -17,7 +17,7 @@ public class StellarAbilities implements ArmorAbility {
     public static boolean underNightSky(ServerPlayer p) {
         var level = p.serverLevel();
         return level.dimension() == com.celestialascent.core.Travel.FALLEN_STARS
-                || (level.isNight() && level.canSeeSky(p.blockPosition().above()));
+                || (Stars.nightSky(level) && level.canSeeSky(p.blockPosition().above()));
     }
 
     @Override

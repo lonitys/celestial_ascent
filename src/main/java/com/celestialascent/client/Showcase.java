@@ -97,6 +97,21 @@ public final class Showcase {
             step(50, t, 0, big ? -10 : 0, CLEAR, boss(t, 0, t.equals("astral_seraph") || t.equals("nebula_leviathan") ? 202 : 200, 3),
                     "tp @s 0 " + (big ? "203" : "202.5") + " " + (big ? "-9" : "-6") + " 0 0");
         }
+        // Evolution: each boss in its three stages side by side (stage textures, growth)
+        Object[][] stages = {{"frost_titan", 5, 12, 200}, {"tide_titan", 5, 12, 200}, {"storm_titan", 5, 12, 200}, {"magma_titan", 5, 12, 200},
+                {"sentinel_construct", 4, 10, 200}, {"ender_colossus", 7, 17, 200}, {"astral_seraph", 5, 12, 202},
+                {"nebula_leviathan", 8, 18, 204}, {"sun_herald", 5, 12, 200}, {"void_sovereign", 7, 16, 200}};
+        for (Object[] st : stages) {
+            String id = (String) st[0];
+            int gap = (Integer) st[1], dist = (Integer) st[2], y = (Integer) st[3];
+            String[] cmds = new String[5];
+            cmds[0] = CLEAR;
+            for (int k = 0; k < 3; k++) {
+                cmds[k + 1] = "summon celestialascent:" + id + " " + ((1 - k) * gap) + " " + y + " 4 {NoAI:1b,Rotation:[180f,0f],PersistenceRequired:1b,Phase:" + k + "}";
+            }
+            cmds[4] = "tp @s 0 " + (y + 2.5) + " " + (4 - dist) + " 0 4";
+            step(50, "stages_" + id, 0, 4, cmds);
+        }
         // Armor on stands
         step(60, "armor", 0, 10, CLEAR, stand(-8, "titan", null), stand(-6, "titan", "frost"), stand(-4, "titan", "tide"),
                 stand(-2, "titan", "storm"), stand(0, "titan", "magma"), stand(2, "imperial", null), stand(4, "stellar", null),

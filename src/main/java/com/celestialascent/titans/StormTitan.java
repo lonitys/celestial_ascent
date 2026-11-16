@@ -52,6 +52,18 @@ public class StormTitan extends TitanBoss {
         sl().sendParticles(ParticleTypes.ELECTRIC_SPARK, at.x, at.y + 0.5, at.z, 40, 0.8, 0.8, 0.8, 0.4);
     }
 
+    private final Set<UUID> tempestHits = new HashSet<>();
+    private double tempestAngle;
+
+    /** The tempest ring has two gaps, opposite each other, about 50 degrees wide. */
+    private boolean inTempestGap(double angle) {
+        for (double gap : new double[]{tempestAngle, tempestAngle + Math.PI}) {
+            double d = Math.abs(Math.IEEEremainder(angle - gap, Math.PI * 2));
+            if (d < 0.45) return true;
+        }
+        return false;
+    }
+
     @Override
     protected void registerAttacks() {
         attacks.add(BossAttack.of("lightning_call").range(0, 30).cooldown(90).duration(40).weight(13)
@@ -124,6 +136,45 @@ public class StormTitan extends TitanBoss {
                     }
                 })
                 .onEnd((b, t, i) -> dashHits.clear()));
+    
+        // Stage 3: a ring of lightning spreads outward. Two gaps drift around it; stand in one.
+        attacks.add(BossAttack.of("tempest").phase(2).range(0, 20).cooldown(360).duration(82).weight(9).animation("attack.lightning_call")
+                .onStart((b, t, i) -> {
+                    hint("tempest");
+                    tempestHits.clear();
+                    tempestAngle = random.nextDouble() * Math.PI * 2;
+                    playSound(SoundEvents.LIGHTNING_BOLT_THUNDER, 3f, 0.6f);
+                })
+                .onTick((b, t, i) -> {
+                    Vec3 c = position();
+                    if (i < 12) {
+                        Fx.ring(sl(), ParticleTypes.ELECTRIC_SPARK, c.add(0, 0.3, 0), 3, 32, 0);
+                        return;
+                    }
+                    double r = 3 + (i - 12) * 0.25;
+                    tempestAngle += 0.035;
+                    for (int k = 0; k < 72; k++) {
+                        double a = Math.PI * 2 * k / 72;
+                        if (inTempestGap(a)) continue;
+                        Vec3 q = ground(c.x + Math.cos(a) * r, c.z + Math.sin(a) * r, c.y);
+                        sl().sendParticles(ParticleTypes.ELECTRIC_SPARK, q.x, q.y + 0.4, q.z, 1, 0.05, 0.3, 0.05, 0.02);
+                    }
+                    if (i % 6 == 0) {
+                        for (int k = 0; k < 3; k++) {
+                            double a = random.nextDouble() * Math.PI * 2;
+                            if (!inTempestGap(a)) strike(ground(c.x + Math.cos(a) * r, c.z + Math.sin(a) * r, c.y), 0, 0);
+                        }
+                    }
+                    for (Player p : playersNear(24)) {
+                        double d = Math.hypot(p.getX() - c.x, p.getZ() - c.z);
+                        double a = Math.atan2(p.getZ() - c.z, p.getX() - c.x);
+                        if (Math.abs(d - r) < 0.8 && !inTempestGap(a) && tempestHits.add(p.getUUID())) {
+                            hitTarget(p, 11);
+                            p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN, 40, 1), this);
+                            sl().sendParticles(ParticleTypes.ELECTRIC_SPARK, p.getX(), p.getY() + 1, p.getZ(), 30, 0.4, 0.8, 0.4, 0.3);
+                        }
+                    }
+                }));
     }
 
     private final Set<UUID> dashHits = new HashSet<>();

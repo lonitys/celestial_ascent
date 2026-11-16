@@ -143,4 +143,25 @@ public final class CoreTests {
         eq(h, 3, be.items.getItem(2).getCount(), "shards stay in their slot");
         h.succeed();
     }
+
+    @GameTest(template = FLOOR)
+    public static void retrogenSeesPlayerBuilds(GameTestHelper h) {
+        var level = h.getLevel();
+        // Natural blocks only: no build found.
+        h.setBlock(new BlockPos(2, 1, 2), net.minecraft.world.level.block.Blocks.STONE);
+        h.setBlock(new BlockPos(3, 1, 2), net.minecraft.world.level.block.Blocks.DIRT);
+        h.setBlock(new BlockPos(4, 1, 2), net.minecraft.world.level.block.Blocks.OAK_LOG);
+        h.setBlock(new BlockPos(5, 1, 2), net.minecraft.world.level.block.Blocks.OAK_LEAVES);
+        h.setBlock(new BlockPos(6, 1, 2), net.minecraft.world.level.block.Blocks.IRON_ORE);
+        var box = net.minecraft.world.level.levelgen.structure.BoundingBox.fromCorners(h.absolutePos(new BlockPos(1, 1, 1)), h.absolutePos(new BlockPos(7, 3, 4)));
+        h.assertTrue(com.celestialascent.retrogen.SiteCheck.findPlayerBuild(level, box) == null, "natural blocks are not a build");
+        for (var block : java.util.List.of(net.minecraft.world.level.block.Blocks.CHEST, net.minecraft.world.level.block.Blocks.OAK_PLANKS,
+                net.minecraft.world.level.block.Blocks.TORCH, net.minecraft.world.level.block.Blocks.GLASS, net.minecraft.world.level.block.Blocks.RED_BED)) {
+            h.setBlock(new BlockPos(3, 2, 3), block);
+            BlockPos found = com.celestialascent.retrogen.SiteCheck.findPlayerBuild(level, box);
+            h.assertTrue(h.absolutePos(new BlockPos(3, 2, 3)).equals(found), block + " counts as a player build");
+            h.setBlock(new BlockPos(3, 2, 3), net.minecraft.world.level.block.Blocks.AIR);
+        }
+        h.succeed();
+    }
 }

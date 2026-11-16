@@ -1,5 +1,8 @@
 package com.celestialascent.boss;
 
+import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
+import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
+import net.minecraft.network.protocol.game.ClientboundSetTitlesAnimationPacket;
 import com.celestialascent.core.ModConfig;
 import com.celestialascent.progress.Constellations;
 import com.celestialascent.progress.Progress;
@@ -101,8 +104,31 @@ public abstract class CelestialBoss extends Monster implements GeoEntity {
     /** Base max health before config and player scaling. */
     public abstract double baseMaxHealth();
 
-    /** Health fractions at which the next phase starts, descending (e.g. {0.5f}). */
-    protected abstract float[] phaseThresholds();
+    /**
+     * Every boss evolves through three stages: the second starts at 66% health, the third at 33%.
+     * Each stage changes its look (BossRenderer), unlocks attacks and gets a name (lang: boss.celestialascent.&lt;id&gt;.stage2/3).
+     */
+    public static final float[] STAGES = {0.66f, 0.33f};
+
+    protected float[] phaseThresholds() {
+        return STAGES;
+    }
+
+    /** Colour of the stage title, matching the boss bar. */
+    protected int stageColor() {
+        return switch (barColor()) {
+            case PINK -> 0xFF8AD8;
+            case BLUE -> 0x6FB7FF;
+            case RED -> 0xFF6A3D;
+            case GREEN -> 0x7CFF7C;
+            case YELLOW -> 0xFFD24C;
+            case PURPLE -> 0xC77DFF;
+            case WHITE -> 0xFFFFFF;
+        };
+    }
+
+    /** Extra particle shown around the boss in its last stage (defaults to the ambient one). */
+    protected ParticleOptions stageParticle() { return ambientParticle(); }
 
     protected abstract BossEvent.BossBarColor barColor();
 
@@ -190,9 +216,14 @@ public abstract class CelestialBoss extends Monster implements GeoEntity {
     public void tick() {
         super.tick();
         if (level().isClientSide) {
+            // The aura thickens with every stage; the last stage adds its own particle.
             ParticleOptions p = ambientParticle();
-            if (p != null && random.nextInt(2) == 0) {
-                level().addParticle(p, getRandomX(1.2), getRandomY(), getRandomZ(1.2), 0, 0.02, 0);
+            for (int k = 0; k <= phase(); k++) {
+                if (p != null && random.nextInt(2) == 0) level().addParticle(p, getRandomX(1.2 + 0.3 * phase()), getRandomY(), getRandomZ(1.2 + 0.3 * phase()), 0, 0.02, 0);
+            }
+            ParticleOptions extra = stageParticle();
+            if (phase() >= 2 && extra != null && random.nextInt(3) == 0) {
+                level().addParticle(extra, getRandomX(1.6), getRandomY(), getRandomZ(1.6), 0, 0.05, 0);
             }
         }
     }
@@ -253,6 +284,19 @@ public abstract class CelestialBoss extends Monster implements GeoEntity {
         }
     }
 
+    /** Starts an attack right away, ignoring cooldowns (GameTests and the screenshot tour). */
+    public void forceAttack(String id, LivingEntity target) {
+        for (BossAttack a : attacks) {
+            if (a.id.equals(id)) {
+                if (current != null) endAttack(target);
+                globalCooldown = 0;
+                startAttack(a, target);
+                return;
+            }
+        }
+        throw new IllegalArgumentException("no attack " + id + " on " + bossId());
+    }
+
     private void startAttack(BossAttack a, LivingEntity target) {
         current = a;
         attackTick = 0;
@@ -280,6 +324,55 @@ public abstract class CelestialBoss extends Monster implements GeoEntity {
             sl.sendParticles(ParticleTypes.EXPLOSION_EMITTER, getX(), getY() + getBbHeight() / 2, getZ(), 2, 0.5, 0.5, 0.5, 0);
         }
         onPhaseChange(newPhase);
+        announceStage(newPhase);
+    }
+
+    /** A short instruction on nearby players' action bars, so a new attack can be answered the first time. */
+    public void hint(String key) {
+        Component msg = Component.translatable("message.celestialascent.hint." + key).withColor(stageColor());
+        for (Player p : playersNear(48)) p.displayClientMessage(msg, true);
+    }
+
+    /** Name of the current stage, or null in the first stage. */
+    public Component stageName() {
+        return phase() == 0 ? null : Component.translatable("boss." + bossId().getNamespace() + "." + bossId().getPath() + ".stage" + (phase() + 1));
+    }
+
+    private void refreshBarName() {
+        Component stage = stageName();
+        bossEvent.setName(stage == null ? getDisplayName()
+                : Component.empty().append(getDisplayName()).append(Component.literal(" \u00B7 ").withColor(0xAAAAAA)).append(stage.copy().withColor(stageColor())));
+    }
+
+    /** Title on every nearby player's screen: the boss's name and its new stage. */
+    private void announceStage(int newPhase) {
+        refreshBarName();
+        if (!(level() instanceof ServerLevel sl)) return;
+        Component title = getDisplayName().copy().withColor(stageColor());
+        Component subtitle = Component.translatable("boss.celestialascent.stage", newPhase + 1, stageName()).withColor(0xEEEEEE);
+        for (ServerPlayer p : sl.getEntitiesOfClass(ServerPlayer.class, getBoundingBox().inflate(64))) {
+            p.connection.send(new ClientboundSetTitlesAnimationPacket(5, 50, 15));
+            p.connection.send(new ClientboundSetTitleTextPacket(title));
+            p.connection.send(new ClientboundSetSubtitleTextPacket(subtitle));
+        }
+    }
+
+    // ---- client: growth when evolving ----
+
+    private int stageChangedTick = -1000;
+
+    @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
+        super.onSyncedDataUpdated(key);
+        if (key.equals(PHASE) && level().isClientSide && tickCount > 5) stageChangedTick = tickCount;
+    }
+
+    /** Render scale: the boss grows 8% per stage, easing into its new size over a second. */
+    public float stageScale(float partialTick) {
+        float to = 1 + 0.08f * phase(), from = 1 + 0.08f * Math.max(0, phase() - 1);
+        float t = Math.min(1, (tickCount + partialTick - stageChangedTick) / 20f);
+        t = t * t * (3 - 2 * t);
+        return from + (to - from) * t;
     }
 
     /** Vanilla caps the max-health attribute at 1024; health beyond that becomes damage resistance. */
@@ -514,7 +607,7 @@ public abstract class CelestialBoss extends Monster implements GeoEntity {
         entityData.set(PHASE, tag.getInt("Phase"));
         damageScale = tag.contains("DamageScale") ? Math.max(1f, tag.getFloat("DamageScale")) : 1f;
         NbtUtils.readBlockPos(tag, "Home").ifPresent(p -> home = p);
-        if (hasCustomName()) bossEvent.setName(getDisplayName());
+        refreshBarName();
     }
 
     // ---- GeckoLib ----------------------------------------------------------------------------
@@ -533,7 +626,7 @@ public abstract class CelestialBoss extends Monster implements GeoEntity {
         AnimationController<CelestialBoss> attack = new AnimationController<>(this, "attack", 2, state -> PlayState.STOP);
         attack.triggerableAnim("phase", RawAnimation.begin().thenPlay("phase"));
         for (BossAttack a : attacks) {
-            if (a.animated) attack.triggerableAnim(a.id, RawAnimation.begin().thenPlay("attack." + a.id));
+            if (a.animated) attack.triggerableAnim(a.id, RawAnimation.begin().thenPlay(a.animation));
         }
         controllers.add(attack);
     }

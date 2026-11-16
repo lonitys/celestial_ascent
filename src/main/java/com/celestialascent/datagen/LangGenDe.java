@@ -284,7 +284,6 @@ public class LangGenDe extends LanguageProvider {
         de("message.celestialascent.beacon_deeper", "Das Leuchtfeuer antwortet nur tief im Abgrund (unter y=40)");
         de("message.celestialascent.sovereign_awakens", "DER LEERENHERRSCHER ERWACHT");
         de("message.celestialascent.sovereign_phase_1", "Der Herrscher ruft die Geister der Tiefe!");
-        de("message.celestialascent.sovereign_phase_2", "Der Abgrund beginnt um dich herum einzustürzen!");
         de("message.celestialascent.sovereign_phase_3", "DIE AUSLÖSCHUNG HAT BEGONNEN");
 
         // ---- progression ----
@@ -300,6 +299,38 @@ public class LangGenDe extends LanguageProvider {
         de("constellation.celestialascent.leviathan", "Die Nebelwindung");
         de("constellation.celestialascent.herald", "Der Herold der Sonne");
         de("constellation.celestialascent.sovereign", "Der Leerenherrscher");
+
+        // ---- boss stages ----
+        de("boss.celestialascent.stage", "Stufe %s: %s");
+        de("boss.celestialascent.frost_titan.stage2", "Gletscherzorn");
+        de("boss.celestialascent.frost_titan.stage3", "Absoluter Nullpunkt");
+        de("boss.celestialascent.tide_titan.stage2", "Steigende Flut");
+        de("boss.celestialascent.tide_titan.stage3", "Tsunami");
+        de("boss.celestialascent.storm_titan.stage2", "Aufziehender Sturm");
+        de("boss.celestialascent.storm_titan.stage3", "Orkan");
+        de("boss.celestialascent.magma_titan.stage2", "Glühender Kern");
+        de("boss.celestialascent.magma_titan.stage3", "Kataklysmus");
+        de("boss.celestialascent.sentinel_construct.stage2", "Übertaktet");
+        de("boss.celestialascent.sentinel_construct.stage3", "Überlastung");
+        de("boss.celestialascent.ender_colossus.stage2", "Rissgänger");
+        de("boss.celestialascent.ender_colossus.stage3", "Schwerkraftkollaps");
+        de("boss.celestialascent.astral_seraph.stage2", "Strahlende Schwingen");
+        de("boss.celestialascent.astral_seraph.stage3", "Kristallchor");
+        de("boss.celestialascent.nebula_leviathan.stage2", "Hungrige Tiefe");
+        de("boss.celestialascent.nebula_leviathan.stage3", "Sternenfresser");
+        de("boss.celestialascent.sun_herald.stage2", "Finsternis");
+        de("boss.celestialascent.sun_herald.stage3", "Supernova");
+        de("boss.celestialascent.void_sovereign.stage2", "Die Tiefe ruft");
+        de("boss.celestialascent.void_sovereign.stage3", "Die Auslöschung");
+
+        // ---- attack hints ----
+        de("message.celestialascent.hint.absolute_zero", "Bleib in Bewegung oder erfriere!");
+        de("message.celestialascent.hint.tsunami", "Spring über die Welle!");
+        de("message.celestialascent.hint.tempest", "Finde eine Lücke im Blitzring!");
+        de("message.celestialascent.hint.cataclysm", "Weg von den glühenden Rissen!");
+        de("message.celestialascent.hint.overload", "Spring über den Strahl!");
+        de("message.celestialascent.hint.crystal_choir", "Zerschlag die Kristalle, bevor sie ihn heilen!");
+        de("message.celestialascent.hint.devour", "Lauf weg von seinem Schlund!");
 
         // ---- codex ----
         de("item.celestialascent.celestial_codex", "Himmelskodex");

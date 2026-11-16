@@ -47,7 +47,6 @@ public class VoidSovereign extends CelestialBoss {
 
     @Override public ResourceLocation bossId() { return ResourceLocation.fromNamespaceAndPath(CelestialAscent.MODID, "void_sovereign"); }
     @Override public double baseMaxHealth() { return 3000; }
-    @Override protected float[] phaseThresholds() { return new float[]{0.75f, 0.5f, 0.25f}; }
     @Override protected BossEvent.BossBarColor barColor() { return BossEvent.BossBarColor.PURPLE; }
     @Override protected ParticleOptions ambientParticle() { return VOID; }
     @Override protected int animTransition() { return 0; } // spinning halo/crown parts
@@ -139,7 +138,7 @@ public class VoidSovereign extends CelestialBoss {
                     }
                     playSound(SoundEvents.VEX_CHARGE, 3f, 0.5f);
                 }));
-        attacks.add(BossAttack.of("collapse").phase(2).range(0, 30).cooldown(180).duration(40).weight(9)
+        attacks.add(BossAttack.of("collapse").phase(1).range(0, 30).cooldown(180).duration(40).weight(9)
                 .onTick((b, t, i) -> {
                     if (i != 10) return;
                     for (Player p : playersNear(30)) {
@@ -154,7 +153,7 @@ public class VoidSovereign extends CelestialBoss {
                     }
                     playSound(SoundEvents.DEEPSLATE_BREAK, 3f, 0.4f);
                 }));
-        attacks.add(BossAttack.of("unmaking").phase(3).range(0, 40).cooldown(200).duration(60).weight(10).mobile()
+        attacks.add(BossAttack.of("unmaking").phase(2).range(0, 40).cooldown(200).duration(60).weight(10).mobile()
                 .onTick((b, t, i) -> {
                     if (i % 18 != 4) return;
                     var ps = playersNear(40);
@@ -174,7 +173,7 @@ public class VoidSovereign extends CelestialBoss {
 
     @Override
     protected void passiveTick(LivingEntity target) {
-        if (phase() >= 3 && tickCount % 40 == 0) {
+        if (phase() >= 2 && tickCount % 40 == 0) {
             for (Player p : playersNear(32)) p.addEffect(new MobEffectInstance(MobEffects.DARKNESS, 60, 0), this);
         }
     }
@@ -185,7 +184,7 @@ public class VoidSovereign extends CelestialBoss {
             hitArea(position(), 9, 12, 2.6);
             s.sendParticles(VOID, getX(), getY() + 2, getZ(), 300, 4, 3, 4, 0);
             for (Player p : playersNear(48)) {
-                p.sendSystemMessage(net.minecraft.network.chat.Component.translatable("message.celestialascent.sovereign_phase_" + phase).withColor(0xB45CFF));
+                p.sendSystemMessage(net.minecraft.network.chat.Component.translatable("message.celestialascent.sovereign_phase_" + (phase == 1 ? 1 : 3)).withColor(0xB45CFF));
             }
         }
     }

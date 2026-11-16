@@ -37,7 +37,7 @@ public class StarCompassItem extends Item {
             player.displayClientMessage(Component.translatable("message.celestialascent.compass_spins"), true);
             return InteractionResultHolder.consume(stack);
         }
-        BlockPos gate = sl.findNearestMapStructure(STAR_GATE, player.blockPosition(), 100, false);
+        BlockPos gate = com.celestialascent.retrogen.Retrogen.findNearest(sl, STAR_GATE, player.blockPosition(), false);
         if (gate == null) {
             player.displayClientMessage(Component.translatable("message.celestialascent.compass_nothing"), true);
             return InteractionResultHolder.consume(stack);

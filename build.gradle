@@ -72,6 +72,11 @@ neoForge {
             server()
             programArgument '--nogui'
             // No gametest namespaces here: with gametests enabled NeoForge creates superflat worlds.
+            // Retrogen testing: -PnoStructures makes a world as if the mod had been installed later,
+            // -PretrogenPaused stops background processing (use /celestialascent retrogen run), -PserverWorld=<name> picks the world.
+            if (project.hasProperty('noStructures')) systemProperty 'celestialascent.debug.noStructures', 'true'
+            if (project.hasProperty('retrogenPaused')) systemProperty 'celestialascent.debug.retrogenPaused', 'true'
+            if (project.hasProperty('serverWorld')) programArguments.addAll '--world', project.findProperty('serverWorld').toString()
         }
 
         // This run config launches GameTestServer and runs all registered gametests, then exits.
@@ -183,3 +188,8 @@ idea {
 
 // Lets you type commands into the dev server console (and lets scripts drive it).
 tasks.matching { it.name == 'runServer' }.configureEach { standardInput = System.in }
+
+// -PnoStructures: leave out this mod's structure placement (testing worlds made before the mod was installed)
+if (project.hasProperty('noStructures')) {
+    tasks.named('processResources') { exclude 'data/celestialascent/worldgen/structure_set/**' }
+}

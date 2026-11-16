@@ -43,7 +43,6 @@ public class EnderColossus extends CelestialBoss {
 
     @Override public ResourceLocation bossId() { return ResourceLocation.fromNamespaceAndPath(CelestialAscent.MODID, "ender_colossus"); }
     @Override public double baseMaxHealth() { return 900; }
-    @Override protected float[] phaseThresholds() { return new float[]{0.66f, 0.33f}; }
     @Override protected BossEvent.BossBarColor barColor() { return BossEvent.BossBarColor.PURPLE; }
     @Override protected ParticleOptions ambientParticle() { return ParticleTypes.REVERSE_PORTAL; }
 

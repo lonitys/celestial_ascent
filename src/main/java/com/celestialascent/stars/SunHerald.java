@@ -44,7 +44,6 @@ public class SunHerald extends CelestialBoss {
 
     @Override public ResourceLocation bossId() { return ResourceLocation.fromNamespaceAndPath(CelestialAscent.MODID, "sun_herald"); }
     @Override public double baseMaxHealth() { return 1600; }
-    @Override protected float[] phaseThresholds() { return new float[]{0.66f, 0.33f}; }
     @Override protected BossEvent.BossBarColor barColor() { return BossEvent.BossBarColor.YELLOW; }
     @Override protected ParticleOptions ambientParticle() { return ParticleTypes.FLAME; }
     @Override protected int animTransition() { return 0; } // spinning halo/crown parts
@@ -66,7 +65,7 @@ public class SunHerald extends CelestialBoss {
                     var hit = level().clip(new ClipContext(eye, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
                     Vec3 stop = hit.getType() == HitResult.Type.BLOCK ? hit.getLocation() : end;
                     Fx.line(sl(), ParticleTypes.FLAME, eye, stop, 0.35);
-                    Fx.line(sl(), ParticleTypes.END_ROD, eye, stop, 1.0);
+                    Fx.line(sl(), ParticleTypes.SMALL_FLAME, eye, stop, 0.5);
                     if (i % 4 == 0 && stop == end) {
                         hitTarget(t, 5);
                         burn(t, 4);
@@ -78,7 +77,7 @@ public class SunHerald extends CelestialBoss {
                     hitArea(position(), 7, 20, 1.6);
                     for (LivingEntity e : level().getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(7), e -> e != this)) burn(e, 6);
                     sl().sendParticles(ParticleTypes.FLAME, getX(), getY() + 1, getZ(), 150, 3, 1, 3, 0.2);
-                    sl().sendParticles(ParticleTypes.FLASH, getX(), getY() + 2, getZ(), 1, 0, 0, 0, 0);
+                    sl().sendParticles(ParticleTypes.EXPLOSION, getX(), getY() + 1.5, getZ(), 6, 2, 0.5, 2, 0);
                     playSound(SoundEvents.GENERIC_EXPLODE.value(), 2f, 0.8f);
                 }));
         attacks.add(BossAttack.of("corona_ring").range(0, 30).cooldown(120).duration(60).weight(10)

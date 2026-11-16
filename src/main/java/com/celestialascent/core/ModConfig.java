@@ -14,6 +14,9 @@ public final class ModConfig {
     public static final ModConfigSpec.IntValue EMERALD_TO_COPPER;
     public static final ModConfigSpec.BooleanValue PROJECTE_REPAIR;
     public static final ModConfigSpec.BooleanValue GIVE_CODEX;
+    public static final ModConfigSpec.BooleanValue RETROGEN;
+    public static final ModConfigSpec.IntValue RETROGEN_RADIUS;
+    public static final ModConfigSpec.IntValue RETROGEN_AVOID_MINUTES;
 
     static {
         ModConfigSpec.Builder b = new ModConfigSpec.Builder();
@@ -34,6 +37,14 @@ public final class ModConfig {
         b.pop();
         b.push("codex");
         GIVE_CODEX = b.comment("Give every player a Celestial Codex (the in-game guide) the first time they join").define("giveOnFirstJoin", true);
+        b.pop();
+        b.push("existingWorlds");
+        RETROGEN = b.comment("Build shrines, cities, the Ruined Capital and the Star Gate into land generated before this mod was installed.",
+                "Spots with player builds, other structures or unusable ground are skipped and a free spot nearby is used instead.")
+                .define("buildIntoExploredLand", true);
+        RETROGEN_RADIUS = b.comment("Around each player who logs in, check this many chunks for structures to build").defineInRange("checkRadiusChunks", 40, 8, 128);
+        RETROGEN_AVOID_MINUTES = b.comment("Never build in chunks where players have spent more than this many minutes (bases). 0 turns the check off")
+                .defineInRange("avoidChunksVisitedMinutes", 30, 0, 100000);
         b.pop();
         SPEC = b.build();
     }

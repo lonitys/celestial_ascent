@@ -48,7 +48,6 @@ public class NebulaLeviathan extends FlyingBoss {
 
     @Override public ResourceLocation bossId() { return ResourceLocation.fromNamespaceAndPath(CelestialAscent.MODID, "nebula_leviathan"); }
     @Override public double baseMaxHealth() { return 1400; }
-    @Override protected float[] phaseThresholds() { return new float[]{0.5f}; }
     @Override protected BossEvent.BossBarColor barColor() { return BossEvent.BossBarColor.PURPLE; }
     @Override protected ParticleOptions ambientParticle() { return NEBULA; }
     @Override protected String moveAnimation() { return "fly"; }
@@ -124,6 +123,40 @@ public class NebulaLeviathan extends FlyingBoss {
                             level().explode(this, at.x, at.y + 0.3, at.z, 0f, false, Level.ExplosionInteraction.NONE);
                             for (LivingEntity e : level().getEntitiesOfClass(LivingEntity.class, new AABB(at, at).inflate(2.4, 2.5, 2.4), e -> e != this)) hitTarget(e, 14);
                         });
+                    }
+                }));
+    
+        // Stage 3: it holds still and inhales everything toward its maw, then bites.
+        attacks.add(BossAttack.of("devour").phase(2).range(0, 26).cooldown(380).duration(70).weight(9).animation("attack.nebula_breath")
+                .onStart((b, t, i) -> {
+                    hint("devour");
+                    playSound(SoundEvents.WARDEN_SONIC_CHARGE, 3f, 0.4f);
+                })
+                .onTick((b, t, i) -> {
+                    Vec3 mouth = front(2.4, 0.5);
+                    if (i < 48) {
+                        setDeltaMovement(getDeltaMovement().scale(0.5));
+                        for (Player p : playersNear(26)) {
+                            Vec3 pull = mouth.subtract(p.position());
+                            double d = pull.length();
+                            if (d > 1.5) {
+                                p.push(pull.x / d * 0.07, pull.y / d * 0.03, pull.z / d * 0.07);
+                                p.hurtMarked = true;
+                            }
+                            if (i % 3 == 0) Fx.line(sl(), NEBULA, p.position().add(0, 1, 0), mouth, 1.5);
+                        }
+                        sl().sendParticles(ParticleTypes.REVERSE_PORTAL, mouth.x, mouth.y, mouth.z, 20, 1.5, 1.5, 1.5, 0.3);
+                    }
+                    if (i == 52) {
+                        for (LivingEntity e : level().getEntitiesOfClass(LivingEntity.class, new AABB(mouth, mouth).inflate(5), e -> e != this)) {
+                            hitTarget(e, 24);
+                            e.addEffect(new MobEffectInstance(MobEffects.WITHER, 80, 1), this);
+                            Vec3 away = e.position().subtract(mouth).normalize();
+                            e.push(away.x * 1.5, 0.8, away.z * 1.5);
+                            e.hurtMarked = true;
+                        }
+                        sl().sendParticles(ParticleTypes.SQUID_INK, mouth.x, mouth.y, mouth.z, 60, 2, 2, 2, 0.1);
+                        playSound(SoundEvents.RAVAGER_ROAR, 3f, 0.4f);
                     }
                 }));
     }

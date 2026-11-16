@@ -25,6 +25,36 @@ An endgame ladder past netherite and the Ender Dragon: four Elemental Titans, th
 
 Every boss kill adds a **constellation** to your night sky and gives a small permanent bonus.
 
+### Three stages
+
+Every boss evolves twice, at 66% and at 33% of its health: it changes form (darker body, glowing veins in its element's colour), grows, its aura thickens, and new attacks unlock. A title names the new stage, and the boss bar keeps showing it. In the third stage each boss has an ultimate attack of its own, and the action bar tells you how to survive it:
+
+| Boss | Stage 2 | Stage 3 | Ultimate |
+|---|---|---|---|
+| Frost Titan | Glacial Wrath | Absolute Zero | standing still freezes you: keep moving |
+| Tide Titan | Rising Tide | Tsunami | a wall of water rolls across the arena: jump it |
+| Storm Titan | Gathering Storm | Tempest | an expanding ring of lightning with two drifting gaps |
+| Magma Titan | Molten Core | Cataclysm | six fissures erupt, then six more, turned |
+| Sentinel Construct | Overclocked | Overload | an ankle-high beam sweeps once around: jump it |
+| Ender Colossus | Rift Walker | Gravity Collapse | gravity well |
+| Astral Seraph | Radiant Wings | Crystal Choir | three star crystals heal it until you break them |
+| Nebula Leviathan | Starving Deep | Devourer of Stars | inhales everything toward its maw, then bites |
+| Sun Herald | Eclipse | Supernova | find cover |
+| Void Sovereign | The Deep Calls | The Unmaking | the Abyss collapses |
+
+## The Celestial Codex
+
+Every player gets the **Celestial Codex** the first time they join (craft another from a book and an amethyst shard). Its first page shows your next step, worked out from the bosses you have defeated, and a click takes you to the right chapter. Eleven chapters explain every step with the real crafting and station recipes. The whole mod, codex included, is translated into German.
+
+## Existing worlds
+
+Minecraft only builds structures while it generates new land, so in a world you played before installing the mod, explored land would never get a shrine. Celestial Ascent builds them in afterwards, at the same spots a new world would use:
+
+- Around every player who logs in (40 chunks by default) and in every older chunk that loads, it checks the structure grid, a few cells at a time in the background.
+- A spot is skipped if anything player-made is there or close by (chests, beds, planks, glass, torches, redstone, crafting stations…), if another structure is in the way, if players spent more than 30 minutes in that chunk, or if the ground is too steep. The structure is then built on a free spot nearby instead, or not at all in that cell.
+- Nothing is built while a player is within about 24 blocks, so nobody gets walled in.
+- Structures built late are registered like normal ones: Titansmith maps, the Star Compass and `/locate` find them.
+
 ### Titan elements
 
 Each Titan armor piece carries one element. With a full set, an element on one piece is level I and on two or more pieces is level II.
@@ -62,7 +92,7 @@ Both can be rebound under *Options → Controls → Celestial Ascent*.
 
 ## Config (`config/celestialascent-common.toml`)
 
-You can tune boss health and damage, how much health bosses gain per extra player (default +50% each), the share of damage a player must deal to get loot, Abyss crumble speed, the emerald→coin rate, and ProjectE EMC repair.
+You can tune boss health and damage, how much health bosses gain per extra player (default +50% each), the share of damage a player must deal to get loot, Abyss crumble speed, the emerald→coin rate, ProjectE EMC repair, whether new players get the codex, and the existing-world options (`buildIntoExploredLand`, `checkRadiusChunks`, `avoidChunksVisitedMinutes`).
 
 ## Development
 
@@ -71,4 +101,7 @@ You can tune boss health and damage, how much health bosses gain per extra playe
 - `./gradlew runData`: regenerate models, loot tables, recipes, tags, language and EMC values
 - `python tools/art/build_all.py`, `tools/art/*/build_all.py`: regenerate the art
 - `python tools/make_*.py`: regenerate structures and dimensions
-- `./gradlew runClient -Pshowcase`: scripted screenshot tour of `run/saves/devworld`
+- `./gradlew runClient -Pshowcase`: scripted screenshot tour of `run/saves/devworld` (`-PshowcaseOnly=<regex>` for some shots)
+- `python tools/split_floating.py`: split the floating tops off altar models after regenerating the art
+- `python tools/art/bosses/gen_stages.py`: regenerate the stage 2/3 boss textures
+- Existing-world test: `./gradlew runServer -PnoStructures -PserverWorld=retroworld` makes a world without this mod's structures (`/celestialascent retrogen pregen <r>`), then run normally with `-PretrogenPaused` and use `/celestialascent retrogen hut|scan|run|status`

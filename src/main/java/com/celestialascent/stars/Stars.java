@@ -109,11 +109,20 @@ public final class Stars {
 
     public static final StationType SKY_ALTAR_TYPE = new StationType("sky_altar", 1200,
             new int[]{30, 35}, new int[][]{{66, 17}, {66, 53}}, new int[]{124, 35}, new int[]{90, 35})
-            .condition((level, pos) -> level.dimension() == Level.OVERWORLD && level.isNight() && level.canSeeSky(pos.above()),
+            .condition((level, pos) -> level.dimension() == Level.OVERWORLD && nightSky(level) && level.canSeeSky(pos.above()),
                     "gui.celestialascent.needs_night_sky");
     public static final DeferredBlock<StationBlock> SKY_ALTAR = Stations.register("sky_altar",
             () -> new StationBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLUE).strength(5f, 1200f).sound(SoundType.AMETHYST)
                     .requiresCorrectToolForDrops().noOcclusion().lightLevel(s -> 12), () -> SKY_ALTAR_TYPE));
+
+    /**
+     * True between dusk and dawn by the clock. Vanilla's isNight() is also true in a daytime thunderstorm,
+     * which would let the Sky Altar charge at noon.
+     */
+    public static boolean nightSky(Level level) {
+        long t = level.getDayTime() % 24000L;
+        return t >= 13000L && t <= 23000L;
+    }
 
     @SubscribeEvent
     public static void attributes(EntityAttributeCreationEvent e) {

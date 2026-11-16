@@ -38,6 +38,9 @@ public class FrostTitan extends TitanBoss {
         e.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, slowAmp), this);
     }
 
+    /** Where each player stood at the last Absolute Zero check. */
+    private final java.util.Map<java.util.UUID, Vec3> stillCheck = new java.util.HashMap<>();
+
     @Override
     protected void registerAttacks() {
         attacks.add(BossAttack.of("slam").range(0, 5.5).cooldown(70).duration(30).weight(14)
@@ -137,6 +140,39 @@ public class FrostTitan extends TitanBoss {
                         }
                     }
                     if (i % 20 == 0) playSound(SoundEvents.ELYTRA_FLYING, 1.5f, 0.6f);
+                }));
+    
+        // Stage 3: the floor freezes over. Anyone who stands still is frozen solid.
+        attacks.add(BossAttack.of("absolute_zero").phase(2).range(0, 24).cooldown(400).duration(100).weight(9).animation("attack.blizzard")
+                .onStart((b, t, i) -> {
+                    hint("absolute_zero");
+                    stillCheck.clear();
+                    for (Player p : playersNear(24)) stillCheck.put(p.getUUID(), p.position());
+                    playSound(SoundEvents.GLASS_BREAK, 3f, 0.3f);
+                })
+                .onTick((b, t, i) -> {
+                    Vec3 c = position();
+                    if (i % 4 == 0) {
+                        for (int k = 0; k < 6; k++) {
+                            double a = random.nextDouble() * Math.PI * 2, r = 2 + random.nextDouble() * 16;
+                            Fx.marker(sl(), ground(c.x + Math.cos(a) * r, c.z + Math.sin(a) * r, c.y), Blocks.BLUE_ICE.defaultBlockState(), 1.2f, 30);
+                        }
+                    }
+                    sl().sendParticles(ParticleTypes.SNOWFLAKE, c.x, c.y + 3, c.z, 20, 10, 2, 10, 0.02);
+                    if (i < 20 || i % 20 != 0) return;
+                    for (Player p : playersNear(24)) {
+                        Vec3 before = stillCheck.getOrDefault(p.getUUID(), p.position());
+                        if (p.position().distanceTo(before) < 2.0) {
+                            p.setTicksFrozen(Math.min(p.getTicksRequiredToFreeze() + 160, p.getTicksFrozen() + 120));
+                            p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN, 40, 3), this);
+                            hitTarget(p, 7);
+                            Fx.spike(sl(), p.position(), Blocks.PACKED_ICE.defaultBlockState(), 1.4f, 2.4f, 8, 4, 30, false);
+                            playSound(SoundEvents.GLASS_BREAK, 1.5f, 0.5f);
+                        } else {
+                            chill(p, 20, 0);
+                        }
+                        stillCheck.put(p.getUUID(), p.position());
+                    }
                 }));
     }
 

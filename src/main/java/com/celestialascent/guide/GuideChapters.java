@@ -70,8 +70,15 @@ public final class GuideChapters {
                             "Besorg dir zuerst volle Netheritrüstung mit guten Verzauberungen. Titanenrüstung wird aus Netheritteilen geschmiedet und behält deren Verzauberungen, sie sind also nicht verloren.")
                     .h("bosses", "Fighting bosses", "Bosse bekämpfen")
                     .p("bosses.text",
-                            "Every boss has a health bar and gets more dangerous as it loses health. One hit can take at most 8%% of its health, so it takes many hits. Bosses can't be lured more than 48 blocks from their altar, and they teleport to you if you hide on a pillar.",
-                            "Jeder Boss hat eine Lebensleiste und wird gefährlicher, je mehr Leben er verliert. Ein Treffer nimmt höchstens 8 %% seiner Lebenspunkte, du brauchst also viele Treffer. Bosse lassen sich nicht weiter als 48 Blöcke von ihrem Altar weglocken und teleportieren sich zu dir, wenn du dich auf einer Säule versteckst.")
+                            "One hit can take at most 8%% of a boss's health, so it takes many hits. Bosses can't be lured more than 48 blocks from their altar, and they teleport to you if you hide on a pillar.",
+                            "Ein Treffer nimmt höchstens 8 %% der Lebenspunkte eines Bosses, du brauchst also viele Treffer. Bosse lassen sich nicht weiter als 48 Blöcke von ihrem Altar weglocken und teleportieren sich zu dir, wenn du dich auf einer Säule versteckst.")
+                    .h("stages", "Three stages", "Drei Stufen")
+                    .p("stages.text",
+                            "Every boss evolves twice: at two thirds and at one third of its health it changes form, grows, glows brighter and learns new attacks. The boss bar shows the name of its stage.",
+                            "Jeder Boss entwickelt sich zweimal: Bei zwei Dritteln und bei einem Drittel seiner Lebenspunkte verwandelt er sich, wächst, leuchtet stärker und lernt neue Angriffe. Die Lebensleiste zeigt den Namen seiner Stufe.")
+                    .tip("stages.ultimate",
+                            "In its third stage every boss has an ultimate attack of its own. When it starts, your action bar tells you how to survive it.",
+                            "In der dritten Stufe hat jeder Boss einen eigenen Ultimate-Angriff. Wenn er beginnt, sagt dir die Aktionsleiste, wie du ihn überlebst.")
                     .p("bosses.team",
                             "Playing together? A boss gets 50%% more health for each extra player nearby. Everyone who dealt at least 5%% of its health in damage gets their own loot.",
                             "Spielt ihr zusammen? Ein Boss bekommt für jeden weiteren Spieler in der Nähe 50 %% mehr Lebenspunkte. Jeder, der mindestens 5 %% seiner Lebenspunkte als Schaden verursacht hat, bekommt eigene Beute.")
@@ -167,6 +174,9 @@ public final class GuideChapters {
                             "The easy way: a Titansmith sells a map to the nearest shrine for 2 %s and a compass. Frost and Storm maps from level 3 (Journeyman), Tide and Magma maps from level 4 (Expert).",
                             "Der einfache Weg: Ein Titanenschmied verkauft dir eine Karte zum nächsten Schrein für 2 %s und einen Kompass. Frost- und Sturmkarten ab Stufe 3 (Geselle), Gezeiten- und Magmakarten ab Stufe 4 (Experte).",
                             i(coin(CoinTier.GOLD)))
+                    .tip("find.existing",
+                            "Installed the mod in a world you already played? Shrines are also built into land you explored before, at the same spots as in a new world. Where you built something, they move to a free spot nearby instead.",
+                            "Die Mod in einer schon gespielten Welt installiert? Schreine entstehen auch in Land, das du schon erkundet hast, an denselben Stellen wie in einer neuen Welt. Wo du etwas gebaut hast, weichen sie auf einen freien Platz in der Nähe aus.")
                     .h("summon", "Summoning", "Beschwören")
                     .p("summon.text",
                             "Craft the matching Elemental Sigil and use it on the altar in the middle of the shrine. After a short ritual the titan awakens.",
@@ -180,8 +190,8 @@ public final class GuideChapters {
                             "Jeder Altar ruht nach einer Beschwörung 10 Minuten. Ein Titanenschmied auf Stufe 5 (Meister) verkauft auch Siegel.")
                     .h("fight", "The fight", "Der Kampf")
                     .p("fight.text",
-                            "%s 400, %s 450, %s 500 and %s 600 health. At half health each titan turns more aggressive and unlocks new attacks.",
-                            "%s 400, %s 450, %s 500 und %s 600 Lebenspunkte. Bei halbem Leben wird jeder Titan aggressiver und setzt neue Angriffe ein.",
+                            "%s 400, %s 450, %s 500 and %s 600 health. At two thirds and at one third of its health each titan evolves and unlocks new attacks, ending with an ultimate.",
+                            "%s 400, %s 450, %s 500 und %s 600 Lebenspunkte. Bei zwei Dritteln und bei einem Drittel seiner Lebenspunkte entwickelt sich jeder Titan weiter und setzt neue Angriffe ein, zuletzt einen Ultimate-Angriff.",
                             e(Titans.FROST_TITAN), e(Titans.TIDE_TITAN), e(Titans.STORM_TITAN), e(Titans.MAGMA_TITAN))
                     .p("fight.loot",
                             "Loot: its core, %s (3 to 5) and coins.",

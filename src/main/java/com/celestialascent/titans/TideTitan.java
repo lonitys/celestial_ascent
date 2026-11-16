@@ -1,5 +1,6 @@
 package com.celestialascent.titans;
 
+import net.minecraft.world.entity.player.Player;
 import com.celestialascent.boss.BossAttack;
 import com.celestialascent.core.Fx;
 import com.celestialascent.core.Scheduler;
@@ -49,6 +50,9 @@ public class TideTitan extends TitanBoss {
         level().addFreshEntity(tr);
         Scheduler.later(sl(), 80, tr::discard);
     }
+
+    private final java.util.Set<java.util.UUID> waveHits = new java.util.HashSet<>();
+    private Vec3 waveOrigin, waveDir;
 
     @Override
     protected void registerAttacks() {
@@ -137,6 +141,45 @@ public class TideTitan extends TitanBoss {
                         }
                     }
                     if (i % 6 == 0) playSound(SoundEvents.PLAYER_SPLASH_HIGH_SPEED, 1.5f, 0.6f);
+                }));
+    
+        // Stage 3: a wall of water rolls across the arena. Only a jump clears it.
+        attacks.add(BossAttack.of("tsunami").phase(2).range(0, 22).cooldown(360).duration(66).weight(9).animation("attack.tidal_wave")
+                .onStart((b, t, i) -> {
+                    hint("tsunami");
+                    waveHits.clear();
+                    waveOrigin = position();
+                    waveDir = flatDirTo(t);
+                    Vec3 side = new Vec3(-waveDir.z, 0, waveDir.x);
+                    for (int k = -10; k <= 10; k += 2) {
+                        Fx.marker(sl(), ground(waveOrigin.x + side.x * k + waveDir.x * 3, waveOrigin.z + side.z * k + waveDir.z * 3, getY()),
+                                Blocks.LIGHT_BLUE_STAINED_GLASS.defaultBlockState(), 1.4f, 16);
+                    }
+                    playSound(SoundEvents.ELDER_GUARDIAN_AMBIENT, 3f, 0.5f);
+                })
+                .onTick((b, t, i) -> {
+                    if (i < 16 || waveOrigin == null) return;
+                    double dist = (i - 16) * 0.55;
+                    if (dist > 26) return;
+                    Vec3 side = new Vec3(-waveDir.z, 0, waveDir.x);
+                    Vec3 front = waveOrigin.add(waveDir.scale(dist));
+                    for (int k = -10; k <= 10; k++) {
+                        Vec3 q = ground(front.x + side.x * k, front.z + side.z * k, waveOrigin.y);
+                        sl().sendParticles(ParticleTypes.SPLASH, q.x, q.y + 0.6, q.z, 4, 0.2, 0.5, 0.2, 0.1);
+                        if ((k + i) % 3 == 0) sl().sendParticles(ParticleTypes.FALLING_WATER, q.x, q.y + 1.4, q.z, 2, 0.2, 0.2, 0.2, 0);
+                        if (k % 2 == 0) sl().sendParticles(ParticleTypes.BUBBLE_POP, q.x, q.y + 1.0, q.z, 1, 0.3, 0.3, 0.3, 0.02);
+                    }
+                    for (Player p : playersNear(30)) {
+                        Vec3 rel = p.position().subtract(waveOrigin);
+                        double along = rel.x * waveDir.x + rel.z * waveDir.z, across = rel.x * side.x + rel.z * side.z;
+                        if (Math.abs(along - dist) < 0.9 && Math.abs(across) <= 10.5 && p.onGround() && waveHits.add(p.getUUID())) {
+                            hitTarget(p, 12);
+                            p.push(waveDir.x * 1.8, 0.55, waveDir.z * 1.8);
+                            p.hurtMarked = true;
+                            p.setAirSupply(Math.max(0, p.getAirSupply() - 100));
+                        }
+                    }
+                    if (i % 6 == 0) playSound(SoundEvents.PLAYER_SPLASH_HIGH_SPEED, 2f, 0.5f);
                 }));
     }
 

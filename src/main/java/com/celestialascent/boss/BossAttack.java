@@ -28,6 +28,7 @@ public final class BossAttack {
     double maxRange = 64;
     boolean locksMovement = true;
     boolean animated = true;
+    String animation;
     Check extra = (b, t) -> true;
     Tick onStart = (b, t, i) -> {};
     Tick onTick = (b, t, i) -> {};
@@ -35,6 +36,7 @@ public final class BossAttack {
 
     private BossAttack(String id) {
         this.id = id;
+        this.animation = "attack." + id;
     }
 
     public static BossAttack of(String id) {
@@ -49,6 +51,8 @@ public final class BossAttack {
     public BossAttack range(double min, double max) { this.minRange = min; this.maxRange = max; return this; }
     public BossAttack mobile() { this.locksMovement = false; return this; }
     public BossAttack noAnimation() { this.animated = false; return this; }
+    /** Plays another animation of the model (e.g. "attack.slam" or "phase") instead of "attack.&lt;id&gt;". */
+    public BossAttack animation(String name) { this.animation = name; return this; }
     public BossAttack when(Check c) { this.extra = c; return this; }
     public BossAttack onStart(Tick t) { this.onStart = t; return this; }
     public BossAttack onTick(Tick t) { this.onTick = t; return this; }

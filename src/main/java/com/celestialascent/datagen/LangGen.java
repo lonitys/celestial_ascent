@@ -244,7 +244,6 @@ public class LangGen extends LanguageProvider {
         add("message.celestialascent.beacon_deeper", "The beacon only answers deep in the Abyss (below y=40)");
         add("message.celestialascent.sovereign_awakens", "THE VOID SOVEREIGN AWAKENS");
         add("message.celestialascent.sovereign_phase_1", "The Sovereign calls the wraiths of the deep!");
-        add("message.celestialascent.sovereign_phase_2", "The Abyss begins to collapse around you!");
         add("message.celestialascent.sovereign_phase_3", "THE UNMAKING HAS BEGUN");
 
         // ---- progression ----
@@ -260,6 +259,38 @@ public class LangGen extends LanguageProvider {
         add("constellation.celestialascent.leviathan", "The Nebula Coil");
         add("constellation.celestialascent.herald", "The Sun's Herald");
         add("constellation.celestialascent.sovereign", "The Void Sovereign");
+
+        // ---- boss stages ----
+        add("boss.celestialascent.stage", "Stage %s: %s");
+        add("boss.celestialascent.frost_titan.stage2", "Glacial Wrath");
+        add("boss.celestialascent.frost_titan.stage3", "Absolute Zero");
+        add("boss.celestialascent.tide_titan.stage2", "Rising Tide");
+        add("boss.celestialascent.tide_titan.stage3", "Tsunami");
+        add("boss.celestialascent.storm_titan.stage2", "Gathering Storm");
+        add("boss.celestialascent.storm_titan.stage3", "Tempest");
+        add("boss.celestialascent.magma_titan.stage2", "Molten Core");
+        add("boss.celestialascent.magma_titan.stage3", "Cataclysm");
+        add("boss.celestialascent.sentinel_construct.stage2", "Overclocked");
+        add("boss.celestialascent.sentinel_construct.stage3", "Overload");
+        add("boss.celestialascent.ender_colossus.stage2", "Rift Walker");
+        add("boss.celestialascent.ender_colossus.stage3", "Gravity Collapse");
+        add("boss.celestialascent.astral_seraph.stage2", "Radiant Wings");
+        add("boss.celestialascent.astral_seraph.stage3", "Crystal Choir");
+        add("boss.celestialascent.nebula_leviathan.stage2", "Starving Deep");
+        add("boss.celestialascent.nebula_leviathan.stage3", "Devourer of Stars");
+        add("boss.celestialascent.sun_herald.stage2", "Eclipse");
+        add("boss.celestialascent.sun_herald.stage3", "Supernova");
+        add("boss.celestialascent.void_sovereign.stage2", "The Deep Calls");
+        add("boss.celestialascent.void_sovereign.stage3", "The Unmaking");
+
+        // ---- attack hints ----
+        add("message.celestialascent.hint.absolute_zero", "Keep moving or freeze!");
+        add("message.celestialascent.hint.tsunami", "Jump over the wave!");
+        add("message.celestialascent.hint.tempest", "Find a gap in the lightning ring!");
+        add("message.celestialascent.hint.cataclysm", "Stay off the glowing cracks!");
+        add("message.celestialascent.hint.overload", "Jump over the beam!");
+        add("message.celestialascent.hint.crystal_choir", "Break the crystals before they heal it!");
+        add("message.celestialascent.hint.devour", "Run from its maw!");
 
         // ---- codex ----
         add(com.celestialascent.guide.Guide.CODEX.get(), "Celestial Codex");

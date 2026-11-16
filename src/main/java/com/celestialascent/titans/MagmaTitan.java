@@ -28,7 +28,6 @@ public class MagmaTitan extends TitanBoss {
 
     @Override public Element element() { return Element.MAGMA; }
     @Override public double baseMaxHealth() { return 600; }
-    @Override protected float[] phaseThresholds() { return new float[]{0.6f, 0.3f}; }
     @Override protected ParticleOptions ambientParticle() { return ParticleTypes.LAVA; }
 
     private ServerLevel sl() { return (ServerLevel) level(); }
@@ -53,6 +52,35 @@ public class MagmaTitan extends TitanBoss {
                 e.hurtMarked = true;
             }
         });
+    }
+
+    private final java.util.Set<java.util.UUID> fissureHits = new java.util.HashSet<>();
+    private double fissureAngle;
+
+    /** Six lines out from the titan: marked first, then erupting in magma. */
+    private void fissures(double base, boolean erupt) {
+        Vec3 c = position();
+        fissureHits.clear();
+        for (int line = 0; line < 6; line++) {
+            double a = base + line * Math.PI / 3;
+            for (double d = 2; d <= 16; d += 1.3) {
+                Vec3 q = ground(c.x + Math.cos(a) * d, c.z + Math.sin(a) * d, c.y);
+                if (!erupt) {
+                    Fx.marker(sl(), q, Blocks.MAGMA_BLOCK.defaultBlockState(), 1.1f, 20);
+                    continue;
+                }
+                Fx.spike(sl(), q, Blocks.MAGMA_BLOCK.defaultBlockState(), 0.9f, 1.4f + random.nextFloat(), 10, 3, 24, true);
+                sl().sendParticles(ParticleTypes.LAVA, q.x, q.y + 0.5, q.z, 3, 0.3, 0.3, 0.3, 0);
+                sl().sendParticles(ParticleTypes.FLAME, q.x, q.y + 0.5, q.z, 4, 0.3, 0.6, 0.3, 0.02);
+                for (LivingEntity e : level().getEntitiesOfClass(LivingEntity.class, new AABB(q, q).inflate(1.0, 2, 1.0), e -> e != this)) {
+                    if (fissureHits.add(e.getUUID())) {
+                        hitTarget(e, 14);
+                        burn(e, 5);
+                    }
+                }
+            }
+        }
+        playSound(erupt ? SoundEvents.GENERIC_EXPLODE.value() : SoundEvents.LAVA_AMBIENT, 2.5f, 0.5f);
     }
 
     @Override
@@ -125,6 +153,19 @@ public class MagmaTitan extends TitanBoss {
                         }
                     }
                     playSound(SoundEvents.LAVA_POP, 2f, 0.5f);
+                }));
+    
+        // Stage 3: the ground splits in six glowing fissures that erupt, then again, turned.
+        attacks.add(BossAttack.of("cataclysm").phase(2).range(0, 18).cooldown(380).duration(72).weight(9).animation("attack.eruption")
+                .onStart((b, t, i) -> {
+                    hint("cataclysm");
+                    fissureAngle = random.nextDouble() * Math.PI * 2;
+                })
+                .onTick((b, t, i) -> {
+                    if (i == 0) fissures(fissureAngle, false);
+                    if (i == 18) fissures(fissureAngle, true);
+                    if (i == 30) fissures(fissureAngle + Math.PI / 6, false);
+                    if (i == 48) fissures(fissureAngle + Math.PI / 6, true);
                 }));
     }
 
