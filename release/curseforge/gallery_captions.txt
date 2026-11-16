@@ -44,9 +44,9 @@
   Title: Codex recipes
   Description: Crafting and station recipes inside the codex.
 
-12_trade_city.png
+12_trade_city_plains.png
   Title: Trade city
-  Description: Walled towns with a bank, a market of player shops and a relic pavilion.
+  Description: Walled cities with four gates, roads with lamps and outskirts with houses, farms, wells and watchtowers.
 
 13_frost_shrine_view.png
   Title: Frost shrine
@@ -83,3 +83,31 @@
 21_constellations_1.png
   Title: Constellations
   Description: Every boss you defeat adds its constellation to your night sky and a permanent bonus.
+
+22_trade_city_desert.png
+  Title: Desert trade city
+  Description: Every trade city is built in the style of its biome: sandstone and birch in the desert.
+
+23_trade_city_snowy.png
+  Title: Snowy trade city
+  Description: Spruce, stone bricks and deepslate roofs in the snow.
+
+24_trade_city_savanna.png
+  Title: Savanna trade city
+  Description: Mud bricks, acacia and dark oak in the savanna.
+
+25_star_spire.png
+  Title: The Star Spire
+  Description: The quartz and gold spire on the central plaza, crowned by a floating Celestial Crystal.
+
+26_jei_titan_forge.png
+  Title: JEI: station recipes
+  Description: With Just Enough Items installed, every station recipe and armor evolution shows up, drawn like the station itself.
+
+27_jei_boss_summoning.png
+  Title: JEI: boss summoning
+  Description: How to call every boss, where to find it, and what it drops.
+
+28_jei_trades.png
+  Title: JEI: villager trades
+  Description: All Banker, Titansmith and Relic Dealer trades by level.

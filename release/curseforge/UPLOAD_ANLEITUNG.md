@@ -10,7 +10,7 @@ Alles, was du brauchst, liegt in diesem Ordner (`release/curseforge`):
 | `summary.txt` | Kurzbeschreibung für die Projektliste |
 | `description.md` / `description.html` | lange Beschreibung (Englisch) |
 | `changelog.md` | Changelog für die Datei 1.0.0 |
-| `gallery/` + `gallery_captions.txt` | 21 Screenshots mit Titel und Beschreibung |
+| `gallery/` + `gallery_captions.txt` | 28 Screenshots mit Titel und Beschreibung |
 
 CurseForge verlangt Englisch für Titel, Kurzbeschreibung und Beschreibung. Deshalb sind diese Texte englisch. Dass die Mod auch Deutsch kann, steht in der Beschreibung.
 
@@ -74,11 +74,12 @@ Im Projekt **Files → Upload File** öffnen und `celestialascent-1.0.0.jar` hin
 | Environment | **Client** und **Server** |
 | Java | **Java 21** |
 
-Unter **Related Projects** zwei Einträge hinzufügen. Dafür jeweils nach dem Namen suchen:
+Unter **Related Projects** drei Einträge hinzufügen. Dafür jeweils nach dem Namen suchen:
 
 | Projekt | Art |
 |---|---|
 | **GeckoLib** | **Required Dependency** |
+| **Just Enough Items (JEI)** | **Optional Dependency** |
 | **ProjectE** | **Optional Dependency** |
 
 Wichtig: Wähle bei GeckoLib das richtige Projekt. Es ist das von *Gecko*, mit Dateien für 1.21.1 und NeoForge. Der CurseForge-Launcher installiert es dann automatisch mit.
@@ -104,4 +105,4 @@ Danach auf **Submit** bzw. **Upload** klicken.
 - [ ] Banner-Link in der Beschreibung ersetzt (kein `BANNER_IMAGE_URL` mehr sichtbar)
 - [ ] Hauptkategorie und 4 Zusatzkategorien gewählt, Lizenz *All Rights Reserved*
 - [ ] Datei: Release, 1.21.1, NeoForge, Client + Server
-- [ ] GeckoLib als *Required*, ProjectE als *Optional* verknüpft
+- [ ] GeckoLib als *Required*, JEI und ProjectE als *Optional* verknüpft

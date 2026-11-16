@@ -305,13 +305,13 @@ public final class Showcase {
      * current code), then photographs it from above, from the south-east, at the north gate and on the plaza.
      */
     private static void cityTour() {
-        Object[][] tour = {{"trade_city", 56000, 56000}, {"trade_city_desert", -56000, 56000}, {"trade_city_savanna", 56000, -56000},
+        Object[][] tour = {{"trade_city", 56000, 56000}, {"trade_city_desert", -72000, 72000}, {"trade_city_savanna", 56000, -56000},
                 {"trade_city_taiga", -56000, -56000}, {"trade_city_snowy", 0, -70000}};
         for (Object[] c : tour) {
             String id = (String) c[0];
             String v = id.equals("trade_city") ? "plains" : id.substring("trade_city_".length());
             // Named (not null) so -PshowcaseOnly can pick one city; its shot is the first look from above.
-            STEPS.add(new Step(700, p -> findCity(p, id, (Integer) c[1], (Integer) c[2]), "city_" + v + "_find", 0, 90, CameraType.FIRST_PERSON));
+            STEPS.add(new Step(1400, p -> findCity(p, id, (Integer) c[1], (Integer) c[2]), "city_" + v + "_find", 0, 90, CameraType.FIRST_PERSON));
             step(400, "city_" + v + "_top", 0, 90, CameraType.FIRST_PERSON, p -> cityTp(p, 0, 130, 0, 0, 90));
             step(250, "city_" + v + "_aerial", 135, 30, CameraType.FIRST_PERSON, p -> cityTp(p, 62, 48, 62, 135, 30));
             step(200, "city_" + v + "_road", 180, 25, CameraType.FIRST_PERSON, p -> cityTp(p, 0, 30, 85, 180, 25));
