@@ -158,8 +158,8 @@ public final class Empire {
         ArmorSets.bonus(SetId.IMPERIAL, Attributes.ENTITY_INTERACTION_RANGE, "reach", 1.0, AttributeModifier.Operation.ADD_VALUE);
         ArmorSets.bonus(SetId.IMPERIAL, Attributes.BLOCK_INTERACTION_RANGE, "block_reach", 1.0, AttributeModifier.Operation.ADD_VALUE);
 
-        Professions.trade(Professions.RELIC_DEALER, 4, Professions.offer(Professions.coin(CoinTier.ENDER), 1, IMPERIAL_PLATING, 2, 6, 25));
-        Professions.trade(Professions.RELIC_DEALER, 5, Professions.offer(DRAGON_HEART, 1, Professions.coin(CoinTier.ENDER), 4, 2, 40));
+        Professions.trade(Professions.RELIC_DEALER, 4, Professions.coin(CoinTier.ENDER), 1, IMPERIAL_PLATING, 2, 6, 25);
+        Professions.trade(Professions.RELIC_DEALER, 5, DRAGON_HEART, 1, Professions.coin(CoinTier.ENDER), 4, 2, 40);
 
         Emc.set(DRAGON_HEART, 5_000_000);
         Emc.set(IMPERIAL_PLATING, 1_500_000);

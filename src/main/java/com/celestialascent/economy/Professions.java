@@ -22,7 +22,8 @@ import net.neoforged.neoforge.event.village.VillagerTradesEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -55,25 +56,64 @@ public final class Professions {
                 SoundEvents.VILLAGER_WORK_CARTOGRAPHER));
     }
 
-    private static final Map<Supplier<VillagerProfession>, Map<Integer, List<VillagerTrades.ItemListing>>> TRADES = new HashMap<>();
+    /** What a trade looks like for recipe viewers (JEI). The stacks are built when shown; costB may be empty. */
+    public record TradeDisplay(int level, Supplier<ItemStack> costA, Supplier<ItemStack> costB, Supplier<ItemStack> result) {}
 
-    /** Adds a trade for a profession at a villager level (1..5). */
-    public static void trade(Supplier<VillagerProfession> prof, int level, VillagerTrades.ItemListing listing) {
-        TRADES.computeIfAbsent(prof, p -> new HashMap<>()).computeIfAbsent(level, l -> new ArrayList<>()).add(listing);
+    /** A trade listing at a villager level, with its display. */
+    public record Trade(VillagerTrades.ItemListing listing, TradeDisplay display) {}
+
+    private static final Map<Supplier<VillagerProfession>, List<Trade>> TRADES = new LinkedHashMap<>();
+
+    /** Adds a trade for a profession at a villager level (1..5); {@code display} must show what the listing offers. */
+    public static void trade(Supplier<VillagerProfession> prof, int level, VillagerTrades.ItemListing listing, TradeDisplay display) {
+        if (display.level() != level) throw new IllegalArgumentException("Trade display level " + display.level() + " != " + level);
+        TRADES.computeIfAbsent(prof, p -> new ArrayList<>()).add(new Trade(listing, display));
     }
 
     /**
-     * Fixed trade. Items are resolved when the offer is generated, so deferred items may be passed
-     * before registration completes.
+     * Fixed trade. Items are resolved when the offer is generated or shown, so deferred items may be
+     * passed before registration completes.
      */
-    public static VillagerTrades.ItemListing offer(ItemLike cost, int costCount, ItemLike result, int resultCount, int maxUses, int xp) {
+    public static void trade(Supplier<VillagerProfession> prof, int level, ItemLike cost, int costCount, ItemLike result, int resultCount,
+                             int maxUses, int xp) {
+        trade(prof, level, offer(cost, costCount, result, resultCount, maxUses, xp),
+                new TradeDisplay(level, () -> new ItemStack(cost, costCount), () -> ItemStack.EMPTY, () -> new ItemStack(result, resultCount)));
+    }
+
+    /** Fixed trade with two costs. */
+    public static void trade(Supplier<VillagerProfession> prof, int level, ItemLike cost, int costCount, ItemLike cost2, int cost2Count,
+                             ItemLike result, int resultCount, int maxUses, int xp) {
+        trade(prof, level, offer2(cost, costCount, cost2, cost2Count, result, resultCount, maxUses, xp),
+                new TradeDisplay(level, () -> new ItemStack(cost, costCount), () -> new ItemStack(cost2, cost2Count), () -> new ItemStack(result, resultCount)));
+    }
+
+    private static VillagerTrades.ItemListing offer(ItemLike cost, int costCount, ItemLike result, int resultCount, int maxUses, int xp) {
         return (trader, random) -> new MerchantOffer(new ItemCost(cost, costCount), new ItemStack(result, resultCount), maxUses, xp, 0.05f);
     }
 
-    public static VillagerTrades.ItemListing offer2(ItemLike cost, int costCount, ItemLike cost2, int cost2Count,
-                                                    ItemLike result, int resultCount, int maxUses, int xp) {
+    private static VillagerTrades.ItemListing offer2(ItemLike cost, int costCount, ItemLike cost2, int cost2Count,
+                                                     ItemLike result, int resultCount, int maxUses, int xp) {
         return (trader, random) -> new MerchantOffer(new ItemCost(cost, costCount), Optional.of(new ItemCost(cost2, cost2Count)),
                 new ItemStack(result, resultCount), maxUses, xp, 0.05f);
+    }
+
+    /** Every trade of a profession with its display, in the order they were added. */
+    public static List<Trade> trades(Supplier<VillagerProfession> prof) {
+        return List.copyOf(TRADES.getOrDefault(prof, List.of()));
+    }
+
+    /** The displays of a profession's trades, sorted by villager level. */
+    public static List<TradeDisplay> displays(Supplier<VillagerProfession> prof) {
+        return trades(prof).stream().map(Trade::display).sorted(Comparator.comparingInt(TradeDisplay::level)).toList();
+    }
+
+    /** Copper the banker pays per emerald; the default while the config is not loaded (recipe viewers). */
+    private static int emeraldToCopper() {
+        try {
+            return ModConfig.EMERALD_TO_COPPER.get();
+        } catch (IllegalStateException notLoaded) {
+            return ModConfig.EMERALD_TO_COPPER.getDefault();
+        }
     }
 
     /** Deferred coin reference (safe to use before registration). */
@@ -84,38 +124,39 @@ public final class Professions {
     public static void init() {
         // Banker: currency exchange and savings goods.
         trade(BANKER, 1, (trader, random) -> new MerchantOffer(new ItemCost(Items.EMERALD, 1),
-                new ItemStack(coin(CoinTier.COPPER), ModConfig.EMERALD_TO_COPPER.get()), 32, 2, 0.0f));
-        trade(BANKER, 1, offer(coin(CoinTier.COPPER), 8, Items.EMERALD, 1, 32, 2));
-        trade(BANKER, 2, offer(Items.GOLD_INGOT, 4, coin(CoinTier.SILVER), 1, 16, 5));
-        trade(BANKER, 2, offer(Items.DIAMOND, 1, coin(CoinTier.SILVER), 3, 16, 10));
-        trade(BANKER, 3, offer(coin(CoinTier.SILVER), 4, Items.DIAMOND, 1, 12, 10));
-        trade(BANKER, 3, offer(coin(CoinTier.SILVER), 2, Items.NAME_TAG, 1, 8, 10));
-        trade(BANKER, 4, offer(Items.NETHERITE_INGOT, 1, coin(CoinTier.GOLD), 3, 8, 20));
-        trade(BANKER, 4, offer(coin(CoinTier.GOLD), 1, Items.ENDER_PEARL, 8, 8, 15));
-        trade(BANKER, 5, offer(coin(CoinTier.GOLD), 4, Items.NETHERITE_SCRAP, 1, 4, 30));
-        trade(BANKER, 5, offer(coin(CoinTier.GOLD), 2, Items.TOTEM_OF_UNDYING, 1, 2, 30));
+                        new ItemStack(coin(CoinTier.COPPER), emeraldToCopper()), 32, 2, 0.0f),
+                new TradeDisplay(1, () -> new ItemStack(Items.EMERALD), () -> ItemStack.EMPTY, () -> new ItemStack(coin(CoinTier.COPPER), emeraldToCopper())));
+        trade(BANKER, 1, coin(CoinTier.COPPER), 8, Items.EMERALD, 1, 32, 2);
+        trade(BANKER, 2, Items.GOLD_INGOT, 4, coin(CoinTier.SILVER), 1, 16, 5);
+        trade(BANKER, 2, Items.DIAMOND, 1, coin(CoinTier.SILVER), 3, 16, 10);
+        trade(BANKER, 3, coin(CoinTier.SILVER), 4, Items.DIAMOND, 1, 12, 10);
+        trade(BANKER, 3, coin(CoinTier.SILVER), 2, Items.NAME_TAG, 1, 8, 10);
+        trade(BANKER, 4, Items.NETHERITE_INGOT, 1, coin(CoinTier.GOLD), 3, 8, 20);
+        trade(BANKER, 4, coin(CoinTier.GOLD), 1, Items.ENDER_PEARL, 8, 8, 15);
+        trade(BANKER, 5, coin(CoinTier.GOLD), 4, Items.NETHERITE_SCRAP, 1, 4, 30);
+        trade(BANKER, 5, coin(CoinTier.GOLD), 2, Items.TOTEM_OF_UNDYING, 1, 2, 30);
 
         // Titansmith: metals and netherite (titan materials are added by the titans module).
-        trade(TITANSMITH, 1, offer(Items.IRON_INGOT, 6, coin(CoinTier.COPPER), 4, 16, 2));
-        trade(TITANSMITH, 1, offer(coin(CoinTier.COPPER), 6, Items.IRON_BLOCK, 1, 12, 2));
-        trade(TITANSMITH, 2, offer(Items.DIAMOND, 2, coin(CoinTier.SILVER), 5, 12, 10));
-        trade(TITANSMITH, 3, offer(Items.NETHERITE_SCRAP, 1, coin(CoinTier.SILVER), 9, 8, 15));
-        trade(TITANSMITH, 4, offer(coin(CoinTier.GOLD), 2, Items.NETHERITE_UPGRADE_SMITHING_TEMPLATE, 1, 4, 20));
+        trade(TITANSMITH, 1, Items.IRON_INGOT, 6, coin(CoinTier.COPPER), 4, 16, 2);
+        trade(TITANSMITH, 1, coin(CoinTier.COPPER), 6, Items.IRON_BLOCK, 1, 12, 2);
+        trade(TITANSMITH, 2, Items.DIAMOND, 2, coin(CoinTier.SILVER), 5, 12, 10);
+        trade(TITANSMITH, 3, Items.NETHERITE_SCRAP, 1, coin(CoinTier.SILVER), 9, 8, 15);
+        trade(TITANSMITH, 4, coin(CoinTier.GOLD), 2, Items.NETHERITE_UPGRADE_SMITHING_TEMPLATE, 1, 4, 20);
 
         // Relic dealer: rare goods (boss materials are added by the ladder modules).
-        trade(RELIC_DEALER, 1, offer(coin(CoinTier.GOLD), 1, Items.ECHO_SHARD, 2, 8, 10));
-        trade(RELIC_DEALER, 2, offer(coin(CoinTier.GOLD), 3, Items.HEART_OF_THE_SEA, 1, 4, 15));
-        trade(RELIC_DEALER, 3, offer(coin(CoinTier.GOLD), 5, Items.NETHER_STAR, 1, 2, 25));
-        trade(RELIC_DEALER, 4, offer(coin(CoinTier.TITAN), 2, Items.ELYTRA, 1, 1, 30));
-        trade(RELIC_DEALER, 5, offer(coin(CoinTier.TITAN), 3, Items.DRAGON_HEAD, 1, 1, 40));
+        trade(RELIC_DEALER, 1, coin(CoinTier.GOLD), 1, Items.ECHO_SHARD, 2, 8, 10);
+        trade(RELIC_DEALER, 2, coin(CoinTier.GOLD), 3, Items.HEART_OF_THE_SEA, 1, 4, 15);
+        trade(RELIC_DEALER, 3, coin(CoinTier.GOLD), 5, Items.NETHER_STAR, 1, 2, 25);
+        trade(RELIC_DEALER, 4, coin(CoinTier.TITAN), 2, Items.ELYTRA, 1, 1, 30);
+        trade(RELIC_DEALER, 5, coin(CoinTier.TITAN), 3, Items.DRAGON_HEAD, 1, 1, 40);
     }
 
     @SubscribeEvent
     public static void onTrades(VillagerTradesEvent e) {
-        for (Map.Entry<Supplier<VillagerProfession>, Map<Integer, List<VillagerTrades.ItemListing>>> entry : TRADES.entrySet()) {
+        for (Map.Entry<Supplier<VillagerProfession>, List<Trade>> entry : TRADES.entrySet()) {
             if (e.getType() != entry.getKey().get()) continue;
             Int2ObjectMap<List<VillagerTrades.ItemListing>> trades = e.getTrades();
-            entry.getValue().forEach((lvl, list) -> trades.computeIfAbsent((int) lvl, k -> new ArrayList<>()).addAll(list));
+            for (Trade t : entry.getValue()) trades.computeIfAbsent(t.display().level(), k -> new ArrayList<>()).add(t.listing());
         }
     }
 }

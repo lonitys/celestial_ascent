@@ -5,11 +5,16 @@ import com.celestialascent.boss.BossDrops;
 import com.celestialascent.boss.BossSummons;
 import com.celestialascent.core.station.StationRecipe;
 import com.celestialascent.core.station.StationType;
+import com.celestialascent.economy.Professions;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -24,6 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 /** The display data recipe viewers (JEI) show: it has to agree with what the game really does. */
 @GameTestHolder(CelestialAscent.MODID)
@@ -85,6 +91,36 @@ public final class JeiDataTests {
         for (BossSummons.Summon s : BossSummons.all()) {
             h.assertTrue(!BossSummons.drops(s).isEmpty(), s.type().get().getDescriptionId() + " shows its drops");
         }
+        h.succeed();
+    }
+
+    /** Every trade of the three professions has a display, and fixed trades show exactly the offer they make. */
+    @GameTest(template = CoreTests.FLOOR)
+    public static void tradesHaveDisplays(GameTestHelper h) {
+        Villager trader = h.spawn(EntityType.VILLAGER, 1, 2, 1);
+        int compared = 0;
+        for (Supplier<VillagerProfession> prof : List.of(Professions.BANKER, Professions.TITANSMITH, Professions.RELIC_DEALER)) {
+            List<Professions.TradeDisplay> list = Professions.displays(prof);
+            h.assertTrue(list.size() >= 5, "few trades for " + prof.get());
+            for (Professions.TradeDisplay t : list) {
+                h.assertTrue(!t.result().get().isEmpty() && !t.costA().get().isEmpty(), "empty trade display for " + prof.get());
+                h.assertTrue(t.level() >= 1 && t.level() <= 5, "bad level " + t.level());
+            }
+            for (Professions.Trade t : Professions.trades(prof)) {
+                if (t.display().result().get().is(Items.FILLED_MAP)) continue; // shrine maps search the world for a shrine
+                MerchantOffer offer = t.listing().getOffer(trader, trader.getRandom());
+                h.assertTrue(offer != null, prof.get() + ": a fixed trade made no offer");
+                String what = prof.get() + " level " + t.display().level() + " " + offer.getResult();
+                h.assertTrue(ItemStack.isSameItemSameComponents(offer.getCostA(), t.display().costA().get())
+                        && offer.getCostA().getCount() == t.display().costA().get().getCount(), what + ": first cost differs");
+                h.assertTrue(ItemStack.isSameItemSameComponents(offer.getCostB(), t.display().costB().get())
+                        && offer.getCostB().getCount() == t.display().costB().get().getCount(), what + ": second cost differs");
+                h.assertTrue(ItemStack.isSameItemSameComponents(offer.getResult(), t.display().result().get())
+                        && offer.getResult().getCount() == t.display().result().get().getCount(), what + ": result differs");
+                compared++;
+            }
+        }
+        h.assertTrue(compared >= 25, "compared only " + compared + " offers with their displays");
         h.succeed();
     }
 }

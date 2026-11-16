@@ -153,7 +153,7 @@ public final class Stars {
 
     public static void init() {
         ArmorSets.ability(SetId.STELLAR, new StellarAbilities());
-        Professions.trade(Professions.RELIC_DEALER, 5, Professions.offer(Professions.coin(CoinTier.STAR), 1, STARDUST, 8, 6, 40));
+        Professions.trade(Professions.RELIC_DEALER, 5, Professions.coin(CoinTier.STAR), 1, STARDUST, 8, 6, 40);
 
         Emc.set(STARDUST, 800_000);
         Emc.set(DORMANT_STAR_CORE, 20_000_000);

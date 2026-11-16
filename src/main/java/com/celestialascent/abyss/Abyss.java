@@ -179,7 +179,7 @@ public final class Abyss {
         ArmorSets.bonus(SetId.ASCENDANT, Attributes.BLOCK_BREAK_SPEED, "mining", 0.5, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
         ArmorSets.bonus(SetId.ASCENDANT, Attributes.LUCK, "luck", 2, AttributeModifier.Operation.ADD_VALUE);
 
-        Professions.trade(Professions.RELIC_DEALER, 5, Professions.offer(Professions.coin(CoinTier.VOID), 1, VOID_ESSENCE, 6, 4, 50));
+        Professions.trade(Professions.RELIC_DEALER, 5, Professions.coin(CoinTier.VOID), 1, VOID_ESSENCE, 6, 4, 50);
 
         Emc.set(VOID_ESSENCE, 5_000_000);
         Emc.set(VOID_HEART, 250_000_000);
