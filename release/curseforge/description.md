@@ -37,12 +37,14 @@ Each piece of the five sets evolves through three stages. Fight while wearing it
 - **Multiplayer:** boss health scales with the players nearby, and everyone who helps gets their own loot.
 - Animated 3D bosses and armor, floating altars, two new dimensions.
 - **Languages:** English and German.
+- **Optional JEI support:** every station recipe and armor evolution, every boss summon with its drops, every villager trade, and info pages for coins, the Dragon Heart and more.
 - **Optional ProjectE support:** every item has a high EMC value, and Celestial armor repairs itself with your EMC.
 
 ## Requirements
 
 - Minecraft **1.21.1** with **NeoForge 21.1.219** or newer
 - **GeckoLib** 4.9.3 or newer (required)
+- Just Enough Items (optional)
 - ProjectE (optional)
 
 ## Getting started

@@ -67,7 +67,9 @@ neoForge {
             if (project.hasProperty('showcase')) {
                 systemProperty 'celestialascent.showcase', 'true'
                 systemProperty 'celestialascent.showcase.only', project.findProperty('showcaseOnly') ?: ''
-                programArguments.addAll '--quickPlaySingleplayer', 'devworld', '--width', '1600', '--height', '900'
+                // -PshowcaseWorld=<save> uses another world; -PshowcaseAt='x y z yaw pitch' adds a "look_at" shot there.
+                if (project.hasProperty('showcaseAt')) systemProperty 'celestialascent.showcase.at', project.findProperty('showcaseAt').toString()
+                programArguments.addAll '--quickPlaySingleplayer', (project.findProperty('showcaseWorld') ?: 'devworld').toString(), '--width', '1600', '--height', '900'
             }
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
@@ -141,7 +143,8 @@ dependencies {
     // JEI is optional: compile against its API, run the full mod only in dev runs.
     compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
     // The full jar is self-contained (newer JEI POMs also list unpublished build modules).
-    runtimeOnly("mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}") { transitive = false }
+    // -Pjei_runtime_version=... runs a different JEI than the API we compile against (compatibility checks).
+    runtimeOnly("mezz.jei:jei-${minecraft_version}-neoforge:${project.findProperty('jei_runtime_version') ?: jei_version}") { transitive = false }
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

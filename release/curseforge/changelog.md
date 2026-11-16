@@ -6,9 +6,11 @@ First release for Minecraft 1.21.1 (NeoForge 21.1.219+, requires GeckoLib 4.9.3+
 - Every boss evolves through three stages with new model parts, new attacks and an ultimate
 - Five armor sets (Titan, Imperial, Stellar, Void, Ascendant) that evolve through three stages each
 - Two new dimensions: the Fallen Stars and the Abyss
-- Economy: coins, banks, player shops, quest boards, growing villages, trade cities and three villager professions
+- Economy: coins, banks, player shops, quest boards, growing villages and three villager professions
+- Walled trade cities in five biome styles with the Star Spire, a bank, a market hall, a forge, an inn and outskirts; the Celestial Crystal decoration block
 - The Celestial Codex, an in-game guide that shows your next step
 - Constellations with permanent bonuses
 - Structures are also built into land explored before the mod was installed, never over player builds
 - English and German translations
+- Optional JEI support: station recipes, armor evolution, boss summons and drops, villager trades, info pages
 - Optional ProjectE support

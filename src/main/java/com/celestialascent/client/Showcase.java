@@ -283,6 +283,14 @@ public final class Showcase {
         step(300, "ruined_capital", 0, 35, "execute in minecraft:the_end run tp @s -1316 85 60 0 35");
         step(300, "star_gate", 0, 35, "execute in minecraft:the_end run tp @s -1052 75 -725 0 35");
         cityTour();
+        // -PshowcaseAt='x y z yaw pitch': one shot from there (for example a structure the retrogen built)
+        String at = System.getProperty("celestialascent.showcase.at", "");
+        if (!at.isBlank()) {
+            String[] a = at.trim().split(" +");
+            step(500, "look_at", Float.parseFloat(a[3]), Float.parseFloat(a[4]), "effect clear @s", "time set 6000",
+                    "execute in minecraft:overworld run tp @s " + a[0] + " " + a[1] + " " + a[2] + " " + a[3] + " " + a[4]);
+            step(120, "look_at_2", Float.parseFloat(a[3]), Float.parseFloat(a[4]), "tp @s ~ ~ ~ " + a[3] + " " + a[4]);
+        }
     }
 
     // ------------------------------------------------------------------ trade cities
@@ -386,6 +394,8 @@ public final class Showcase {
                 "jei_trades_titansmith", 0, 30, CameraType.FIRST_PERSON));
         STEPS.add(new Step(40, p -> client(() -> com.celestialascent.compat.jei.JeiShowcase.showInfo(new net.minecraft.world.item.ItemStack(
                 com.celestialascent.economy.Economy.coin(com.celestialascent.economy.CoinTier.GOLD)))), "jei_info_coin", 0, 30, CameraType.FIRST_PERSON));
+        STEPS.add(new Step(40, p -> client(() -> com.celestialascent.compat.jei.JeiShowcase.showRecipes(new net.minecraft.world.item.ItemStack(
+                com.celestialascent.economy.Economy.CELESTIAL_CRYSTAL.get()))), "jei_crystal", 0, 30, CameraType.FIRST_PERSON));
         STEPS.add(new Step(10, p -> client(() -> Minecraft.getInstance().setScreen(null)), null, 0, 0, CameraType.FIRST_PERSON));
         // The + button: open a Titan Forge with the materials in the inventory, then let JEI move them in.
         STEPS.add(new Step(30, p -> {
