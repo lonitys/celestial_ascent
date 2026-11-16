@@ -138,15 +138,16 @@ public final class Stars {
 
     static void recipes() {
         // Charge a Dormant Star Core under the night sky (no materials).
-        SKY_ALTAR_TYPE.add(new StationRecipe(s -> s.is(DORMANT_STAR_CORE.get()), List.of(), s -> new ItemStack(STAR_CORE.get())));
+        SKY_ALTAR_TYPE.add(StationRecipe.of(s -> s.is(DORMANT_STAR_CORE.get()), List.of(), s -> new ItemStack(STAR_CORE.get()),
+                () -> List.of(new ItemStack(DORMANT_STAR_CORE.get()))));
         List<Item> imperial = List.of(Empire.HELMET.get(), Empire.CHESTPLATE.get(), Empire.LEGGINGS.get(), Empire.BOOTS.get());
         List<DeferredItem<CelestialArmorItem>> stellar = List.of(HELMET, CHESTPLATE, LEGGINGS, BOOTS);
         for (int i = 0; i < 4; i++) {
             Item base = imperial.get(i);
             Item out = stellar.get(i).get();
-            SKY_ALTAR_TYPE.add(new StationRecipe(s -> s.is(base), List.of(
+            SKY_ALTAR_TYPE.add(StationRecipe.of(s -> s.is(base), List.of(
                     new StationRecipe.Mat(Ingredient.of(STAR_CORE.get()), 1), new StationRecipe.Mat(Ingredient.of(STARDUST.get()), i == 1 ? 24 : 16)),
-                    s -> Empire.upgrade(s, out)));
+                    s -> Empire.upgrade(s, out), () -> List.of(new ItemStack(base))));
         }
     }
 

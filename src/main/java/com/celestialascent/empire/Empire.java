@@ -119,7 +119,7 @@ public final class Empire {
                     ? List.of(new StationRecipe.Mat(Ingredient.of(IMPERIAL_PLATING.get()), 6), new StationRecipe.Mat(Ingredient.of(ENDER_GEAR.get()), 3),
                               new StationRecipe.Mat(Ingredient.of(COLOSSUS_CORE.get()), 1))
                     : List.of(new StationRecipe.Mat(Ingredient.of(IMPERIAL_PLATING.get()), 4), new StationRecipe.Mat(Ingredient.of(ENDER_GEAR.get()), 2));
-            FORGE.add(new StationRecipe(s -> s.is(base), mats, s -> upgrade(s, out)));
+            FORGE.add(StationRecipe.of(s -> s.is(base), mats, s -> upgrade(s, out), () -> List.of(new ItemStack(base))));
         }
     }
 

@@ -171,14 +171,24 @@ public final class ArmorStages {
                 int stageFrom = from;
                 if (piece instanceof TitanArmorItem) {
                     for (Element el : Element.values()) {
-                        ev.station().add(new StationRecipe(s -> s.is(piece) && TitanArmorItem.element(s) == el && stage(s) == stageFrom && ready(s),
-                                titanMats(el, stageFrom), ArmorStages::evolve));
+                        ev.station().add(StationRecipe.of(s -> s.is(piece) && TitanArmorItem.element(s) == el && stage(s) == stageFrom && ready(s),
+                                titanMats(el, stageFrom), ArmorStages::evolve, () -> List.of(sample(piece, el, stageFrom))));
                     }
                 } else {
-                    ev.station().add(new StationRecipe(s -> s.is(piece) && stage(s) == stageFrom && ready(s), ev.mats(stageFrom), ArmorStages::evolve));
+                    ev.station().add(StationRecipe.of(s -> s.is(piece) && stage(s) == stageFrom && ready(s), ev.mats(stageFrom), ArmorStages::evolve,
+                            () -> List.of(sample(piece, null, stageFrom))));
                 }
             }
         }
+    }
+
+    /** A piece at a stage with full resonance, ready to evolve (titan pieces infused with an element): for recipe viewers. */
+    public static ItemStack sample(Item piece, Element elementOrNull, int stage) {
+        ItemStack s = new ItemStack(piece);
+        if (elementOrNull != null) s.set(Titans.ELEMENT.get(), elementOrNull);
+        s.set(STAGE.get(), stage);
+        s.set(RESONANCE.get(), required(s));
+        return s;
     }
 
     // ------------------------------------------------------------------ resonance

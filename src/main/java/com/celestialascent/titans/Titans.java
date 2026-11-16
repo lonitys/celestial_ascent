@@ -182,13 +182,14 @@ public final class Titans {
             DeferredItem<TitanArmorItem> out = titan.get(i);
             for (Element e : Element.values()) {
                 // Netherite piece + core + 4 shards -> infused titan piece (keeps enchantments and name).
-                FORGE.add(new StationRecipe(s -> s.is(base.get()), List.of(
+                FORGE.add(StationRecipe.of(s -> s.is(base.get()), List.of(
                         new StationRecipe.Mat(Ingredient.of(CORES.get(e)), 1), new StationRecipe.Mat(Ingredient.of(TITAN_SHARD), 4)),
-                        s -> infuse(s, out.get(), e)));
+                        s -> infuse(s, out.get(), e), () -> List.of(new ItemStack(base.get()))));
                 // Re-infuse an existing titan piece with a different element: core + 2 shards.
-                FORGE.add(new StationRecipe(s -> s.is(out.get()) && TitanArmorItem.element(s) != e, List.of(
+                Element other = Element.values()[(e.ordinal() + 1) % Element.values().length];
+                FORGE.add(StationRecipe.of(s -> s.is(out.get()) && TitanArmorItem.element(s) != e, List.of(
                         new StationRecipe.Mat(Ingredient.of(CORES.get(e)), 1), new StationRecipe.Mat(Ingredient.of(TITAN_SHARD), 2)),
-                        s -> infuse(s, out.get(), e)));
+                        s -> infuse(s, out.get(), e), () -> List.of(infuse(new ItemStack(base.get()), out.get(), other))));
             }
         }
     }

@@ -32,6 +32,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.DropExperienceBlock;
@@ -123,14 +124,14 @@ public final class Abyss {
         List<Item> asc = List.of(ASC_HELMET.get(), ASC_CHESTPLATE.get(), ASC_LEGGINGS.get(), ASC_BOOTS.get());
         for (int i = 0; i < 4; i++) {
             Item base = stellar.get(i), out = voidSet.get(i);
-            INFUSER.add(new StationRecipe(s -> s.is(base), List.of(
+            INFUSER.add(StationRecipe.of(s -> s.is(base), List.of(
                     new StationRecipe.Mat(Ingredient.of(VOID_ESSENCE.get()), i == 1 ? 12 : 8), new StationRecipe.Mat(Ingredient.of(Stars.STARDUST.get()), 8)),
-                    s -> Empire.upgrade(s, out)));
+                    s -> Empire.upgrade(s, out), () -> List.of(new ItemStack(base))));
             Item vb = voidSet.get(i), ao = asc.get(i);
             StationRecipe.Mat third = i == 1 ? new StationRecipe.Mat(Ingredient.of(VOID_HEART.get()), 1) : new StationRecipe.Mat(Ingredient.of(VOID_ESSENCE.get()), 16);
-            ASCENSION.add(new StationRecipe(s -> s.is(vb), List.of(
+            ASCENSION.add(StationRecipe.of(s -> s.is(vb), List.of(
                     new StationRecipe.Mat(Ingredient.of(PRIMORDIAL_CORE.get()), 1), new StationRecipe.Mat(Ingredient.of(Stars.STAR_CORE.get()), 1), third),
-                    s -> Empire.upgrade(s, ao)));
+                    s -> Empire.upgrade(s, ao), () -> List.of(new ItemStack(vb))));
         }
     }
 
