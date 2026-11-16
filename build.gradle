@@ -32,6 +32,11 @@ repositories {
         url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
         content { includeGroup('software.bernie.geckolib') }
     }
+    maven {
+        name = 'BlameJared (JEI)'
+        url = 'https://maven.blamejared.com/'
+        content { includeGroup('mezz.jei') }
+    }
 }
 
 base {
@@ -133,6 +138,10 @@ configurations {
 
 dependencies {
     implementation "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
+    // JEI is optional: compile against its API, run the full mod only in dev runs.
+    compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
+    // The full jar is self-contained (newer JEI POMs also list unpublished build modules).
+    runtimeOnly("mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}") { transitive = false }
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
@@ -148,6 +157,7 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
             mod_license            : mod_license,
             mod_version            : mod_version,
             geckolib_version       : geckolib_version,
+            jei_version            : jei_version,
     ]
     inputs.properties replaceProperties
     expand replaceProperties
