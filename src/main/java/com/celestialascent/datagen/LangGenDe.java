@@ -384,6 +384,6 @@ public class LangGenDe extends LanguageProvider {
         de("jei.celestialascent.info.bank_counter", "Bewahrt deine Münzen auf einem Konto auf. Dein Guthaben gilt an jeder Bank, bleibt beim Tod erhalten, und Läden und Pylonen können davon abbuchen.\n\nEin Dorfbewohner ohne Beruf daneben wird zum Bankier.");
         de("jei.celestialascent.info.codex", "Jeder Spieler bekommt den Himmelskodex, wenn er zum ersten Mal beitritt. Er zeigt immer deinen nächsten Schritt auf dem Weg nach oben, mit Rezepten.\n\nVerloren? Stell aus einem Buch und einem Amethystsplitter einen neuen her.");
         de("jei.celestialascent.info.armor", "Diese Rüstung entwickelt sich in drei Stufen. Kämpfe damit: Jedes besiegte Monster bringt ein Drittel seiner Lebenspunkte als Resonanz, ein Boss die Hälfte seiner Lebenspunkte.\n\nMit voller Resonanz (600 für Stufe II, 1.800 für Stufe III) schließt du die Entwicklung an der Station des Sets ab. Jede Stufe bringt mehr Rüstung und Härte.");
-        de("jei.celestialascent.info.celestial_crystal", "Ein schwebender, sich drehender Kristall, der seine Umgebung erhellt (Lichtstufe 15). Er krönt die Sternenspitze in Handelsstädten.\n\nHergestellt aus 4 Amethystsplittern, einem Goldbarren und Glowstonestaub.");
+        de("jei.celestialascent.info.celestial_crystal", "Ein schwebender, sich drehender Kristall, der seine Umgebung erhellt (Lichtstufe 15). Er krönt den Sternenturm in Handelsstädten.\n\nHergestellt aus 4 Amethystsplittern, einem Goldbarren und Glowstonestaub.");
     }
 }
