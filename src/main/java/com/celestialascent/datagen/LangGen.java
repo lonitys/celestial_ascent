@@ -317,5 +317,34 @@ public class LangGen extends LanguageProvider {
         add("tooltip.celestialascent.codex", "Right-click to read");
         add("message.celestialascent.codex_given", "You received the Celestial Codex. Right-click it to see what to do next.");
         for (var e : com.celestialascent.guide.GuideBook.strings().entrySet()) add(e.getKey(), e.getValue()[0]);
+
+        // ---- JEI (only shown when JEI is installed) ----
+        add("jei.celestialascent.summon", "Boss Summoning");
+        add("jei.celestialascent.trades.banker", "Banker Trades");
+        add("jei.celestialascent.trades.titansmith", "Titansmith Trades");
+        add("jei.celestialascent.trades.relic_dealer", "Relic Dealer Trades");
+        add("jei.celestialascent.time", "Takes %s s");
+        add("jei.celestialascent.needs_resonance", "Needs full resonance (%s)");
+        add("jei.celestialascent.level", "Level %s");
+        add("jei.celestialascent.health", "Health: %s");
+        add("jei.celestialascent.drop_count", "Drops %s");
+        add("jei.celestialascent.drop_looting", "Looting: up to +1 per level");
+        add("jei.celestialascent.drop_each", "Every player at the fight gets their own loot");
+        add("jei.celestialascent.where.shrine", "Use its Elemental Sigil on the altar in the middle of its shrine. Frost, Tide and Storm shrines are in the Overworld, the Magma shrine is in the Nether.");
+        add("jei.celestialascent.where.end", "Defeat it in the End: every player within 200 blocks receives a Dragon Heart. Four End Crystals on the exit portal call it again.");
+        add("jei.celestialascent.where.capital", "Guards the pylons of the Ruined Capital on the outer End islands. It appears when you come close to a pylon that is not restored yet.");
+        add("jei.celestialascent.where.throne", "Use a Dragon Heart on the empty throne in the throne hall of the Ruined Capital.");
+        add("jei.celestialascent.where.fallen_stars", "Offer 16 Stardust at its altar in a sanctum of the Fallen Stars.");
+        add("jei.celestialascent.where.herald", "Offer 16 Stardust at its altar in the Fallen Stars, once you have defeated the Astral Seraph and the Nebula Leviathan.");
+        add("jei.celestialascent.where.abyss", "Use the Abyssal Beacon below height 40 in the Abyss.");
+        add("jei.celestialascent.info.coins", "Aster coins come in seven tiers, each worth ten of the tier below. Bankers exchange emeralds for coins, and bosses and Quest Boards pay in coins.\n\nPut a coin in the crafting grid to split it into ten of the tier below. To combine small coins, deposit them at a Bank Counter and withdraw bigger ones.");
+        add("jei.celestialascent.info.dragon_heart", "When the Ender Dragon dies, every player within 200 blocks receives a Dragon Heart. Respawn the dragon with four End Crystals for more.\n\nYou need hearts for the Star Compass, to wake the Ender Colossus and for the last evolution of Ascendant armor.");
+        add("jei.celestialascent.info.dormant_star_core", "Dropped by the Celestials of the Fallen Stars. Charge it in a Sky Altar in the Overworld, at night under open sky, to get a Star Core.");
+        add("jei.celestialascent.info.shop_stall", "Your own shop: fill its stock and set a price and bundle size. Buyers pay with coins or their bank balance, and the money goes straight into your account, even while you are offline.\n\nEmpty stalls in trade cities can be rented for 100 coins: sneak and right-click.");
+        add("jei.celestialascent.info.quest_board", "Offers three delivery quests each day. They pay coins and raise the village's prosperity. At each prosperity level the village builds something new by itself.");
+        add("jei.celestialascent.info.bank_counter", "Keeps your coins in an account. Your balance works at every bank, survives death, and shops and pylons can take payment from it.\n\nA villager without a job next to it becomes a Banker.");
+        add("jei.celestialascent.info.codex", "Every player receives the Celestial Codex when first joining. It always shows your next step on the ladder, with recipes.\n\nLost it? Craft a new one from a book and an amethyst shard.");
+        add("jei.celestialascent.info.armor", "This armor evolves through three stages. Fight while wearing it: every monster you defeat adds a third of its health as resonance, a boss half of its health.\n\nWith full resonance (600 for stage II, 1,800 for stage III) complete the evolution at the set's station. Each stage adds armor and toughness.");
+        add("jei.celestialascent.info.celestial_crystal", "A floating, turning crystal that lights up its surroundings (light level 15). It crowns the Star Spire in trade cities.\n\nCrafted from 4 amethyst shards, a gold ingot and glowstone dust.");
     }
 }

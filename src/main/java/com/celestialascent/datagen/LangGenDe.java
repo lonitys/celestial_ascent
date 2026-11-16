@@ -356,5 +356,34 @@ public class LangGenDe extends LanguageProvider {
         de("item.celestialascent.celestial_codex", "Himmelskodex");
         de("tooltip.celestialascent.codex", "Rechtsklick zum Lesen");
         de("message.celestialascent.codex_given", "Du hast den Himmelskodex erhalten. Rechtsklicke ihn, um zu sehen, was als Nächstes zu tun ist.");
+
+        // ---- JEI (only shown when JEI is installed) ----
+        de("jei.celestialascent.summon", "Bossbeschwörung");
+        de("jei.celestialascent.trades.banker", "Bankier-Angebote");
+        de("jei.celestialascent.trades.titansmith", "Titanenschmied-Angebote");
+        de("jei.celestialascent.trades.relic_dealer", "Reliquienhändler-Angebote");
+        de("jei.celestialascent.time", "Dauer: %s s");
+        de("jei.celestialascent.needs_resonance", "Braucht volle Resonanz (%s)");
+        de("jei.celestialascent.level", "Stufe %s");
+        de("jei.celestialascent.health", "Lebenspunkte: %s");
+        de("jei.celestialascent.drop_count", "Beute: %s");
+        de("jei.celestialascent.drop_looting", "Plünderung: bis zu +1 pro Stufe");
+        de("jei.celestialascent.drop_each", "Jeder Spieler beim Kampf bekommt eigene Beute");
+        de("jei.celestialascent.where.shrine", "Benutze sein Elementarsiegel am Altar in der Mitte seines Schreins. Frost-, Gezeiten- und Sturmschreine liegen in der Oberwelt, der Magmaschrein im Nether.");
+        de("jei.celestialascent.where.end", "Besiege ihn im End: Jeder Spieler im Umkreis von 200 Blöcken bekommt ein Drachenherz. Vier Endkristalle auf dem Ausgangsportal rufen ihn erneut.");
+        de("jei.celestialascent.where.capital", "Bewacht die Pylonen der verfallenen Hauptstadt auf den äußeren Endinseln. Es erscheint, wenn du einem Pylon nahe kommst, der noch nicht wiederhergestellt ist.");
+        de("jei.celestialascent.where.throne", "Benutze ein Drachenherz am leeren Thron in der Thronhalle der verfallenen Hauptstadt.");
+        de("jei.celestialascent.where.fallen_stars", "Opfere 16 Sternenstaub an seinem Altar in einem Heiligtum der Gefallenen Sterne.");
+        de("jei.celestialascent.where.herald", "Opfere 16 Sternenstaub an seinem Altar in den Gefallenen Sternen, sobald du den Astralseraph und den Nebelleviathan besiegt hast.");
+        de("jei.celestialascent.where.abyss", "Benutze das Abgrundleuchtfeuer unterhalb von Höhe 40 im Abgrund.");
+        de("jei.celestialascent.info.coins", "Aster-Münzen gibt es in sieben Stufen, jede ist zehn Münzen der Stufe darunter wert. Bankiers tauschen Smaragde gegen Münzen, und Bosse und Auftragstafeln zahlen in Münzen.\n\nLeg eine Münze ins Handwerksfeld, um sie in zehn der Stufe darunter zu teilen. Um kleine Münzen zusammenzulegen, zahl sie an einem Bankschalter ein und heb größere ab.");
+        de("jei.celestialascent.info.dragon_heart", "Wenn der Enderdrache stirbt, bekommt jeder Spieler im Umkreis von 200 Blöcken ein Drachenherz. Mit vier Endkristallen beschwörst du den Drachen erneut und bekommst weitere.\n\nDu brauchst Herzen für den Sternenkompass, um den Ender-Koloss zu wecken und für die letzte Entwicklung der Aufgestiegenen Rüstung.");
+        de("jei.celestialascent.info.dormant_star_core", "Die Himmlischen der Gefallenen Sterne lassen ihn fallen. Lade ihn in einem Himmelsaltar in der Oberwelt auf, nachts unter offenem Himmel, um einen Sternkern zu bekommen.");
+        de("jei.celestialascent.info.shop_stall", "Dein eigener Laden: Füll sein Lager und leg Preis und Bündelgröße fest. Käufer zahlen mit Münzen oder ihrem Bankguthaben, und das Geld geht direkt auf dein Konto, auch wenn du offline bist.\n\nFreie Stände in Handelsstädten kannst du für 100 Münzen mieten: schleichen und rechtsklicken.");
+        de("jei.celestialascent.info.quest_board", "Bietet jeden Tag drei Lieferaufträge. Sie bringen Münzen und steigern den Wohlstand des Dorfes. Bei jeder Wohlstandsstufe baut das Dorf von selbst etwas Neues.");
+        de("jei.celestialascent.info.bank_counter", "Bewahrt deine Münzen auf einem Konto auf. Dein Guthaben gilt an jeder Bank, bleibt beim Tod erhalten, und Läden und Pylonen können davon abbuchen.\n\nEin Dorfbewohner ohne Beruf daneben wird zum Bankier.");
+        de("jei.celestialascent.info.codex", "Jeder Spieler bekommt den Himmelskodex, wenn er zum ersten Mal beitritt. Er zeigt immer deinen nächsten Schritt auf dem Weg nach oben, mit Rezepten.\n\nVerloren? Stell aus einem Buch und einem Amethystsplitter einen neuen her.");
+        de("jei.celestialascent.info.armor", "Diese Rüstung entwickelt sich in drei Stufen. Kämpfe damit: Jedes besiegte Monster bringt ein Drittel seiner Lebenspunkte als Resonanz, ein Boss die Hälfte seiner Lebenspunkte.\n\nMit voller Resonanz (600 für Stufe II, 1.800 für Stufe III) schließt du die Entwicklung an der Station des Sets ab. Jede Stufe bringt mehr Rüstung und Härte.");
+        de("jei.celestialascent.info.celestial_crystal", "Ein schwebender, sich drehender Kristall, der seine Umgebung erhellt (Lichtstufe 15). Er krönt die Sternenspitze in Handelsstädten.\n\nHergestellt aus 4 Amethystsplittern, einem Goldbarren und Glowstonestaub.");
     }
 }

@@ -39,3 +39,10 @@ Climb the Celestial Ascent: hunt four Elemental Titans, restore the Lost Ender E
     versionRange="*"
     ordering="AFTER"
     side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="jei"
+    type="optional"
+    versionRange="[19.0,)"
+    ordering="NONE"
+    side="BOTH"

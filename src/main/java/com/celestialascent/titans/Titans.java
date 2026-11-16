@@ -157,8 +157,20 @@ public final class Titans {
             MapItem.renderBiomePreviewMap(level, map);
             MapItemSavedData.addTargetDecoration(map, pos, "+", MapDecorationTypes.RED_X);
             map.set(DataComponents.ITEM_NAME, Component.translatable("filled_map.celestialascent." + e.key + "_shrine"));
-            return new MerchantOffer(new ItemCost(Professions.coin(CoinTier.GOLD), 2), Optional.of(new ItemCost(Items.COMPASS)), map, 1, 15, 0.2f);
+            return new MerchantOffer(new ItemCost(Professions.coin(CoinTier.GOLD), SHRINE_MAP_GOLD), Optional.of(new ItemCost(Items.COMPASS)), map, 1, 15, 0.2f);
         };
+    }
+
+    private static final int SHRINE_MAP_GOLD = 2;
+
+    /** What a shrine map trade shows in recipe viewers: the same costs and a named filled map. */
+    private static Professions.TradeDisplay shrineMapDisplay(int level, Element e) {
+        return new Professions.TradeDisplay(level, () -> new ItemStack(Professions.coin(CoinTier.GOLD), SHRINE_MAP_GOLD), () -> new ItemStack(Items.COMPASS),
+                () -> {
+                    ItemStack map = new ItemStack(Items.FILLED_MAP);
+                    map.set(DataComponents.ITEM_NAME, Component.translatable("filled_map.celestialascent." + e.key + "_shrine"));
+                    return map;
+                });
     }
 
     private static ItemStack infuse(ItemStack base, Item result, Element e) {
@@ -182,13 +194,14 @@ public final class Titans {
             DeferredItem<TitanArmorItem> out = titan.get(i);
             for (Element e : Element.values()) {
                 // Netherite piece + core + 4 shards -> infused titan piece (keeps enchantments and name).
-                FORGE.add(new StationRecipe(s -> s.is(base.get()), List.of(
+                FORGE.add(StationRecipe.of(s -> s.is(base.get()), List.of(
                         new StationRecipe.Mat(Ingredient.of(CORES.get(e)), 1), new StationRecipe.Mat(Ingredient.of(TITAN_SHARD), 4)),
-                        s -> infuse(s, out.get(), e)));
+                        s -> infuse(s, out.get(), e), () -> List.of(new ItemStack(base.get()))));
                 // Re-infuse an existing titan piece with a different element: core + 2 shards.
-                FORGE.add(new StationRecipe(s -> s.is(out.get()) && TitanArmorItem.element(s) != e, List.of(
+                Element other = Element.values()[(e.ordinal() + 1) % Element.values().length];
+                FORGE.add(StationRecipe.of(s -> s.is(out.get()) && TitanArmorItem.element(s) != e, List.of(
                         new StationRecipe.Mat(Ingredient.of(CORES.get(e)), 1), new StationRecipe.Mat(Ingredient.of(TITAN_SHARD), 2)),
-                        s -> infuse(s, out.get(), e)));
+                        s -> infuse(s, out.get(), e), () -> List.of(infuse(new ItemStack(base.get()), out.get(), other))));
             }
         }
     }
@@ -196,14 +209,14 @@ public final class Titans {
     public static void init() {
         ArmorSets.ability(SetId.TITAN, new TitanAbilities());
 
-        Professions.trade(Professions.TITANSMITH, 2, Professions.offer(TITAN_SHARD, 1, Professions.coin(CoinTier.GOLD), 2, 16, 10));
-        Professions.trade(Professions.TITANSMITH, 3, shrineMap(Element.FROST));
-        Professions.trade(Professions.TITANSMITH, 3, shrineMap(Element.STORM));
-        Professions.trade(Professions.TITANSMITH, 4, shrineMap(Element.TIDE));
-        Professions.trade(Professions.TITANSMITH, 4, shrineMap(Element.MAGMA));
+        Professions.trade(Professions.TITANSMITH, 2, TITAN_SHARD, 1, Professions.coin(CoinTier.GOLD), 2, 16, 10);
+        Professions.trade(Professions.TITANSMITH, 3, shrineMap(Element.FROST), shrineMapDisplay(3, Element.FROST));
+        Professions.trade(Professions.TITANSMITH, 3, shrineMap(Element.STORM), shrineMapDisplay(3, Element.STORM));
+        Professions.trade(Professions.TITANSMITH, 4, shrineMap(Element.TIDE), shrineMapDisplay(4, Element.TIDE));
+        Professions.trade(Professions.TITANSMITH, 4, shrineMap(Element.MAGMA), shrineMapDisplay(4, Element.MAGMA));
         for (Element e : Element.values()) {
-            Professions.trade(Professions.TITANSMITH, 5, Professions.offer2(Professions.coin(CoinTier.TITAN), 1, Items.NETHERITE_SCRAP, 2, SIGILS.get(e), 1, 3, 30));
-            Professions.trade(Professions.RELIC_DEALER, 3, Professions.offer(CORES.get(e), 1, Professions.coin(CoinTier.TITAN), 2, 4, 20));
+            Professions.trade(Professions.TITANSMITH, 5, Professions.coin(CoinTier.TITAN), 1, Items.NETHERITE_SCRAP, 2, SIGILS.get(e), 1, 3, 30);
+            Professions.trade(Professions.RELIC_DEALER, 3, CORES.get(e), 1, Professions.coin(CoinTier.TITAN), 2, 4, 20);
         }
 
         Emc.set(TITAN_SHARD, 250_000);

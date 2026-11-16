@@ -119,7 +119,7 @@ public final class Empire {
                     ? List.of(new StationRecipe.Mat(Ingredient.of(IMPERIAL_PLATING.get()), 6), new StationRecipe.Mat(Ingredient.of(ENDER_GEAR.get()), 3),
                               new StationRecipe.Mat(Ingredient.of(COLOSSUS_CORE.get()), 1))
                     : List.of(new StationRecipe.Mat(Ingredient.of(IMPERIAL_PLATING.get()), 4), new StationRecipe.Mat(Ingredient.of(ENDER_GEAR.get()), 2));
-            FORGE.add(new StationRecipe(s -> s.is(base), mats, s -> upgrade(s, out)));
+            FORGE.add(StationRecipe.of(s -> s.is(base), mats, s -> upgrade(s, out), () -> List.of(new ItemStack(base))));
         }
     }
 
@@ -158,8 +158,8 @@ public final class Empire {
         ArmorSets.bonus(SetId.IMPERIAL, Attributes.ENTITY_INTERACTION_RANGE, "reach", 1.0, AttributeModifier.Operation.ADD_VALUE);
         ArmorSets.bonus(SetId.IMPERIAL, Attributes.BLOCK_INTERACTION_RANGE, "block_reach", 1.0, AttributeModifier.Operation.ADD_VALUE);
 
-        Professions.trade(Professions.RELIC_DEALER, 4, Professions.offer(Professions.coin(CoinTier.ENDER), 1, IMPERIAL_PLATING, 2, 6, 25));
-        Professions.trade(Professions.RELIC_DEALER, 5, Professions.offer(DRAGON_HEART, 1, Professions.coin(CoinTier.ENDER), 4, 2, 40));
+        Professions.trade(Professions.RELIC_DEALER, 4, Professions.coin(CoinTier.ENDER), 1, IMPERIAL_PLATING, 2, 6, 25);
+        Professions.trade(Professions.RELIC_DEALER, 5, DRAGON_HEART, 1, Professions.coin(CoinTier.ENDER), 4, 2, 40);
 
         Emc.set(DRAGON_HEART, 5_000_000);
         Emc.set(IMPERIAL_PLATING, 1_500_000);

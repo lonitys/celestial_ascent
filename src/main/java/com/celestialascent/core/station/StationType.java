@@ -7,6 +7,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +46,11 @@ public final class StationType {
 
     public static StationType byId(String id) {
         return BY_ID.get(id);
+    }
+
+    /** Every station type, in registration order. */
+    public static Collection<StationType> all() {
+        return BY_ID.values();
     }
 
     public StationType condition(BiPredicate<Level, BlockPos> c, String translationKey) {
