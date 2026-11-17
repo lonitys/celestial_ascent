@@ -44,3 +44,4 @@ tools/art/__pycache__/
 dist/
 release/curseforge/*.jar
 .claude/
+release/curseforge/files/
